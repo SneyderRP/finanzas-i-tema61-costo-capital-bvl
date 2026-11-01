@@ -7,7 +7,7 @@ metodos del articulo y sirve de guion para la disertacion.
 
 ---
 
-## 2026-10-25 - Montaje del proyecto
+## 2026-11-01 - Montaje del proyecto
 
 - Se crea la estructura de las tres subcarpetas del numeral 2.5.
 - Se inicia el repositorio GitHub, para que el historial refleje el proceso
