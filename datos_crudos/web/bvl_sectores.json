@@ -1,0 +1,38 @@
+[
+ {
+  "sectorCode": "CA",
+  "description": "ADMINISTRADORAS DE FONDOS DE PENSIONES"
+ },
+ {
+  "sectorCode": "CD",
+  "description": "DIVERSAS"
+ },
+ {
+  "sectorCode": "CS",
+  "description": "SEGUROS"
+ },
+ {
+  "sectorCode": "CG",
+  "description": "AGRARIO"
+ },
+ {
+  "sectorCode": "CB",
+  "description": "BANCOS Y FINANCIERAS"
+ },
+ {
+  "sectorCode": "FI",
+  "description": "FONDOS DE INVERSIÓN"
+ },
+ {
+  "sectorCode": "CM",
+  "description": "MINERAS"
+ },
+ {
+  "sectorCode": "CP",
+  "description": "SERVICIOS PÚBLICOS"
+ },
+ {
+  "sectorCode": "CI",
+  "description": "INDUSTRIALES"
+ }
+]

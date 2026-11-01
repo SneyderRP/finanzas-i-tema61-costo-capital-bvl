@@ -1,1 +1,71 @@
 [2026-10-25 23:24:34] Montaje de la Carpeta 3: config y utilidades escritos
+[2026-11-01 00:27:12] Montaje de la Carpeta 3: config y utilidades escritos
+[2026-11-01 01:08:29] GET /v1/sector | HTTP 200
+[2026-11-01 01:08:29] Catalogo de sectores guardado | filas=9
+[2026-11-01 01:08:30] POST /v1/stock-quote/market {"sector": "CM", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:30] Sector CM (MINERAS) | filas=17
+[2026-11-01 01:08:32] POST /v1/stock-quote/market {"sector": "CB", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:32] Sector CB (BANCOS Y FINANCIERAS) | filas=4
+[2026-11-01 01:08:34] POST /v1/stock-quote/market {"sector": "CI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:34] Sector CI (INDUSTRIALES) | filas=9
+[2026-11-01 01:08:35] POST /v1/stock-quote/market {"sector": "CD", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:35] Sector CD (DIVERSAS) | filas=15
+[2026-11-01 01:08:37] POST /v1/stock-quote/market {"sector": "CP", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:37] Sector CP (SERVICIOS PÚBLICOS) | filas=6
+[2026-11-01 01:08:39] POST /v1/stock-quote/market {"sector": "CG", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:39] Sector CG (AGRARIO) | filas=2
+[2026-11-01 01:08:40] POST /v1/stock-quote/market {"sector": "CS", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:40] Sector CS (SEGUROS) | filas=1
+[2026-11-01 01:08:42] POST /v1/stock-quote/market {"sector": "CA", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:42] Sector CA (ADMINISTRADORAS DE FONDOS DE PENSIONES) | filas=0
+[2026-11-01 01:08:43] POST /v1/stock-quote/market {"sector": "FI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 01:08:43] Sector FI (FONDOS DE INVERSIÓN) | filas=26
+[2026-11-01 01:08:44] Guardado datos_crudos_web_2024200522B.csv | filas=80
+[2026-11-01 01:08:44] Los 19 tickers de las carteras estan presentes
+[2026-11-01 01:29:02] Ventana congelada: 2021-11-01 a 2026-10-31 (epoch 1635724800 a 1793404800)
+[2026-11-01 01:29:02] GET https://query1.finance.yahoo.com/v8/finance/chart/ALICORC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:03] ALICORC1 | filas=1244
+[2026-11-01 01:29:04] GET https://query1.finance.yahoo.com/v8/finance/chart/ATACOBC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:05] ATACOBC1 | filas=1253
+[2026-11-01 01:29:05] GET https://query1.finance.yahoo.com/v8/finance/chart/BACKUSI1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:07] BACKUSI1 | filas=1246
+[2026-11-01 01:29:07] GET https://query1.finance.yahoo.com/v8/finance/chart/BBVAC1.LM?period1=1635724800&period2=17934 | HTTP 200 JSON
+[2026-11-01 01:29:08] BBVAC1 | filas=1243
+[2026-11-01 01:29:09] GET https://query1.finance.yahoo.com/v8/finance/chart/BUENAVI1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:10] BUENAVI1 | filas=1254
+[2026-11-01 01:29:10] GET https://query1.finance.yahoo.com/v8/finance/chart/CORAREI1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:12] CORAREI1 | filas=1243
+[2026-11-01 01:29:12] GET https://query1.finance.yahoo.com/v8/finance/chart/CPACASC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:13] CPACASC1 | filas=1245
+[2026-11-01 01:29:14] GET https://query1.finance.yahoo.com/v8/finance/chart/CREDITC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:15] CREDITC1 | filas=1245
+[2026-11-01 01:29:15] GET https://query1.finance.yahoo.com/v8/finance/chart/CVERDEC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:17] CVERDEC1 | filas=1243
+[2026-11-01 01:29:17] GET https://query1.finance.yahoo.com/v8/finance/chart/GLORIAI1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:18] GLORIAI1 | filas=1253
+[2026-11-01 01:29:18] GET https://query1.finance.yahoo.com/v8/finance/chart/INRETC1.LM?period1=1635724800&period2=1793 | HTTP 200 JSON
+[2026-11-01 01:29:20] INRETC1 | filas=1243
+[2026-11-01 01:29:20] GET https://query1.finance.yahoo.com/v8/finance/chart/INTERBC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:22] INTERBC1 | filas=1254
+[2026-11-01 01:29:22] GET https://query1.finance.yahoo.com/v8/finance/chart/MINSURI1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:23] MINSURI1 | filas=1244
+[2026-11-01 01:29:23] GET https://query1.finance.yahoo.com/v8/finance/chart/NEXAPEC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:25] NEXAPEC1 | filas=1243
+[2026-11-01 01:29:25] GET https://query1.finance.yahoo.com/v8/finance/chart/SCCO?period1=1635724800&period2=1793404800 | HTTP 200 JSON
+[2026-11-01 01:29:27] SCCO | filas=1255
+[2026-11-01 01:29:27] GET https://query1.finance.yahoo.com/v8/finance/chart/SCOTIAC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:28] SCOTIAC1 | filas=1254
+[2026-11-01 01:29:28] GET https://query1.finance.yahoo.com/v8/finance/chart/SIDERC1.LM?period1=1635724800&period2=1793 | HTTP 200 JSON
+[2026-11-01 01:29:30] SIDERC1 | filas=1247
+[2026-11-01 01:29:30] GET https://query1.finance.yahoo.com/v8/finance/chart/UNACEMC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:32] UNACEMC1 | filas=1245
+[2026-11-01 01:29:32] GET https://query1.finance.yahoo.com/v8/finance/chart/VOLCABC1.LM?period1=1635724800&period2=179 | HTTP 200 JSON
+[2026-11-01 01:29:33] VOLCABC1 | filas=1243
+[2026-11-01 01:29:33] Crudo de precios guardado | filas=23697
+[2026-11-01 01:29:33] AVISO: la serie 'cobre' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 01:29:33] AVISO: la serie 'oro' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 01:29:33] AVISO: la serie 'zinc' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 01:29:33] AVISO: la serie 'tasa_activa' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 01:29:34] GET https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD38026MD/json/2021-11-1/2026-10-31 | HTTP 200 NO-JSON
+[2026-11-01 01:29:34] Incidencia registrada: https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD38026MD/json/2021-11-1/2026-10-31/esp (HTTP 200 (pagina antibot))
+[2026-11-01 01:29:34] BCRPData no disponible: BCRPData

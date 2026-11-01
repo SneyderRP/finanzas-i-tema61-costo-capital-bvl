@@ -1,0 +1,28 @@
+{
+ "up": 0,
+ "down": 0,
+ "equal": 1,
+ "content": [
+  {
+   "companyCode": "67200",
+   "companyName": "RIMAC SEGUROS Y REASEGUROS",
+   "shortName": "Rímac Seguros y Reaseg.",
+   "nemonico": "RIMSEGC1",
+   "sectorCode": "CS",
+   "sectorDescription": "SEGUROS",
+   "previousDate": "2026-09-22",
+   "buy": 1.25,
+   "sell": 1.4,
+   "previous": 1.38,
+   "negotiatedQuantity": "496",
+   "negotiatedAmount": 694.0,
+   "negotiatedNationalAmount": 694.0,
+   "operationsNumber": "1",
+   "currency": "S/",
+   "unity": "1",
+   "segment": "RV1",
+   "createdDate": "2026-10-30T17:40:59.477",
+   "numNeg": "0"
+  }
+ ]
+}
