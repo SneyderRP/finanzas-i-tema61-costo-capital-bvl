@@ -1,0 +1,115 @@
+===== Mineria =====
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:       Y_retorno_sector   R-squared:                       0.766
+Model:                            OLS   Adj. R-squared:                  0.765
+Method:                 Least Squares   F-statistic:                     289.6
+Date:                Mon, 02 Nov 2026   Prob (F-statistic):          4.27e-132
+Time:                        00:03:20   Log-Likelihood:                -1164.9
+No. Observations:                 918   AIC:                             2338.
+Df Residuals:                     914   BIC:                             2357.
+Df Model:                           3                                         
+Covariance Type:                  HAC                                         
+======================================================================================
+                         coef    std err          z      P>|z|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept             -0.0168      0.029     -0.588      0.557      -0.073       0.039
+X1_retorno_mercado     1.6155      0.091     17.818      0.000       1.438       1.793
+X2_treasury_10a       -0.6096      0.395     -1.545      0.122      -1.383       0.164
+X3_tipo_cambio         0.0191      0.038      0.503      0.615      -0.055       0.094
+==============================================================================
+Omnibus:                      143.648   Durbin-Watson:                   2.051
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             2104.547
+Skew:                          -0.030   Prob(JB):                         0.00
+Kurtosis:                      10.417   Cond. No.                         21.7
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 5 lags and without small sample correction
+
+===== Banca =====
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:       Y_retorno_sector   R-squared:                       0.588
+Model:                            OLS   Adj. R-squared:                  0.587
+Method:                 Least Squares   F-statistic:                     304.5
+Date:                Mon, 02 Nov 2026   Prob (F-statistic):          5.27e-137
+Time:                        00:03:20   Log-Likelihood:                -1344.3
+No. Observations:                 918   AIC:                             2697.
+Df Residuals:                     914   BIC:                             2716.
+Df Model:                           3                                         
+Covariance Type:                  HAC                                         
+======================================================================================
+                         coef    std err          z      P>|z|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              0.0221      0.034      0.648      0.517      -0.045       0.089
+X1_retorno_mercado     1.0689      0.093     11.555      0.000       0.888       1.250
+X2_treasury_10a        0.3011      0.541      0.557      0.578      -0.758       1.361
+X3_tipo_cambio         0.3425      0.044      7.719      0.000       0.256       0.429
+==============================================================================
+Omnibus:                       70.028   Durbin-Watson:                   2.114
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              323.796
+Skew:                          -0.127   Prob(JB):                     4.88e-71
+Kurtosis:                       5.898   Cond. No.                         21.7
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 5 lags and without small sample correction
+
+===== Consumo =====
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:       Y_retorno_sector   R-squared:                       0.419
+Model:                            OLS   Adj. R-squared:                  0.417
+Method:                 Least Squares   F-statistic:                     149.8
+Date:                Mon, 02 Nov 2026   Prob (F-statistic):           6.04e-79
+Time:                        00:03:20   Log-Likelihood:                -1084.3
+No. Observations:                 918   AIC:                             2177.
+Df Residuals:                     914   BIC:                             2196.
+Df Model:                           3                                         
+Covariance Type:                  HAC                                         
+======================================================================================
+                         coef    std err          z      P>|z|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              0.0016      0.027      0.059      0.953      -0.051       0.054
+X1_retorno_mercado     0.5475      0.055      9.971      0.000       0.440       0.655
+X2_treasury_10a        0.5297      0.458      1.156      0.248      -0.368       1.428
+X3_tipo_cambio         0.2093      0.024      8.762      0.000       0.163       0.256
+==============================================================================
+Omnibus:                      221.565   Durbin-Watson:                   1.878
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             1969.666
+Skew:                           0.834   Prob(JB):                         0.00
+Kurtosis:                       9.979   Cond. No.                         21.7
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 5 lags and without small sample correction
+
+===== Construccion =====
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:       Y_retorno_sector   R-squared:                       0.399
+Model:                            OLS   Adj. R-squared:                  0.397
+Method:                 Least Squares   F-statistic:                     62.41
+Date:                Mon, 02 Nov 2026   Prob (F-statistic):           1.04e-36
+Time:                        00:03:20   Log-Likelihood:                -1254.2
+No. Observations:                 918   AIC:                             2516.
+Df Residuals:                     914   BIC:                             2536.
+Df Model:                           3                                         
+Covariance Type:                  HAC                                         
+======================================================================================
+                         coef    std err          z      P>|z|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              0.0012      0.031      0.041      0.967      -0.059       0.061
+X1_retorno_mercado     0.8679      0.065     13.293      0.000       0.740       0.996
+X2_treasury_10a        0.1503      0.495      0.304      0.761      -0.820       1.120
+X3_tipo_cambio        -0.2904      0.028    -10.361      0.000      -0.345      -0.235
+==============================================================================
+Omnibus:                      255.502   Durbin-Watson:                   2.033
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             7640.364
+Skew:                           0.610   Prob(JB):                         0.00
+Kurtosis:                      17.080   Cond. No.                         21.7
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 5 lags and without small sample correction

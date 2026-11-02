@@ -4,11 +4,11 @@
 # Fecha de extraccion: COMPLETAR (AAAA-MM-DD, el dia que ejecutes la extraccion)
 
 """
-Parametros compartidos por todos los scripts del proyecto.
+Parametros compartidos por todos los scripts.
 
 Numeral 2.4.5: la consulta se CONGELA. Las fechas se declaran aqui como
-constantes y se convierten a epoch para Yahoo. Nunca se usa el parametro
-range=5y, que es una ventana movil equivalente a datetime.today().
+constantes y se convierten a epoch. Nunca se usa el parametro range=5y de
+Yahoo, que es una ventana movil equivalente a datetime.today().
 
 Numeral 2.4.4: rutas relativas, nunca rutas absolutas del computador.
 """
@@ -20,20 +20,17 @@ CODIGO_MATRICULA = "2024200522B"
 NOMBRE_COMPLETO = "ROJAS POMA MEGLINHO SNEYDER"
 TEMA = ("61 - Costo de capital por sector en la BVL: "
         "mineria, banca, consumo y construccion")
-SEMILLA = 522   # cuatro ultimos digitos del codigo (numeral 2.4.4)
+SEMILLA = 522          # cuatro ultimos digitos del codigo (numeral 2.4.4)
 
 # --------------------------------------------------------------------------
-# VENTANA CONGELADA
+# 1. VENTANA CONGELADA
 # --------------------------------------------------------------------------
 FECHA_INICIO = "2021-11-01"
 FECHA_CORTE = "2026-10-31"
 
-BCRP_INICIO = "2021-11-1"
-BCRP_FIN = "2026-10-31"
-
 
 def a_epoch(fecha_iso):
-    """Convierte AAAA-MM-DD en segundos epoch UTC, que es lo que pide Yahoo."""
+    """AAAA-MM-DD a segundos epoch UTC, que es lo que pide Yahoo."""
     y, m, d = (int(x) for x in fecha_iso.split("-"))
     return int(datetime(y, m, d, tzinfo=timezone.utc).timestamp())
 
@@ -42,61 +39,80 @@ YF_PERIOD1 = a_epoch(FECHA_INICIO)
 YF_PERIOD2 = a_epoch(FECHA_CORTE)
 
 # --------------------------------------------------------------------------
-# LAS CUATRO CARTERAS SECTORIALES
+# 2. LAS CUATRO CARTERAS SECTORIALES
 # --------------------------------------------------------------------------
-# Construidas a partir de la clasificacion oficial de la BVL (/v1/sector) y
-# de la actividad economica de cada emisor. Se excluyen duplicados: una
-# empresa no puede entrar dos veces por tener ADR o dos clases de accion.
+# La BVL no reconoce consumo ni construccion como sector, y su categoria
+# DIVERSAS mezcla un holding bancario, un retail y una cementera. Las
+# carteras se arman con la clasificacion oficial (/v1/sector) y la actividad
+# economica del emisor, y la agrupacion se declara en Materiales y metodos.
 #
-# Excluidos y por que:
-#   BVN       ADR de BUENAVI1 en Nueva York
-#   CPACASI1  segunda clase de accion de Cementos Pacasmayo
-#   BAP       holding de CREDITC1
-#   IFS       holding de INTERBC1
-#   BACKUBC1  segunda clase de accion de Backus
+# FILTRO DE LIQUIDEZ
+# Se midio, para cada accion, en que porcentaje de los dias el precio
+# efectivamente CAMBIO. Un precio repetido no es una cotizacion nueva: es el
+# ultimo valor conocido arrastrado hacia adelante, y produce retornos cero
+# que sesgan la beta hacia abajo. Seis acciones se mueven menos del 30 % de
+# los dias; BUENAVI1 llego a estar 341 dias seguidos con el mismo precio.
+#
+# REGLA APLICADA, la misma en los cuatro sectores:
+#   1. Un instrumento por grupo economico, el de mayor liquidez.
+#   2. Fuera lo que se mueva menos del 30 % de los dias.
+#
+# Sustituciones por grupo:
+#   BUENAVI1 ( 4.1 %) -> BVN      (98.3 %)   Buenaventura
+#   INTERBC1 (11.9 %) -> IFS      (98.9 %)   Intercorp
+#   CREDITC1 (67.5 %) -> BAP      (99.4 %)   Credicorp
+#   ATACOBC1 (26.6 %) -> NEXAPEC1 (43.2 %)   Nexa, mismo grupo
+# Exclusiones sin reemplazo, por no tener vehiculo listado liquido:
+#   SCOTIAC1 (12.5 %), GLORIAI1 (10.1 %)
+#
+# Hallazgo que se discute en el articulo: las empresas peruanas grandes se
+# negocian con regularidad en Nueva York y no en Lima. Buenaventura se mueve
+# el 4.1 % de los dias en la BVL y el 98.3 % como ADR.
 CARTERAS = {
-    "mineria": ["BUENAVI1", "ATACOBC1", "CVERDEC1", "MINSURI1",
-                "NEXAPEC1", "VOLCABC1", "SCCO"],
-    "banca": ["BBVAC1", "CREDITC1", "INTERBC1", "SCOTIAC1"],
-    "consumo": ["ALICORC1", "BACKUSI1", "GLORIAI1", "INRETC1"],
+    "mineria": ["SCCO", "BVN", "CVERDEC1", "VOLCABC1", "MINSURI1", "NEXAPEC1"],
+    "banca": ["BAP", "IFS", "BBVAC1"],
+    "consumo": ["ALICORC1", "BACKUSI1", "INRETC1"],
     "construccion": ["CPACASC1", "UNACEMC1", "CORAREI1", "SIDERC1"],
 }
 
 ETIQUETAS = {"mineria": "Mineria", "banca": "Banca",
              "consumo": "Consumo", "construccion": "Construccion"}
 
-TICKERS = sorted({t for lista in CARTERAS.values() for t in lista})
+TICKERS_CARTERAS = sorted({t for v in CARTERAS.values() for t in v})
+
+# Acciones liquidas que no entran en ninguna cartera. Solo amplian el indice
+# de mercado, lo que reduce la correlacion mecanica entre cada cartera y el
+# mercado. Se excluyen las que no pasan el filtro de liquidez.
+TICKERS_EXTRA = ["CREDITC1", "FERREYC1", "LUSURC1", "ENGIEC1"]
+
+TICKERS = sorted(set(TICKERS_CARTERAS) | set(TICKERS_EXTRA))
+
+# Cotizan fuera de Lima: su simbolo en Yahoo no lleva el sufijo .LM
+SIN_SUFIJO = ("SCCO", "BVN", "BAP", "IFS", "TEF")
 
 # --------------------------------------------------------------------------
-# SERIES DEL BCRP
+# 3. SERIES DE MERCADO Y MACROECONOMICAS
 # --------------------------------------------------------------------------
-# CONFIRMADAS: verificadas contra el catalogo oficial.
-SERIES_BCRP = {
-    "igbvl":        "PD38026MD",   # Indice General Bursatil BVL (indice)
-    "isbvl":        "PD38027MD",   # Indice Selectivo Bursatil BVL (indice)
-    "embig":        "PD04709XD",   # Spread EMBIG Peru (pbs)
-    "treasury_10a": "PD04719XD",   # Bonos del Tesoro EE.UU. 10 anos (%)
+# BCRPData quedo inaccesible por via automatizada desde el 2026-10-31: su
+# cortafuegos responde HTTP 200 con una pagina antibot en lugar de JSON, a
+# cualquier serie, desde Colab y desde una conexion domestica, con cuatro
+# configuraciones distintas de cabeceras, incluido un agente de navegador
+# completo. Documentado en incidencias_fuente.md.
+#
+# Los sustitutos se toman de Yahoo Finance, fuente API sugerida en el
+# numeral 2.4.1.
+SERIES_YAHOO = {
+    "treasury_10a": "^TNX",       # Rf: rendimiento del Tesoro EE.UU. 10 anos
+    "tipo_cambio":  "USDPEN=X",   # soles por dolar
 }
 
-# POR VERIFICAR: buscar en el catalogo y pegar el codigo. El script avisa
-# de los que sigan vacios y continua; no inventa ninguno.
-SERIES_POR_VERIFICAR = {
-    # Confirmadas en el catalogo el 2026-10-31.
-    # Se descargan las dos puntas del tipo de cambio: se convierte con la de
-    # venta y la de compra queda como prueba de robustez. El diferencial es
-    # casi constante, de modo que al trabajar con retornos la eleccion entre
-    # una y otra no altera los resultados.
-    "tc_venta":    "PD04638PD",   # Tipo de cambio Interbancario - Venta
-    "tc_compra":   "PD04637PD",   # Tipo de cambio Interbancario - Compra
-    # Pendientes de buscar en el catalogo. El script avisa y continua.
-    "cobre":       "",   # cotizacion del cobre, diaria
-    "oro":         "",   # cotizacion del oro, diaria
-    "zinc":        "",   # cotizacion del zinc, diaria
-    "tasa_activa": "",   # tasa activa en soles (TAMN)
-}
+# Indice de mercado. Se intenta el oficial de la BVL; Yahoo respondio 404 el
+# 2026-11-01, de modo que 03_limpieza_datos.py lo construye promediando las
+# 20 acciones. El script vuelve a intentarlo en cada ejecucion.
+INDICE_MERCADO = "^SPBLPGPT"      # S&P/BVL Peru General
 
 # --------------------------------------------------------------------------
-# RUTAS RELATIVAS (numeral 2.4.4)
+# 4. RUTAS RELATIVAS (numeral 2.4.4)
 # --------------------------------------------------------------------------
 RAIZ = Path(__file__).resolve().parent.parent
 DIR_CRUDOS = RAIZ / "datos_crudos"
@@ -115,7 +131,7 @@ ARCHIVO_CRUDO_WEB = DIR_CRUDOS / f"datos_crudos_web_{CODIGO_MATRICULA}.csv"
 ARCHIVO_PROCESADO = DIR_PROCESADOS / f"datos_procesados_{CODIGO_MATRICULA}.csv"
 
 # --------------------------------------------------------------------------
-# CORTESIA EN EL RASTREO (numeral 2.4.8)
+# 5. CORTESIA EN EL RASTREO (numeral 2.4.8)
 # --------------------------------------------------------------------------
 USER_AGENT = ("UNCP-FacultadEconomia-FinanzasI/1.0 (trabajo academico; "
               "contacto: e_2024200522B@uncp.edu.pe)")
@@ -124,5 +140,4 @@ TIMEOUT = 90
 REINTENTOS = 3
 
 BVL_API = "https://dataondemand.bvl.com.pe"
-BCRP_API = "https://estadisticas.bcrp.gob.pe/estadisticas/series/api"
 YAHOO_API = "https://query1.finance.yahoo.com/v8/finance/chart"

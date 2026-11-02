@@ -69,3 +69,414 @@
 [2026-11-01 01:29:34] GET https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD38026MD/json/2021-11-1/2026-10-31 | HTTP 200 NO-JSON
 [2026-11-01 01:29:34] Incidencia registrada: https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD38026MD/json/2021-11-1/2026-10-31/esp (HTTP 200 (pagina antibot))
 [2026-11-01 01:29:34] BCRPData no disponible: BCRPData
+[2026-11-01 22:23:54] Montaje de la Carpeta 3: config y utilidades escritos
+[2026-11-01 22:28:22] GET /v1/sector | HTTP 200
+[2026-11-01 22:28:22] Catalogo de sectores guardado | filas=9
+[2026-11-01 22:28:24] POST /v1/stock-quote/market {"sector": "CM", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:24] Sector CM (MINERAS) | filas=17
+[2026-11-01 22:28:26] POST /v1/stock-quote/market {"sector": "CB", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:26] Sector CB (BANCOS Y FINANCIERAS) | filas=4
+[2026-11-01 22:28:27] POST /v1/stock-quote/market {"sector": "CI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:27] Sector CI (INDUSTRIALES) | filas=9
+[2026-11-01 22:28:29] POST /v1/stock-quote/market {"sector": "CD", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:29] Sector CD (DIVERSAS) | filas=15
+[2026-11-01 22:28:30] POST /v1/stock-quote/market {"sector": "CP", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:30] Sector CP (SERVICIOS PÚBLICOS) | filas=6
+[2026-11-01 22:28:32] POST /v1/stock-quote/market {"sector": "CG", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:32] Sector CG (AGRARIO) | filas=2
+[2026-11-01 22:28:34] POST /v1/stock-quote/market {"sector": "CS", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:34] Sector CS (SEGUROS) | filas=1
+[2026-11-01 22:28:35] POST /v1/stock-quote/market {"sector": "CA", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:35] Sector CA (ADMINISTRADORAS DE FONDOS DE PENSIONES) | filas=0
+[2026-11-01 22:28:37] POST /v1/stock-quote/market {"sector": "FI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 22:28:37] Sector FI (FONDOS DE INVERSIÓN) | filas=26
+[2026-11-01 22:28:37] Guardado datos_crudos_web_2024200522B.csv | filas=80
+[2026-11-01 22:28:37] Los 19 tickers de las carteras estan presentes
+[2026-11-01 22:28:43] Ventana congelada: 2021-11-01 a 2026-10-31 (epoch 1635724800 a 1793404800)
+[2026-11-01 22:28:43] yahoo_ALICORC1.json ya estaba descargado
+[2026-11-01 22:28:43] ALICORC1 | filas=1244
+[2026-11-01 22:28:43] yahoo_ATACOBC1.json ya estaba descargado
+[2026-11-01 22:28:43] ATACOBC1 | filas=1253
+[2026-11-01 22:28:43] yahoo_BACKUSI1.json ya estaba descargado
+[2026-11-01 22:28:43] BACKUSI1 | filas=1246
+[2026-11-01 22:28:43] yahoo_BBVAC1.json ya estaba descargado
+[2026-11-01 22:28:43] BBVAC1 | filas=1243
+[2026-11-01 22:28:43] yahoo_BUENAVI1.json ya estaba descargado
+[2026-11-01 22:28:43] BUENAVI1 | filas=1254
+[2026-11-01 22:28:43] yahoo_CORAREI1.json ya estaba descargado
+[2026-11-01 22:28:43] CORAREI1 | filas=1243
+[2026-11-01 22:28:43] yahoo_CPACASC1.json ya estaba descargado
+[2026-11-01 22:28:43] CPACASC1 | filas=1245
+[2026-11-01 22:28:44] yahoo_CREDITC1.json ya estaba descargado
+[2026-11-01 22:28:44] CREDITC1 | filas=1245
+[2026-11-01 22:28:44] yahoo_CVERDEC1.json ya estaba descargado
+[2026-11-01 22:28:44] CVERDEC1 | filas=1243
+[2026-11-01 22:28:44] yahoo_GLORIAI1.json ya estaba descargado
+[2026-11-01 22:28:44] GLORIAI1 | filas=1253
+[2026-11-01 22:28:44] yahoo_INRETC1.json ya estaba descargado
+[2026-11-01 22:28:44] INRETC1 | filas=1243
+[2026-11-01 22:28:44] yahoo_INTERBC1.json ya estaba descargado
+[2026-11-01 22:28:44] INTERBC1 | filas=1254
+[2026-11-01 22:28:44] yahoo_MINSURI1.json ya estaba descargado
+[2026-11-01 22:28:44] MINSURI1 | filas=1244
+[2026-11-01 22:28:44] yahoo_NEXAPEC1.json ya estaba descargado
+[2026-11-01 22:28:44] NEXAPEC1 | filas=1243
+[2026-11-01 22:28:44] yahoo_SCCO.json ya estaba descargado
+[2026-11-01 22:28:44] SCCO | filas=1255
+[2026-11-01 22:28:44] yahoo_SCOTIAC1.json ya estaba descargado
+[2026-11-01 22:28:44] SCOTIAC1 | filas=1254
+[2026-11-01 22:28:44] yahoo_SIDERC1.json ya estaba descargado
+[2026-11-01 22:28:44] SIDERC1 | filas=1247
+[2026-11-01 22:28:44] yahoo_UNACEMC1.json ya estaba descargado
+[2026-11-01 22:28:44] UNACEMC1 | filas=1245
+[2026-11-01 22:28:44] yahoo_VOLCABC1.json ya estaba descargado
+[2026-11-01 22:28:44] VOLCABC1 | filas=1243
+[2026-11-01 22:28:44] Crudo de precios guardado | filas=23697
+[2026-11-01 22:28:44] AVISO: la serie 'cobre' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 22:28:44] AVISO: la serie 'oro' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 22:28:44] AVISO: la serie 'zinc' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 22:28:44] AVISO: la serie 'tasa_activa' no tiene codigo asignado; se omite. Buscarla en el catalogo de BCRPData.
+[2026-11-01 22:28:44] GET https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD38026MD/json/2021-11-1/2026-10-31 | HTTP 200 NO-JSON
+[2026-11-01 22:28:44] Incidencia registrada: https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD38026MD/json/2021-11-1/2026-10-31/esp (HTTP 200 (pagina antibot))
+[2026-11-01 22:28:44] BCRPData no disponible: BCRPData
+[2026-11-01 23:32:23] GET /v1/sector | HTTP 200
+[2026-11-01 23:32:25] Catalogo de sectores guardado | filas=9
+[2026-11-01 23:32:27] POST /v1/stock-quote/market {"sector": "CM", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:27] Sector CM (MINERAS) | filas=17
+[2026-11-01 23:32:29] POST /v1/stock-quote/market {"sector": "CB", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:30] Sector CB (BANCOS Y FINANCIERAS) | filas=4
+[2026-11-01 23:32:32] POST /v1/stock-quote/market {"sector": "CI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:33] Sector CI (INDUSTRIALES) | filas=9
+[2026-11-01 23:32:35] POST /v1/stock-quote/market {"sector": "CD", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:36] Sector CD (DIVERSAS) | filas=15
+[2026-11-01 23:32:38] POST /v1/stock-quote/market {"sector": "CP", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:39] Sector CP (SERVICIOS PÚBLICOS) | filas=6
+[2026-11-01 23:32:41] POST /v1/stock-quote/market {"sector": "CG", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:42] Sector CG (AGRARIO) | filas=2
+[2026-11-01 23:32:44] POST /v1/stock-quote/market {"sector": "CS", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:44] Sector CS (SEGUROS) | filas=1
+[2026-11-01 23:32:46] POST /v1/stock-quote/market {"sector": "CA", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:47] Sector CA (ADMINISTRADORAS DE FONDOS DE PENSIONES) | filas=0
+[2026-11-01 23:32:49] POST /v1/stock-quote/market {"sector": "FI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:32:50] Sector FI (FONDOS DE INVERSIÓN) | filas=26
+[2026-11-01 23:32:51] Guardado datos_crudos_web_2024200522B.csv | filas=80
+[2026-11-01 23:32:51] Los 24 tickers de las carteras estan presentes
+[2026-11-01 23:33:08] Ventana congelada: 2021-11-01 a 2026-10-31 (epoch 1635724800 a 1793404800)
+[2026-11-01 23:33:09] yahoo_ALICORC1.json ya estaba descargado
+[2026-11-01 23:33:10] ALICORC1 | filas=1244
+[2026-11-01 23:33:10] yahoo_ATACOBC1.json ya estaba descargado
+[2026-11-01 23:33:10] ATACOBC1 | filas=1253
+[2026-11-01 23:33:10] yahoo_BACKUSI1.json ya estaba descargado
+[2026-11-01 23:33:11] BACKUSI1 | filas=1246
+[2026-11-01 23:33:11] yahoo_BBVAC1.json ya estaba descargado
+[2026-11-01 23:33:12] BBVAC1 | filas=1243
+[2026-11-01 23:33:12] yahoo_BUENAVI1.json ya estaba descargado
+[2026-11-01 23:33:12] BUENAVI1 | filas=1254
+[2026-11-01 23:33:13] GET https://query1.finance.yahoo.com/v8/finance/chart/BVN?period1=1635724800&period2=1793404 | HTTP 200 JSON
+[2026-11-01 23:33:14] BVN | filas=1255
+[2026-11-01 23:33:14] yahoo_CORAREI1.json ya estaba descargado
+[2026-11-01 23:33:15] CORAREI1 | filas=1243
+[2026-11-01 23:33:15] yahoo_CPACASC1.json ya estaba descargado
+[2026-11-01 23:33:16] CPACASC1 | filas=1245
+[2026-11-01 23:33:16] GET https://query1.finance.yahoo.com/v8/finance/chart/CPACASI1.LM?period1=1635724800&period2 | HTTP 200 JSON
+[2026-11-01 23:33:18] CPACASI1 | filas=1253
+[2026-11-01 23:33:18] yahoo_CREDITC1.json ya estaba descargado
+[2026-11-01 23:33:18] CREDITC1 | filas=1245
+[2026-11-01 23:33:18] yahoo_CVERDEC1.json ya estaba descargado
+[2026-11-01 23:33:19] CVERDEC1 | filas=1243
+[2026-11-01 23:33:19] GET https://query1.finance.yahoo.com/v8/finance/chart/ENGIEC1.LM?period1=1635724800&period2= | HTTP 200 JSON
+[2026-11-01 23:33:21] ENGIEC1 | filas=1245
+[2026-11-01 23:33:21] GET https://query1.finance.yahoo.com/v8/finance/chart/FERREYC1.LM?period1=1635724800&period2 | HTTP 200 JSON
+[2026-11-01 23:33:23] FERREYC1 | filas=1243
+[2026-11-01 23:33:23] yahoo_GLORIAI1.json ya estaba descargado
+[2026-11-01 23:33:24] GLORIAI1 | filas=1253
+[2026-11-01 23:33:24] yahoo_INRETC1.json ya estaba descargado
+[2026-11-01 23:33:24] INRETC1 | filas=1243
+[2026-11-01 23:33:24] yahoo_INTERBC1.json ya estaba descargado
+[2026-11-01 23:33:25] INTERBC1 | filas=1254
+[2026-11-01 23:33:25] GET https://query1.finance.yahoo.com/v8/finance/chart/LUSURC1.LM?period1=1635724800&period2= | HTTP 200 JSON
+[2026-11-01 23:33:27] LUSURC1 | filas=1250
+[2026-11-01 23:33:27] yahoo_MINSURI1.json ya estaba descargado
+[2026-11-01 23:33:28] MINSURI1 | filas=1244
+[2026-11-01 23:33:28] yahoo_NEXAPEC1.json ya estaba descargado
+[2026-11-01 23:33:29] NEXAPEC1 | filas=1243
+[2026-11-01 23:33:29] yahoo_SCCO.json ya estaba descargado
+[2026-11-01 23:33:30] SCCO | filas=1255
+[2026-11-01 23:33:30] yahoo_SCOTIAC1.json ya estaba descargado
+[2026-11-01 23:33:31] SCOTIAC1 | filas=1254
+[2026-11-01 23:33:31] yahoo_SIDERC1.json ya estaba descargado
+[2026-11-01 23:33:31] SIDERC1 | filas=1247
+[2026-11-01 23:33:31] yahoo_UNACEMC1.json ya estaba descargado
+[2026-11-01 23:33:33] UNACEMC1 | filas=1245
+[2026-11-01 23:33:33] yahoo_VOLCABC1.json ya estaba descargado
+[2026-11-01 23:33:33] VOLCABC1 | filas=1243
+[2026-11-01 23:33:34] Guardado datos_crudos_precios_2024200522B.csv | filas=29943
+[2026-11-01 23:33:35] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?period1=1635724800&period2=1793 | HTTP 200 JSON
+[2026-11-01 23:33:36] treasury_10a <- ^TNX (USD) | filas=1255
+[2026-11-01 23:33:37] GET https://query1.finance.yahoo.com/v8/finance/chart/USDPEN%3DX?period1=1635724800&period2= | HTTP 200 JSON
+[2026-11-01 23:33:38] tipo_cambio <- USDPEN=X (PEN) | filas=1301
+[2026-11-01 23:33:38] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-01 23:33:42] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-01 23:33:48] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-01 23:33:57] Indice oficial no disponible: FuenteBloqueada. Se construira con las acciones.
+[2026-11-01 23:33:57] Guardado datos_crudos_macro_2024200522B.csv | filas=1447
+[2026-11-01 23:34:15] Cargado crudo de precios | filas=29943
+[2026-11-01 23:34:15] Cargado crudo macro | filas=1447
+[2026-11-01 23:34:15] Cargado crudo de la BVL | filas=80
+[2026-11-01 23:34:15] Acciones en dolares segun la BVL: BVN, CVERDEC1, INRETC1, SCCO
+[2026-11-01 23:34:15] Filas en dolares sin tipo de cambio ese dia: 578. Se descartan, no se rellenan.
+[2026-11-01 23:34:16] Guardado intermedio_acciones_2024200522B.csv | filas=29365
+[2026-11-01 23:34:16] Carteras sectoriales construidas | filas=5007
+[2026-11-01 23:34:16] Mercado: construido con 24 acciones de la BVL, ponderacion igual
+[2026-11-01 23:34:16] Filas descartadas por faltante en alguna exogena: 1306
+[2026-11-01 23:34:16] Filas descartadas por fecha incompleta: 17
+[2026-11-01 23:34:16] Tabla final | filas=3684 | SHA-256: ba8593c893c6d579632d02c9a78a1b36d77c2ca538d2f66e69d8b709cf036d24
+[2026-11-01 23:34:30] Analisis: panel cargado | filas=3684
+[2026-11-01 23:34:30] Tasa libre de riesgo promedio de la ventana: 3.886 %
+[2026-11-01 23:34:30] Salida generada: tabla1_descriptiva
+[2026-11-01 23:34:31] Salida generada: tabla2_adf
+[2026-11-01 23:34:31] Salida generada: tabla3_correlaciones
+[2026-11-01 23:34:31] Beta de Mineria = 1.6984 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Beta de Banca = 0.6025 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Beta de Consumo = 0.5036 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Beta de Construccion = 1.0148 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Salida generada: tabla4_betas
+[2026-11-01 23:34:31] Retorno anualizado del mercado: 15.260 % | prima de mercado realizada: 11.374 %
+[2026-11-01 23:34:31] Salida generada: tabla5_costo_capital
+[2026-11-01 23:34:31] Beta de Mineria = 1.1540 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Beta de Banca = 0.3527 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Beta de Consumo = 0.3139 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Beta de Construccion = 0.6651 (p=0.0000, N=921)
+[2026-11-01 23:34:31] Salida generada: tabla6_betas_robustez
+[2026-11-01 23:34:31] Salida generada: tabla7_diagnostico
+[2026-11-01 23:34:32] Salida generada: figura1_evolucion_sectorial.png
+[2026-11-01 23:34:34] Salida generada: figura2_retornos_diarios.png
+[2026-11-01 23:34:35] Salida generada: figura3_mineria_vs_mercado.png
+[2026-11-01 23:34:35] Salida generada: figura4_banca_vs_mercado.png
+[2026-11-01 23:34:36] Salida generada: figura5_consumo_vs_mercado.png
+[2026-11-01 23:34:36] Salida generada: figura6_construccion_vs_mercado.png
+[2026-11-01 23:34:36] Salida generada: figura7_betas.png
+[2026-11-01 23:34:37] Salida generada: figura8_costo_capital.png
+[2026-11-01 23:34:37] Analisis terminado.
+[2026-11-01 23:51:30] GET /v1/sector | HTTP 200
+[2026-11-01 23:51:30] Catalogo de sectores guardado | filas=9
+[2026-11-01 23:51:32] POST /v1/stock-quote/market {"sector": "CM", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:32] Sector CM (MINERAS) | filas=17
+[2026-11-01 23:51:34] POST /v1/stock-quote/market {"sector": "CB", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:34] Sector CB (BANCOS Y FINANCIERAS) | filas=4
+[2026-11-01 23:51:36] POST /v1/stock-quote/market {"sector": "CI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:36] Sector CI (INDUSTRIALES) | filas=9
+[2026-11-01 23:51:38] POST /v1/stock-quote/market {"sector": "CD", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:38] Sector CD (DIVERSAS) | filas=15
+[2026-11-01 23:51:40] POST /v1/stock-quote/market {"sector": "CP", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:40] Sector CP (SERVICIOS PÚBLICOS) | filas=6
+[2026-11-01 23:51:43] POST /v1/stock-quote/market {"sector": "CG", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:43] Sector CG (AGRARIO) | filas=2
+[2026-11-01 23:51:45] POST /v1/stock-quote/market {"sector": "CS", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:45] Sector CS (SEGUROS) | filas=1
+[2026-11-01 23:51:47] POST /v1/stock-quote/market {"sector": "CA", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:47] Sector CA (ADMINISTRADORAS DE FONDOS DE PENSIONES) | filas=0
+[2026-11-01 23:51:49] POST /v1/stock-quote/market {"sector": "FI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-01 23:51:49] Sector FI (FONDOS DE INVERSIÓN) | filas=26
+[2026-11-01 23:51:49] Guardado datos_crudos_web_2024200522B.csv | filas=80
+[2026-11-01 23:51:49] Los 20 tickers de las carteras estan presentes
+[2026-11-01 23:51:58] Ventana congelada: 2021-11-01 a 2026-10-31 (epoch 1635724800 a 1793404800)
+[2026-11-01 23:51:58] yahoo_ALICORC1.json ya estaba descargado
+[2026-11-01 23:51:58] ALICORC1 | filas=1244
+[2026-11-01 23:51:58] yahoo_BACKUSI1.json ya estaba descargado
+[2026-11-01 23:51:58] BACKUSI1 | filas=1246
+[2026-11-01 23:51:59] GET https://query1.finance.yahoo.com/v8/finance/chart/BAP?period1=1635724800&period2=1793404 | HTTP 200 JSON
+[2026-11-01 23:52:00] BAP | filas=1255
+[2026-11-01 23:52:00] yahoo_BBVAC1.json ya estaba descargado
+[2026-11-01 23:52:00] BBVAC1 | filas=1243
+[2026-11-01 23:52:00] yahoo_BVN.json ya estaba descargado
+[2026-11-01 23:52:00] BVN | filas=1255
+[2026-11-01 23:52:00] yahoo_CORAREI1.json ya estaba descargado
+[2026-11-01 23:52:00] CORAREI1 | filas=1243
+[2026-11-01 23:52:00] yahoo_CPACASC1.json ya estaba descargado
+[2026-11-01 23:52:00] CPACASC1 | filas=1245
+[2026-11-01 23:52:00] yahoo_CREDITC1.json ya estaba descargado
+[2026-11-01 23:52:00] CREDITC1 | filas=1245
+[2026-11-01 23:52:00] yahoo_CVERDEC1.json ya estaba descargado
+[2026-11-01 23:52:00] CVERDEC1 | filas=1243
+[2026-11-01 23:52:01] yahoo_ENGIEC1.json ya estaba descargado
+[2026-11-01 23:52:01] ENGIEC1 | filas=1245
+[2026-11-01 23:52:01] yahoo_FERREYC1.json ya estaba descargado
+[2026-11-01 23:52:01] FERREYC1 | filas=1243
+[2026-11-01 23:52:01] GET https://query1.finance.yahoo.com/v8/finance/chart/IFS?period1=1635724800&period2=1793404 | HTTP 200 JSON
+[2026-11-01 23:52:02] IFS | filas=1255
+[2026-11-01 23:52:02] yahoo_INRETC1.json ya estaba descargado
+[2026-11-01 23:52:02] INRETC1 | filas=1243
+[2026-11-01 23:52:02] yahoo_LUSURC1.json ya estaba descargado
+[2026-11-01 23:52:02] LUSURC1 | filas=1250
+[2026-11-01 23:52:02] yahoo_MINSURI1.json ya estaba descargado
+[2026-11-01 23:52:02] MINSURI1 | filas=1244
+[2026-11-01 23:52:02] yahoo_NEXAPEC1.json ya estaba descargado
+[2026-11-01 23:52:02] NEXAPEC1 | filas=1243
+[2026-11-01 23:52:02] yahoo_SCCO.json ya estaba descargado
+[2026-11-01 23:52:03] SCCO | filas=1255
+[2026-11-01 23:52:03] yahoo_SIDERC1.json ya estaba descargado
+[2026-11-01 23:52:03] SIDERC1 | filas=1247
+[2026-11-01 23:52:03] yahoo_UNACEMC1.json ya estaba descargado
+[2026-11-01 23:52:03] UNACEMC1 | filas=1245
+[2026-11-01 23:52:03] yahoo_VOLCABC1.json ya estaba descargado
+[2026-11-01 23:52:03] VOLCABC1 | filas=1243
+[2026-11-01 23:52:03] Guardado datos_crudos_precios_2024200522B.csv | filas=24932
+[2026-11-01 23:52:03] yahoo_treasury_10a.json ya estaba descargado
+[2026-11-01 23:52:03] treasury_10a <- ^TNX (USD) | filas=1255
+[2026-11-01 23:52:03] yahoo_tipo_cambio.json ya estaba descargado
+[2026-11-01 23:52:03] tipo_cambio <- USDPEN=X (PEN) | filas=1301
+[2026-11-01 23:52:03] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-01 23:52:06] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-01 23:52:12] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-01 23:52:21] Indice oficial no disponible: FuenteBloqueada. Se construira con las acciones.
+[2026-11-01 23:52:21] Guardado datos_crudos_macro_2024200522B.csv | filas=1447
+[2026-11-01 23:52:48] Cargado crudo de precios | filas=24932
+[2026-11-01 23:52:48] Cargado crudo macro | filas=1447
+[2026-11-01 23:52:48] Cargado crudo de la BVL | filas=80
+[2026-11-01 23:52:48] Acciones en dolares segun la BVL: BAP, BVN, CVERDEC1, IFS, INRETC1, SCCO
+[2026-11-01 23:52:48] Filas en dolares sin tipo de cambio ese dia: 870. Se descartan, no se rellenan.
+[2026-11-01 23:52:49] Guardado intermedio_acciones_2024200522B.csv | filas=24062
+[2026-11-01 23:52:49] Carteras sectoriales construidas | filas=4995
+[2026-11-01 23:52:49] Mercado: construido con 20 acciones de la BVL, ponderacion igual
+[2026-11-01 23:52:49] Filas descartadas por faltante en alguna exogena: 1298
+[2026-11-01 23:52:49] Filas descartadas por fecha incompleta: 25
+[2026-11-01 23:52:49] Tabla final | filas=3672 | SHA-256: d5e5ea080f282ccf3c743665ffefe45fb8bec10ea6777ef499ffdffd429a7ba7
+[2026-11-01 23:53:19] Analisis: panel cargado | filas=3672
+[2026-11-01 23:53:19] Tasa libre de riesgo promedio de la ventana: 3.886 %
+[2026-11-01 23:53:19] Salida generada: tabla1_descriptiva
+[2026-11-01 23:53:20] Salida generada: tabla2_adf
+[2026-11-01 23:53:21] Salida generada: tabla3_correlaciones
+[2026-11-01 23:53:21] Beta de Mineria = 1.6155 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Beta de Banca = 1.0689 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Beta de Consumo = 0.5475 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Beta de Construccion = 0.8679 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Salida generada: tabla4_betas
+[2026-11-01 23:53:21] Retorno anualizado del mercado: 19.266 % | prima de mercado realizada: 15.380 %
+[2026-11-01 23:53:21] Salida generada: tabla5_costo_capital
+[2026-11-01 23:53:21] Beta de Mineria = 1.0933 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Beta de Banca = 0.7931 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Beta de Consumo = 0.3785 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Beta de Construccion = 0.5343 (p=0.0000, N=918)
+[2026-11-01 23:53:21] Salida generada: tabla6_betas_robustez
+[2026-11-01 23:53:21] Salida generada: tabla7_diagnostico
+[2026-11-01 23:53:22] Salida generada: figura1_evolucion_sectorial.png
+[2026-11-01 23:53:23] Salida generada: figura2_retornos_diarios.png
+[2026-11-01 23:53:23] Salida generada: figura3_mineria_vs_mercado.png
+[2026-11-01 23:53:24] Salida generada: figura4_banca_vs_mercado.png
+[2026-11-01 23:53:24] Salida generada: figura5_consumo_vs_mercado.png
+[2026-11-01 23:53:24] Salida generada: figura6_construccion_vs_mercado.png
+[2026-11-01 23:53:25] Salida generada: figura7_betas.png
+[2026-11-01 23:53:25] Salida generada: figura8_costo_capital.png
+[2026-11-01 23:53:25] Analisis terminado.
+[2026-11-02 00:02:31] GET /v1/sector | HTTP 200
+[2026-11-02 00:02:31] Catalogo de sectores guardado | filas=9
+[2026-11-02 00:02:33] POST /v1/stock-quote/market {"sector": "CM", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:33] Sector CM (MINERAS) | filas=17
+[2026-11-02 00:02:35] POST /v1/stock-quote/market {"sector": "CB", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:35] Sector CB (BANCOS Y FINANCIERAS) | filas=4
+[2026-11-02 00:02:37] POST /v1/stock-quote/market {"sector": "CI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:37] Sector CI (INDUSTRIALES) | filas=9
+[2026-11-02 00:02:40] POST /v1/stock-quote/market {"sector": "CD", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:40] Sector CD (DIVERSAS) | filas=15
+[2026-11-02 00:02:42] POST /v1/stock-quote/market {"sector": "CP", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:42] Sector CP (SERVICIOS PÚBLICOS) | filas=6
+[2026-11-02 00:02:44] POST /v1/stock-quote/market {"sector": "CG", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:44] Sector CG (AGRARIO) | filas=2
+[2026-11-02 00:02:46] POST /v1/stock-quote/market {"sector": "CS", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:46] Sector CS (SEGUROS) | filas=1
+[2026-11-02 00:02:48] POST /v1/stock-quote/market {"sector": "CA", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:48] Sector CA (ADMINISTRADORAS DE FONDOS DE PENSIONES) | filas=0
+[2026-11-02 00:02:50] POST /v1/stock-quote/market {"sector": "FI", "today": true, "companyCode": "", "inputCompany": ""} | HTTP 200
+[2026-11-02 00:02:50] Sector FI (FONDOS DE INVERSIÓN) | filas=26
+[2026-11-02 00:02:50] Guardado datos_crudos_web_2024200522B.csv | filas=80
+[2026-11-02 00:02:50] Los 20 tickers de las carteras estan presentes
+[2026-11-02 00:02:51] Ventana congelada: 2021-11-01 a 2026-10-31 (epoch 1635724800 a 1793404800)
+[2026-11-02 00:02:51] yahoo_ALICORC1.json ya estaba descargado
+[2026-11-02 00:02:51] ALICORC1 | filas=1244
+[2026-11-02 00:02:51] yahoo_BACKUSI1.json ya estaba descargado
+[2026-11-02 00:02:51] BACKUSI1 | filas=1246
+[2026-11-02 00:02:51] yahoo_BAP.json ya estaba descargado
+[2026-11-02 00:02:51] BAP | filas=1255
+[2026-11-02 00:02:51] yahoo_BBVAC1.json ya estaba descargado
+[2026-11-02 00:02:51] BBVAC1 | filas=1243
+[2026-11-02 00:02:51] yahoo_BVN.json ya estaba descargado
+[2026-11-02 00:02:51] BVN | filas=1255
+[2026-11-02 00:02:51] yahoo_CORAREI1.json ya estaba descargado
+[2026-11-02 00:02:51] CORAREI1 | filas=1243
+[2026-11-02 00:02:51] yahoo_CPACASC1.json ya estaba descargado
+[2026-11-02 00:02:51] CPACASC1 | filas=1245
+[2026-11-02 00:02:51] yahoo_CREDITC1.json ya estaba descargado
+[2026-11-02 00:02:51] CREDITC1 | filas=1245
+[2026-11-02 00:02:51] yahoo_CVERDEC1.json ya estaba descargado
+[2026-11-02 00:02:51] CVERDEC1 | filas=1243
+[2026-11-02 00:02:51] yahoo_ENGIEC1.json ya estaba descargado
+[2026-11-02 00:02:51] ENGIEC1 | filas=1245
+[2026-11-02 00:02:51] yahoo_FERREYC1.json ya estaba descargado
+[2026-11-02 00:02:51] FERREYC1 | filas=1243
+[2026-11-02 00:02:51] yahoo_IFS.json ya estaba descargado
+[2026-11-02 00:02:51] IFS | filas=1255
+[2026-11-02 00:02:51] yahoo_INRETC1.json ya estaba descargado
+[2026-11-02 00:02:51] INRETC1 | filas=1243
+[2026-11-02 00:02:51] yahoo_LUSURC1.json ya estaba descargado
+[2026-11-02 00:02:51] LUSURC1 | filas=1250
+[2026-11-02 00:02:51] yahoo_MINSURI1.json ya estaba descargado
+[2026-11-02 00:02:52] MINSURI1 | filas=1244
+[2026-11-02 00:02:52] yahoo_NEXAPEC1.json ya estaba descargado
+[2026-11-02 00:02:52] NEXAPEC1 | filas=1243
+[2026-11-02 00:02:52] yahoo_SCCO.json ya estaba descargado
+[2026-11-02 00:02:52] SCCO | filas=1255
+[2026-11-02 00:02:52] yahoo_SIDERC1.json ya estaba descargado
+[2026-11-02 00:02:52] SIDERC1 | filas=1247
+[2026-11-02 00:02:52] yahoo_UNACEMC1.json ya estaba descargado
+[2026-11-02 00:02:52] UNACEMC1 | filas=1245
+[2026-11-02 00:02:52] yahoo_VOLCABC1.json ya estaba descargado
+[2026-11-02 00:02:52] VOLCABC1 | filas=1243
+[2026-11-02 00:02:52] Guardado datos_crudos_precios_2024200522B.csv | filas=24932
+[2026-11-02 00:02:52] yahoo_treasury_10a.json ya estaba descargado
+[2026-11-02 00:02:52] treasury_10a <- ^TNX (USD) | filas=1255
+[2026-11-02 00:02:52] yahoo_tipo_cambio.json ya estaba descargado
+[2026-11-02 00:02:52] tipo_cambio <- USDPEN=X (PEN) | filas=1301
+[2026-11-02 00:02:52] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-02 00:02:56] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-02 00:03:02] GET https://query1.finance.yahoo.com/v8/finance/chart/%5ESPBLPGPT?period1=1635724800&period2 | HTTP 404 JSON
+[2026-11-02 00:03:11] Indice oficial no disponible: FuenteBloqueada. Se construira con las acciones.
+[2026-11-02 00:03:11] Guardado datos_crudos_macro_2024200522B.csv | filas=1447
+[2026-11-02 00:03:12] Cargado crudo de precios | filas=24932
+[2026-11-02 00:03:12] Cargado crudo macro | filas=1447
+[2026-11-02 00:03:12] Cargado crudo de la BVL | filas=80
+[2026-11-02 00:03:12] Acciones en dolares segun la BVL: BAP, BVN, CVERDEC1, IFS, INRETC1, SCCO
+[2026-11-02 00:03:12] Filas en dolares sin tipo de cambio ese dia: 870. Se descartan, no se rellenan.
+[2026-11-02 00:03:12] Guardado intermedio_acciones_2024200522B.csv | filas=24062
+[2026-11-02 00:03:12] Carteras sectoriales construidas | filas=4995
+[2026-11-02 00:03:12] Mercado: construido con 20 acciones de la BVL, ponderacion igual
+[2026-11-02 00:03:12] Filas descartadas por faltante en alguna exogena: 1298
+[2026-11-02 00:03:12] Filas descartadas por fecha incompleta: 25
+[2026-11-02 00:03:12] Tabla final | filas=3672 | SHA-256: d5e5ea080f282ccf3c743665ffefe45fb8bec10ea6777ef499ffdffd429a7ba7
+[2026-11-02 00:03:16] Analisis: panel cargado | filas=3672
+[2026-11-02 00:03:16] Tasa libre de riesgo promedio de la ventana: 3.886 %
+[2026-11-02 00:03:16] Salida generada: tabla1_descriptiva
+[2026-11-02 00:03:20] Salida generada: tabla2_adf
+[2026-11-02 00:03:20] Salida generada: tabla3_correlaciones
+[2026-11-02 00:03:20] Beta de Mineria = 1.6155 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Beta de Banca = 1.0689 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Beta de Consumo = 0.5475 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Beta de Construccion = 0.8679 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Salida generada: tabla4_betas
+[2026-11-02 00:03:20] Retorno anualizado del mercado: 19.266 % | prima de mercado realizada: 15.380 %
+[2026-11-02 00:03:20] Salida generada: tabla5_costo_capital
+[2026-11-02 00:03:20] Beta de Mineria = 1.0933 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Beta de Banca = 0.7931 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Beta de Consumo = 0.3785 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Beta de Construccion = 0.5343 (p=0.0000, N=918)
+[2026-11-02 00:03:20] Salida generada: tabla6_betas_robustez
+[2026-11-02 00:03:20] Salida generada: tabla7_diagnostico
+[2026-11-02 00:03:21] Salida generada: figura1_evolucion_sectorial.png
+[2026-11-02 00:03:23] Salida generada: figura2_retornos_diarios.png
+[2026-11-02 00:03:24] Salida generada: figura3_mineria_vs_mercado.png
+[2026-11-02 00:03:25] Salida generada: figura4_banca_vs_mercado.png
+[2026-11-02 00:03:25] Salida generada: figura5_consumo_vs_mercado.png
+[2026-11-02 00:03:26] Salida generada: figura6_construccion_vs_mercado.png
+[2026-11-02 00:03:26] Salida generada: figura7_betas.png
+[2026-11-02 00:03:26] Salida generada: figura8_costo_capital.png
+[2026-11-02 00:03:26] Analisis terminado.

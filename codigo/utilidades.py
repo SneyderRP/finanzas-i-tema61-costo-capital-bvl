@@ -94,6 +94,9 @@ def registrar_incidencia(url, http, detalle):
     """
     Deja constancia escrita de un bloqueo de la fuente en
     incidencias_fuente.md (numeral 2.4.3).
+
+    Con ese registro se solicita la sustitucion de fuente al docente, con un
+    minimo de 5 dias calendario de anticipacion al EXANTE.
     """
     existe = cfg.INCIDENCIAS.exists()
     with open(cfg.INCIDENCIAS, "a", encoding="utf-8") as f:
