@@ -1,7 +1,7 @@
 # Meglinho Sneyder Rojas Poma
 # Codigo de matricula: 2024200522B
 # Tema 61 del temario: Costo de capital por sector en la BVL: mineria, banca, consumo y construccion
-# Fecha de extraccion: COMPLETAR (AAAA-MM-DD, el dia que ejecutes la extraccion)
+# Fecha de extraccion: 2026-11-01
 
 """
 VIA 1 - API. Yahoo Finance, fuente sugerida en el numeral 2.4.1.

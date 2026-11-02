@@ -5,7 +5,7 @@ Dep. Variable:       Y_retorno_sector   R-squared:                       0.766
 Model:                            OLS   Adj. R-squared:                  0.765
 Method:                 Least Squares   F-statistic:                     289.6
 Date:                Mon, 02 Nov 2026   Prob (F-statistic):          4.27e-132
-Time:                        00:03:20   Log-Likelihood:                -1164.9
+Time:                        00:56:16   Log-Likelihood:                -1164.9
 No. Observations:                 918   AIC:                             2338.
 Df Residuals:                     914   BIC:                             2357.
 Df Model:                           3                                         
@@ -34,7 +34,7 @@ Dep. Variable:       Y_retorno_sector   R-squared:                       0.588
 Model:                            OLS   Adj. R-squared:                  0.587
 Method:                 Least Squares   F-statistic:                     304.5
 Date:                Mon, 02 Nov 2026   Prob (F-statistic):          5.27e-137
-Time:                        00:03:20   Log-Likelihood:                -1344.3
+Time:                        00:56:16   Log-Likelihood:                -1344.3
 No. Observations:                 918   AIC:                             2697.
 Df Residuals:                     914   BIC:                             2716.
 Df Model:                           3                                         
@@ -63,7 +63,7 @@ Dep. Variable:       Y_retorno_sector   R-squared:                       0.419
 Model:                            OLS   Adj. R-squared:                  0.417
 Method:                 Least Squares   F-statistic:                     149.8
 Date:                Mon, 02 Nov 2026   Prob (F-statistic):           6.04e-79
-Time:                        00:03:20   Log-Likelihood:                -1084.3
+Time:                        00:56:16   Log-Likelihood:                -1084.3
 No. Observations:                 918   AIC:                             2177.
 Df Residuals:                     914   BIC:                             2196.
 Df Model:                           3                                         
@@ -92,7 +92,7 @@ Dep. Variable:       Y_retorno_sector   R-squared:                       0.399
 Model:                            OLS   Adj. R-squared:                  0.397
 Method:                 Least Squares   F-statistic:                     62.41
 Date:                Mon, 02 Nov 2026   Prob (F-statistic):           1.04e-36
-Time:                        00:03:20   Log-Likelihood:                -1254.2
+Time:                        00:56:16   Log-Likelihood:                -1254.2
 No. Observations:                 918   AIC:                             2516.
 Df Residuals:                     914   BIC:                             2536.
 Df Model:                           3                                         

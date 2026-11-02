@@ -480,3 +480,30 @@
 [2026-11-02 00:03:26] Salida generada: figura7_betas.png
 [2026-11-02 00:03:26] Salida generada: figura8_costo_capital.png
 [2026-11-02 00:03:26] Analisis terminado.
+[2026-11-02 00:56:14] Analisis: panel cargado | filas=3672
+[2026-11-02 00:56:14] Tasa libre de riesgo promedio de la ventana: 3.886 %
+[2026-11-02 00:56:15] Salida generada: tabla1_descriptiva
+[2026-11-02 00:56:15] Salida generada: tabla2_adf
+[2026-11-02 00:56:15] Salida generada: tabla3_correlaciones
+[2026-11-02 00:56:15] Beta de Mineria = 1.6155 (p=0.0000, N=918)
+[2026-11-02 00:56:15] Beta de Banca = 1.0689 (p=0.0000, N=918)
+[2026-11-02 00:56:15] Beta de Consumo = 0.5475 (p=0.0000, N=918)
+[2026-11-02 00:56:15] Beta de Construccion = 0.8679 (p=0.0000, N=918)
+[2026-11-02 00:56:16] Salida generada: tabla4_betas
+[2026-11-02 00:56:16] Retorno anualizado del mercado: 19.266 % | prima de mercado realizada: 15.380 %
+[2026-11-02 00:56:16] Salida generada: tabla5_costo_capital
+[2026-11-02 00:56:16] Beta de Mineria = 1.0933 (p=0.0000, N=918)
+[2026-11-02 00:56:16] Beta de Banca = 0.7931 (p=0.0000, N=918)
+[2026-11-02 00:56:16] Beta de Consumo = 0.3785 (p=0.0000, N=918)
+[2026-11-02 00:56:16] Beta de Construccion = 0.5343 (p=0.0000, N=918)
+[2026-11-02 00:56:16] Salida generada: tabla6_betas_robustez
+[2026-11-02 00:56:16] Salida generada: tabla7_diagnostico
+[2026-11-02 00:56:16] Salida generada: figura1_evolucion_sectorial.png
+[2026-11-02 00:56:18] Salida generada: figura2_retornos_diarios.png
+[2026-11-02 00:56:18] Salida generada: figura3_mineria_vs_mercado.png
+[2026-11-02 00:56:19] Salida generada: figura4_banca_vs_mercado.png
+[2026-11-02 00:56:19] Salida generada: figura5_consumo_vs_mercado.png
+[2026-11-02 00:56:19] Salida generada: figura6_construccion_vs_mercado.png
+[2026-11-02 00:56:20] Salida generada: figura7_betas.png
+[2026-11-02 00:56:20] Salida generada: figura8_costo_capital.png
+[2026-11-02 00:56:20] Analisis terminado.
