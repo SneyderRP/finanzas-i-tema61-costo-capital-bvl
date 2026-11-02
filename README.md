@@ -171,6 +171,7 @@ Todas se regeneran con `04_analisis.py` (Criterio 4).
 
 | Salida | Archivo | Sección |
 |---|---|---|
+| Tabla 0 | `salidas/tabla0_composicion_carteras.tex` | Anexo. Correspondencia entre la clasificación oficial de la BVL y las cuatro carteras |
 | Tabla 1 | `salidas/tabla1_descriptiva.tex` | Materiales y métodos |
 | Tabla 2 | `salidas/tabla2_adf.tex` | Materiales y métodos |
 | Tabla 3 | `salidas/tabla3_correlaciones.tex` | Resultados |
