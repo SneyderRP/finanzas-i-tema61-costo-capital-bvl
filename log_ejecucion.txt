@@ -645,3 +645,13 @@
 [2026-11-20 22:22:13] Salida generada: figura7_betas.png
 [2026-11-20 22:22:14] Salida generada: figura8_costo_capital.png
 [2026-11-20 22:22:14] Analisis terminado.
+[2026-11-20 23:17:03] ============================================================
+[2026-11-20 23:17:03] 05_markowitz.py: diversificacion y desempeno ajustado
+[2026-11-20 23:17:03] Rf 3.886 % | prima 15.3797 % | Rm 19.266 %
+[2026-11-20 23:17:03] Panel en formato ancho: 918 dias x 4 sectores
+[2026-11-20 23:17:03] Guardado tabla8_frontera_carteras | filas=3
+[2026-11-20 23:17:03] Guardado tabla9_desempeno_ajustado | filas=4
+[2026-11-20 23:17:03] Guardado tabla10_ganancia_diversificacion | filas=6
+[2026-11-20 23:17:05] Guardada figura9_frontera_eficiente.png
+[2026-11-20 23:17:06] Guardada figura10_linea_mercado_valores.png
+[2026-11-20 23:17:06] 05_markowitz.py termino sin errores

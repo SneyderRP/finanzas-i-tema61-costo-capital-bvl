@@ -81,6 +81,7 @@ python 02_scraping_web.py     # vía scraping: BVL   -> /datos_crudos/web
 python 01_extraccion_api.py   # vía API: Yahoo      -> /datos_crudos/api
 python 03_limpieza_datos.py   # unión y limpieza    -> /datos_procesados
 python 04_analisis.py         # tablas y figuras    -> /salidas
+python 05_markowitz.py        # diversificación     -> /salidas
 ```
 
 Los scripts guardan cada descarga por separado y no repiten lo que ya está en
@@ -167,7 +168,8 @@ limitación.
 
 ## 11. Trazabilidad de tablas y figuras
 
-Todas se regeneran con `04_analisis.py` (Criterio 4).
+Las tablas 0 a 7 y las figuras 1 a 8 se regeneran con `04_analisis.py`.
+Las tablas 8 a 10 y las figuras 9 y 10, con `05_markowitz.py` (Criterio 4).
 
 | Salida | Archivo | Sección |
 |---|---|---|
@@ -184,6 +186,11 @@ Todas se regeneran con `04_analisis.py` (Criterio 4).
 | Figuras 3 a 6 | `salidas/figura{3,4,5,6}_*_vs_mercado.png` | Resultados |
 | Figura 7 | `salidas/figura7_betas.png` | Resultados |
 | Figura 8 | `salidas/figura8_costo_capital.png` | Resultados |
+| Tabla 8 | `salidas/tabla8_frontera_carteras.tex` | Resultados. Carteras notables de la frontera eficiente |
+| Tabla 9 | `salidas/tabla9_desempeno_ajustado.tex` | Resultados. Sharpe, Treynor y alfa de Jensen |
+| Tabla 10 | `salidas/tabla10_ganancia_diversificacion.tex` | Resultados. Ganancia de combinar los cuatro sectores |
+| Figura 9 | `salidas/figura9_frontera_eficiente.png` | Resultados |
+| Figura 10 | `salidas/figura10_linea_mercado_valores.png` | Resultados |
 
 ## 12. Análisis aplicados
 
@@ -192,6 +199,7 @@ Todas se regeneran con `04_analisis.py` (Criterio 4).
 | Descriptivo | Media, desviación, mínimo, mediana y máximo del retorno de cada cartera; volatilidad y retorno anualizados; evolución acumulada | `tabla1`, `figura1`, `figura2` |
 | Inferencial | Prueba de raíz unitaria de Dickey-Fuller aumentada; correlaciones entre sectores | `tabla2`, `tabla3` |
 | Econométrico | Una regresión por sector con errores robustos de Newey-West (5 rezagos); betas con su intervalo de confianza; costo de capital por CAPM; robustez frente al mercado que excluye al propio sector; residuos revisados con Durbin-Watson y Jarque-Bera | `tabla4`, `tabla5`, `tabla6`, `tabla7`, `figuras 3 a 8` |
+| Financiero | Frontera eficiente de Markowitz (1952) sobre las cuatro carteras: 200 000 combinaciones de pesos no negativos con semilla 522, cartera de máximo ratio de Sharpe y de mínima varianza global; medidas de desempeño ajustado por riesgo de Sharpe (1964): ratio de Sharpe, ratio de Treynor y alfa de Jensen con su p-valor | `tabla8`, `tabla9`, `tabla10`, `figura9`, `figura10` |
 
 ## 13. Resultados principales
 

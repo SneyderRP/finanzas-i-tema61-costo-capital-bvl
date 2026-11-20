@@ -1,0 +1,5 @@
+Sector,Beta,Retorno anual %,Volatilidad anual %,Ke del CAPM %,Sharpe,Treynor %,Alfa de Jensen anual %,p del alfa,Retorno menos Ke %
+Minería,1.6155,27.07,28.25,28.73,0.8208,14.35,-4.23,0.557,-1.66
+Banca,1.0689,26.72,25.9,20.33,0.8815,21.36,5.57,0.517,6.39
+Construcción,0.8679,16.46,19.43,17.23,0.647,14.48,0.3,0.967,-0.78
+Consumo,0.5475,11.21,16.42,12.31,0.4457,13.37,0.4,0.953,-1.1
