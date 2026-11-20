@@ -45,6 +45,13 @@ from utilidades import cfg, registrar, registrar_incidencia, abortar
 # los cuatro del modelo, para dejar constancia del universo completo.
 SECTORES_BVL = ["CM", "CB", "CI", "CD", "CP", "CG", "CS", "CA", "FI"]
 
+# Ventana congelada (numeral 2.4.5). El backend de la BVL solo entrega la
+# sesion vigente: no admite pedir una fecha pasada. Con CONGELADO en True el
+# script conserva la captura que ya esta en disco en lugar de pisarla con la
+# sesion de hoy. Ponlo en False solo si quieres capturar una ventana nueva.
+CONGELADO = True
+
+
 CABECERAS = {
     "User-Agent": cfg.USER_AGENT,
     "Accept": "application/json, text/plain, */*",
@@ -82,6 +89,9 @@ def pedir(metodo, ruta, cuerpo=None):
 def guardar_crudo(objeto, nombre):
     """Deja el JSON tal como llego. Es la evidencia primaria y no se edita."""
     ruta = cfg.DIR_WEB / nombre
+    if CONGELADO and ruta.exists() and ruta.stat().st_size > 0:
+        registrar(f"Se conserva {nombre}", motivo="ventana congelada")
+        return ruta
     ruta.write_text(json.dumps(objeto, ensure_ascii=False, indent=1),
                     encoding="utf-8")
     return ruta
@@ -132,8 +142,21 @@ def main():
 
     tabla = pd.DataFrame(filas).drop_duplicates(subset=["nemonico"])
     tabla = tabla.sort_values(["sector_codigo", "nemonico"])
-    tabla.to_csv(cfg.ARCHIVO_CRUDO_WEB, index=False, encoding="utf-8")
-    registrar(f"Guardado {cfg.ARCHIVO_CRUDO_WEB.name}", filas=len(tabla))
+    destino = cfg.ARCHIVO_CRUDO_WEB
+    if CONGELADO and destino.exists() and destino.stat().st_size > 0:
+        previa = pd.read_csv(destino)
+        registrar(f"Se conserva {destino.name}", filas=len(previa),
+                  motivo="ventana congelada")
+        print(f"  La captura de {destino.name} ya existe con {len(previa)} "
+              "filas y se conserva.")
+        print("  El backend de la BVL no permite pedir una sesion pasada, de "
+              "modo que")
+        print("  sobrescribirla dejaria la evidencia fuera de la ventana "
+              "declarada.")
+        tabla = previa
+    else:
+        tabla.to_csv(destino, index=False, encoding="utf-8")
+        registrar(f"Guardado {destino.name}", filas=len(tabla))
 
     # ---------------------------------------------------------------- 3
     # Comprobacion: los 19 tickers de las cuatro carteras deben estar aqui.
