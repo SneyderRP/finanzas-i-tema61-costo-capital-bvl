@@ -1,7 +1,7 @@
 # Meglinho Sneyder Rojas Poma
 # Codigo de matricula: 2024200522B
 # Tema 61 del temario: Costo de capital por sector en la BVL: mineria, banca, consumo y construccion
-# Fecha de extraccion: COMPLETAR (AAAA-MM-DD, el dia que ejecutes la extraccion)
+# Fecha de extraccion: 2026-11-01
 
 """
 ANALISIS. Genera TODAS las tablas y figuras del articulo.
@@ -225,7 +225,7 @@ def main():
         sub = d[d.sector == s].sort_values("fecha")
         plt.plot(sub.fecha, sub.Y_retorno_sector.cumsum(), label=ETQ[s], lw=1)
     plt.xlabel("Fecha"); plt.ylabel("Retorno acumulado (%)")
-    plt.title("Evolucion acumulada de las cuatro carteras sectoriales, 2021-2026")
+    plt.title("Evolución acumulada de las cuatro carteras sectoriales, 2021-2026")
     plt.legend(); plt.grid(alpha=.3)
     guardar_figura("figura1_evolucion_sectorial")
 
@@ -235,7 +235,7 @@ def main():
         sub = d[d.sector == s].sort_values("fecha")
         eje.plot(sub.fecha, sub.Y_retorno_sector, lw=.5)
         eje.set_title(ETQ[s]); eje.grid(alpha=.3)
-        eje.set_ylabel("Variacion diaria (%)")
+        eje.set_ylabel("Variación diaria (%)")
     plt.suptitle("Retornos diarios por sector")
     guardar_figura("figura2_retornos_diarios")
 
@@ -260,7 +260,7 @@ def main():
     plt.barh(orden.index, orden["Beta"], color="steelblue")
     plt.axvline(1, color="firebrick", ls="--", lw=1)
     plt.xlabel("Beta estimada")
-    plt.title("Beta por sector. La linea marca la beta del mercado")
+    plt.title("Beta por sector. La línea marca la beta del mercado")
     plt.grid(axis="x", alpha=.3)
     guardar_figura("figura7_betas")
 
@@ -272,7 +272,7 @@ def main():
     plt.barh(orden.index, orden[col], color="darkseagreen")
     plt.axvline(rf_anual, color="firebrick", ls="--", lw=1)
     plt.xlabel("Costo de capital anual (%)")
-    plt.title("Costo de capital por sector. La linea marca la tasa libre de riesgo")
+    plt.title("Costo de capital por sector. La línea marca la tasa libre de riesgo")
     plt.grid(axis="x", alpha=.3)
     guardar_figura("figura8_costo_capital")
 
