@@ -1,0 +1,5 @@
+,Banca,Construccion,Consumo,Mineria
+Banca,1.0,0.2051,0.4553,0.5337
+Construccion,0.2051,1.0,0.2447,0.2968
+Consumo,0.4553,0.2447,1.0,0.3849
+Mineria,0.5337,0.2968,0.3849,1.0

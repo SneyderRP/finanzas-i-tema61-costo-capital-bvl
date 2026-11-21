@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Costo de capital por sector en la BVL</title>
+<meta name="description" content="Betas sectoriales y costo de capital en la Bolsa de Valores de Lima, 2021-2026. Meglinho Sneyder Rojas Poma, UNCP.">
+<style>
+:root{
+  --bg:#080c12; --panel:#111924; --panel2:#0d141d; --line:#1e2b3a;
+  --fg:#e9eff7; --muted:#8396ab; --accent:#4da3ff; --accent2:#7c5cff;
+  --mineria:#5b9bd5; --banca:#ffa94d; --construccion:#f06565; --consumo:#2ec4a0;
+  --ok:#2ec4a0; --warn:#ffa94d;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--sans);
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.wrap{
+  max-width:1120px; margin:0 auto;
+  padding-left:max(18px,env(safe-area-inset-left,0px));
+  padding-right:max(18px,env(safe-area-inset-right,0px));
+}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.015em}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ---------- cabecera ---------- */
+.top{
+  position:sticky; top:0; z-index:40; backdrop-filter:blur(12px);
+  background:rgba(8,12,18,.86); border-bottom:1px solid var(--line);
+}
+.top .wrap{display:flex; align-items:center; gap:18px; height:54px}
+.brand{font-weight:600; font-size:.9rem; white-space:nowrap}
+.brand span{color:var(--muted); font-weight:400}
+.nav{display:flex; gap:4px; margin-left:auto; overflow-x:auto; scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{
+  color:var(--muted); font-size:.82rem; padding:6px 11px; border-radius:7px;
+  white-space:nowrap; transition:color .18s,background .18s;
+}
+.nav a:hover,.nav a.on{color:var(--fg); background:var(--panel); text-decoration:none}
+
+/* ---------- portada ---------- */
+.hero{padding:54px 0 38px; border-bottom:1px solid var(--line); position:relative; overflow:hidden}
+.hero::before{
+  content:""; position:absolute; top:-180px; right:-140px; width:460px; height:460px;
+  background:radial-gradient(circle,rgba(77,163,255,.15),transparent 68%); pointer-events:none;
+}
+.eyebrow{font-size:.7rem; letter-spacing:.17em; text-transform:uppercase; color:var(--accent); font-weight:600}
+.hero h1{font-size:clamp(1.7rem,4.6vw,2.9rem); line-height:1.1; margin:.5rem 0 .7rem; max-width:17ch}
+.hero .lead{color:var(--muted); font-size:1rem; max-width:62ch}
+.hero .lead b{color:var(--fg); font-weight:600}
+.autor{margin-top:20px; font-size:.86rem; color:var(--muted)}
+.autor b{color:var(--fg); font-weight:600}
+
+.kpis{display:grid; gap:12px; margin-top:30px; grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
+.kpi{
+  background:linear-gradient(158deg,var(--panel),var(--panel2));
+  border:1px solid var(--line); border-radius:13px; padding:17px 19px;
+  position:relative; overflow:hidden; transition:transform .22s,border-color .22s;
+}
+.kpi::after{content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--accent)}
+.kpi:hover{transform:translateY(-2px); border-color:var(--accent)}
+.kpi .lbl{font-size:.69rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em}
+.kpi .val{font-family:var(--serif); font-size:clamp(1.5rem,3.6vw,2.05rem); margin-top:5px; line-height:1.08; font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:.74rem; color:var(--muted); margin-top:3px}
+
+/* ---------- secciones ---------- */
+section{padding:46px 0; border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+h2{font-size:clamp(1.15rem,2.4vw,1.42rem)}
+.snote{color:var(--muted); font-size:.89rem; margin:.5rem 0 20px; max-width:76ch}
+.snote b{color:var(--fg); font-weight:600}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:20px}
+.grid2{display:grid; gap:15px; grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+
+.chart{position:relative; width:100%}
+.chart svg{display:block; width:100%; height:auto; overflow:visible}
+.tip{
+  position:absolute; pointer-events:none; opacity:0; z-index:20;
+  background:#050a10; border:1px solid var(--line); border-radius:9px;
+  padding:8px 11px; font-size:.78rem; white-space:pre; line-height:1.45;
+  box-shadow:0 10px 28px rgba(0,0,0,.7); transition:opacity .13s;
+}
+.legend{display:flex; flex-wrap:wrap; gap:7px; margin-top:14px}
+.chip{
+  display:inline-flex; align-items:center; gap:7px; font-size:.78rem; color:var(--muted);
+  background:var(--panel2); border:1px solid var(--line); border-radius:999px;
+  padding:5px 12px; cursor:pointer; transition:.18s;
+}
+.chip:hover{color:var(--fg); border-color:var(--accent)}
+.chip.off{opacity:.38}
+.dot{width:9px; height:9px; border-radius:50%; flex:none}
+
+/* ---------- simulador ---------- */
+.sim{background:linear-gradient(140deg,rgba(77,163,255,.07),transparent); border-color:rgba(77,163,255,.3)}
+.ctrl{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:18px}
+.ctrl label{font-size:.82rem; color:var(--muted); white-space:nowrap}
+.ctrl output{
+  font-family:var(--mono); font-size:1.02rem; color:var(--accent); font-weight:600;
+  min-width:74px; text-align:right; font-variant-numeric:tabular-nums;
+}
+input[type=range]{
+  -webkit-appearance:none; appearance:none; flex:1; min-width:170px; height:5px;
+  background:var(--line); border-radius:3px; outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:19px; height:19px; border-radius:50%;
+  background:var(--accent); cursor:grab; border:3px solid var(--bg);
+  box-shadow:0 0 0 1px var(--accent);
+}
+input[type=range]::-moz-range-thumb{
+  width:19px; height:19px; border-radius:50%; background:var(--accent);
+  cursor:grab; border:3px solid var(--bg); box-shadow:0 0 0 1px var(--accent);
+}
+.btn{
+  background:var(--panel2); color:var(--fg); border:1px solid var(--line);
+  border-radius:8px; padding:7px 14px; font-size:.8rem; cursor:pointer; transition:.18s;
+}
+.btn:hover{border-color:var(--accent); color:var(--accent)}
+
+/* ---------- tablas ---------- */
+.tw{overflow-x:auto; -webkit-overflow-scrolling:touch}
+table{width:100%; border-collapse:collapse; font-size:.85rem; min-width:560px}
+th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+th:first-child,td:first-child{text-align:left; position:sticky; left:0; background:var(--panel)}
+thead th{
+  color:var(--muted); font-weight:600; font-size:.7rem; text-transform:uppercase;
+  letter-spacing:.08em; cursor:pointer; user-select:none; background:var(--panel);
+}
+thead th:hover{color:var(--fg)}
+thead th::after{content:"\2195"; opacity:.26; margin-left:6px; font-size:.85em}
+thead th.asc::after{content:"\2191"; opacity:1; color:var(--accent)}
+thead th.desc::after{content:"\2193"; opacity:1; color:var(--accent)}
+tbody td{font-variant-numeric:tabular-nums}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(77,163,255,.06)}
+tbody tr:last-child td{border-bottom:none}
+.pos{color:var(--ok)} .neg{color:var(--construccion)}
+
+/* ---------- descargas ---------- */
+.dl{display:grid; gap:11px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.dl a{
+  display:flex; align-items:center; gap:13px; background:var(--panel);
+  border:1px solid var(--line); border-radius:11px; padding:14px 16px;
+  color:var(--fg); transition:.19s;
+}
+.dl a:hover{border-color:var(--accent); background:var(--panel2); text-decoration:none; transform:translateY(-1px)}
+.dl .ico{
+  width:36px; height:36px; border-radius:9px; background:rgba(77,163,255,.13);
+  display:grid; place-items:center; color:var(--accent); font-size:.65rem;
+  font-weight:700; letter-spacing:.04em; flex:none;
+}
+.dl .t{font-size:.88rem; font-weight:500}
+.dl .d{font-size:.74rem; color:var(--muted)}
+
+/* ---------- pie ---------- */
+footer{padding:36px 0 56px; color:var(--muted); font-size:.82rem}
+footer p{margin:.5rem 0; max-width:80ch}
+code{font-family:var(--mono); font-size:.92em; color:var(--accent)}
+.aviso{
+  background:var(--panel2); border-left:3px solid var(--warn);
+  border-radius:0 9px 9px 0; padding:13px 17px; margin:18px 0; font-size:.84rem;
+}
+.aviso b{color:var(--fg)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+@media (max-width:620px){
+  .hero{padding:34px 0 26px}
+  section{padding:34px 0}
+  .brand span{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Tema 61 <span>&middot; Finanzas I &middot; UNCP</span></div>
+    <nav class="nav" id="nav">
+      <a href="#riesgo">Riesgo</a>
+      <a href="#capital">Costo de capital</a>
+      <a href="#carteras">Carteras</a>
+      <a href="#datos">Datos</a>
+      <a href="#descargas">Descargas</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Unidad II &middot; 2026-II</div>
+    <h1>Betas sectoriales y costo de capital en la Bolsa de Valores de Lima</h1>
+    <p class="lead">
+      Qué rendimiento le exige el mercado a cada sector de la bolsa peruana, estimado con
+      <b id="h-dias">—</b> días de cotización entre noviembre de 2021 y octubre de 2026.
+      La minería amplifica el mercado con una beta de <b id="h-bmax">—</b>; el consumo lo
+      amortigua con <b id="h-bmin">—</b>.
+    </p>
+    <p class="autor">
+      <b>Meglinho Sneyder Rojas Poma</b> &middot; código 2024200522B &middot;
+      Escuela Profesional de Economía, Universidad Nacional del Centro del Perú
+    </p>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="lbl">Observaciones</div>
+        <div class="val" id="k-obs">—</div>
+        <div class="sub">días por sector, panel balanceado</div>
+      </div>
+      <div class="kpi">
+        <div class="lbl">Costo de capital</div>
+        <div class="val" id="k-ke">—</div>
+        <div class="sub">del consumo a la minería</div>
+      </div>
+      <div class="kpi">
+        <div class="lbl">Prima de mercado</div>
+        <div class="val" id="k-prima">—</div>
+        <div class="sub">realizada en la ventana</div>
+      </div>
+      <div class="kpi">
+        <div class="lbl">Diversificar suma</div>
+        <div class="val" id="k-sharpe">—</div>
+        <div class="sub">de mejora en el ratio de Sharpe</div>
+      </div>
+    </div>
+  </div>
+
+  <section id="riesgo">
+    <h2>Riesgo sistemático por sector</h2>
+    <p class="snote">
+      La beta mide cuánto se mueve un sector cuando el mercado se mueve uno por ciento.
+      Cada punto es la estimación por mínimos cuadrados con errores de Newey-West; la banda,
+      su intervalo de confianza al 95 %. <b>La banca es el único sector cuyo intervalo
+      contiene el 1</b>, de modo que su riesgo no se distingue del mercado.
+      Pasa el cursor por cada barra para ver el detalle.
+    </p>
+    <div class="card">
+      <div class="chart" id="c-betas"></div>
+      <div class="legend" id="leg-betas"></div>
+    </div>
+  </section>
+
+  <section id="capital">
+    <h2>Simulador del costo de capital</h2>
+    <p class="snote">
+      El CAPM dice que <code>Ke = Rf + beta × prima</code>. Mueve la prima de mercado y mira
+      cómo cambia lo que cada sector tiene que rendir. La línea punteada marca la
+      <b>prima realizada en la ventana</b>, que es la que usa el artículo.
+    </p>
+    <div class="card sim">
+      <div class="ctrl">
+        <label for="prima">Prima de mercado</label>
+        <input type="range" id="prima" min="2" max="20" step="0.1" value="15.4"
+               aria-label="Prima de mercado en porcentaje">
+        <output id="prima-val">15,4 %</output>
+        <button class="btn" id="prima-reset">Volver a la realizada</button>
+      </div>
+      <div class="chart" id="c-ke"></div>
+    </div>
+  </section>
+
+  <section id="carteras">
+    <h2>Diversificación entre sectores</h2>
+    <p class="snote">
+      Frontera eficiente de Markowitz sobre las cuatro carteras sectoriales. La construcción
+      pesa <b id="h-const">—</b> % en la cartera de máximo Sharpe pese a tener el segundo peor
+      retorno, porque es el sector con las correlaciones más bajas. Eso es diversificación:
+      lo que vale no es el retorno de un activo, sino que se mueva distinto a los demás.
+    </p>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="font-size:.92rem;margin-bottom:12px">Riesgo frente a retorno</h3>
+        <div class="chart" id="c-front"></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:.92rem;margin-bottom:12px">Correlaciones entre sectores</h3>
+        <div class="chart" id="c-corr"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="datos">
+    <h2>Desempeño ajustado por riesgo</h2>
+    <p class="snote">
+      La banca lidera en Sharpe y en Treynor: rindió casi lo mismo que la minería con una beta
+      34 % menor. <b>Ningún alfa de Jensen es significativo al 5 %</b>, de modo que la
+      diferencia se describe pero no prueba que un sector haya batido al mercado.
+      Haz clic en una columna para ordenar.
+    </p>
+    <div class="card tw">
+      <table id="t-desempeno">
+        <thead><tr id="t-head"></tr></thead>
+        <tbody id="t-body"></tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:1rem;margin:30px 0 10px">Las dieciséis acciones del panel</h3>
+    <p class="snote">
+      La Bolsa de Valores de Lima clasifica por tipo de empresa, no por actividad económica,
+      de modo que diez de las dieciséis se reasignaron con criterio económico. La columna
+      lo declara.
+    </p>
+    <div class="card tw">
+      <table id="t-comp">
+        <thead><tr id="tc-head"></tr></thead>
+        <tbody id="tc-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="descargas">
+    <h2>Descargas</h2>
+    <p class="snote">Los productos del trabajo y las tablas que alimentan esta página.</p>
+    <h3 style="font-size:.95rem;margin-bottom:11px">Productos</h3>
+    <div class="dl" id="dl-prod"></div>
+    <h3 style="font-size:.95rem;margin:26px 0 11px">Datos en CSV</h3>
+    <div class="dl" id="dl-datos"></div>
+
+    <div class="aviso">
+      <b>Sobre los artículos de la revisión.</b> Los treinta artículos en inglés son de sus
+      editoriales y las traducciones al español son obras derivadas, de modo que no se
+      republican aquí. Cada uno se consulta por su DOI, que figura en las referencias del
+      artículo.
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Fuentes.</b> Dos vías de extracción. El backend de la Bolsa de Valores de Lima aporta
+      la clasificación sectorial y la moneda de cotización; la API de Yahoo Finance aporta los
+      precios diarios, el rendimiento del Tesoro de Estados Unidos a diez años y el tipo de
+      cambio. Ventana congelada al 31 de octubre de 2026.</p>
+    <p><b>Reproducibilidad.</b> Cada número de esta página sale de las tablas que generan
+      <code>04_analisis.py</code> y <code>05_markowitz.py</code>, y esta página la escribe
+      <code>06_generar_web.py</code> desde esas mismas tablas. El código completo está en el
+      repositorio.</p>
+    <p style="margin-top:18px">Finanzas I (055D), ciclo V, periodo 2026-II &middot;
+      Dr. Ciro Iván Machacuay Meza &middot; Universidad Nacional del Centro del Perú</p>
+  </footer>
+</div>
+
+<script>
+/*__DATOS__*/
+
+(function () {
+  "use strict";
+
+  var ORDEN = ["Mineria", "Banca", "Construccion", "Consumo"];
+  var ETQ = { Mineria: "Minería", Banca: "Banca", Construccion: "Construcción", Consumo: "Consumo" };
+  var COL = {
+    Mineria: "#5b9bd5", Banca: "#ffa94d", Construccion: "#f06565", Consumo: "#2ec4a0"
+  };
+  var ocultos = {};
+
+  // Las tablas no escriben el sector igual: tabla9 lleva tilde y las demas no.
+  // Esta funcion devuelve siempre la misma clave, de modo que color, etiqueta y
+  // orden coinciden venga de donde venga la fila.
+  function clave(s) {
+    if (!s) return "";
+    var x = String(s).normalize ? String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                                : String(s);
+    return x.charAt(0).toUpperCase() + x.slice(1).toLowerCase();
+  }
+  function color(s) { return COL[clave(s)] || "#8396ab"; }
+  function nombre(s) { return ETQ[clave(s)] || s; }
+
+  function num(v) { var x = parseFloat(v); return isFinite(x) ? x : NaN; }
+  function fmt(v, d) {
+    return isFinite(v) ? v.toFixed(d === undefined ? 2 : d).replace(".", ",") : "—";
+  }
+  function pct(v, d) { return fmt(v, d) + " %"; }
+  function el(id) { return document.getElementById(id); }
+
+  function fila(tabla, campo, valor) {
+    var a = DATOS[tabla] || [];
+    for (var i = 0; i < a.length; i++) if (a[i][campo] === valor) return a[i];
+    return null;
+  }
+  function porOrden(tabla) {
+    return (DATOS[tabla] || []).slice().sort(function (a, b) {
+      return ORDEN.indexOf(clave(a.Sector)) - ORDEN.indexOf(clave(b.Sector));
+    });
+  }
+  function visibles(rows) {
+    return rows.filter(function (r) { return !ocultos[clave(r.Sector)]; });
+  }
+
+  // ---------- utilidades de dibujo ----------
+  var NS = "http://www.w3.org/2000/svg";
+  function svgEl(t, at) {
+    var e = document.createElementNS(NS, t);
+    for (var k in at) if (at[k] !== null && at[k] !== undefined) e.setAttribute(k, at[k]);
+    return e;
+  }
+  function lienzo(host, h, label) {
+    host.textContent = "";
+    var w = Math.max(280, host.clientWidth || 320);
+    var s = svgEl("svg", {
+      viewBox: "0 0 " + w + " " + h, width: "100%", height: h,
+      role: "img", "aria-label": label
+    });
+    host.appendChild(s);
+    return { s: s, w: w, h: h };
+  }
+  function texto(p, x, y, txt, op) {
+    op = op || {};
+    var t = svgEl("text", {
+      x: x, y: y, fill: op.fill || "#8396ab",
+      "font-size": op.size || 11, "text-anchor": op.anchor || "start",
+      "font-weight": op.weight || null
+    });
+    if (op.mono) t.setAttribute("style", "font-variant-numeric:tabular-nums");
+    t.textContent = txt;
+    p.appendChild(t);
+    return t;
+  }
+  function tooltip(host) {
+    var d = document.createElement("div");
+    d.className = "tip";
+    host.style.position = "relative";
+    host.appendChild(d);
+    return {
+      ver: function (x, y, txt) {
+        d.textContent = txt;
+        d.style.opacity = 1;
+        var bw = d.offsetWidth, bh = d.offsetHeight, W = host.clientWidth;
+        d.style.left = Math.max(2, Math.min(x - bw / 2, W - bw - 2)) + "px";
+        d.style.top = Math.max(2, y - bh - 12) + "px";
+      },
+      ir: function () { d.style.opacity = 0; }
+    };
+  }
+  function zonaHover(p, at, texto_, tip, host) {
+    var z = svgEl("rect", at);
+    z.setAttribute("fill", "transparent");
+    z.style.cursor = "crosshair";
+    z.addEventListener("pointermove", function (ev) {
+      var r = host.getBoundingClientRect();
+      tip.ver(ev.clientX - r.left, ev.clientY - r.top, texto_);
+    });
+    z.addEventListener("pointerleave", tip.ir);
+    p.appendChild(z);
+  }
+
+  // ---------- portada ----------
+  function portada() {
+    var b = porOrden("betas");
+    var c = DATOS.costo[0] || {};
+    var min = fila("betas", "Sector", "Consumo"), max = fila("betas", "Sector", "Mineria");
+
+    el("h-dias").textContent = b.length ? (+b[0].N).toLocaleString("es-PE") : "—";
+    el("k-obs").textContent = b.length ? (+b[0].N).toLocaleString("es-PE") : "—";
+    el("h-bmax").textContent = max ? fmt(num(max.Beta), 3) : "—";
+    el("h-bmin").textContent = min ? fmt(num(min.Beta), 3) : "—";
+
+    var kes = DATOS.costo.map(function (r) { return num(r["Costo de capital Ke (%)"]); })
+      .filter(isFinite);
+    el("k-ke").textContent = kes.length
+      ? fmt(Math.min.apply(null, kes), 1) + " a " + pct(Math.max.apply(null, kes), 1) : "—";
+    el("k-prima").textContent = pct(num(c["Prima de mercado (%)"]), 2);
+
+    var mej = fila("diversificacion", "Indicador", "Mejora porcentual del Sharpe");
+    el("k-sharpe").textContent = mej ? "+" + pct(num(mej.Valor), 1) : "—";
+
+    var tan = (DATOS.frontera || []).filter(function (r) {
+      return r.Cartera.indexOf("Maximo") === 0;
+    })[0];
+    el("h-const").textContent = tan ? fmt(num(tan["Construcción %"]), 1) : "—";
+  }
+
+  // ---------- grafico de betas ----------
+  function dibujarBetas() {
+    var host = el("c-betas");
+    var rows = visibles(porOrden("betas"));
+    if (!rows.length) { host.textContent = ""; return; }
+    var h = rows.length * 46 + 44;
+    var L = lienzo(host, h, "Beta de cada sector con su intervalo de confianza al 95 por ciento");
+    var m = { l: 94, r: 54, t: 12, b: 30 };
+    var maxv = Math.max.apply(null, rows.map(function (r) { return num(r["IC 95% superior"]); }));
+    var X = function (v) { return m.l + (v / (maxv * 1.08)) * (L.w - m.l - m.r); };
+    var bw = (h - m.t - m.b) / rows.length;
+    var tip = tooltip(host);
+
+    for (var g = 0; g <= 2; g += 0.5) {
+      if (g > maxv * 1.08) break;
+      L.s.appendChild(svgEl("line", {
+        x1: X(g), x2: X(g), y1: m.t, y2: h - m.b,
+        stroke: "#1e2b3a", "stroke-width": 1
+      }));
+      texto(L.s, X(g), h - m.b + 16, fmt(g, 1), { anchor: "middle" });
+    }
+    L.s.appendChild(svgEl("line", {
+      x1: X(1), x2: X(1), y1: m.t, y2: h - m.b,
+      stroke: "#8396ab", "stroke-width": 1, "stroke-dasharray": "5 4", opacity: .8
+    }));
+    texto(L.s, X(1) + 6, m.t + 11, "mercado = 1", { size: 10 });
+
+    rows.forEach(function (r, i) {
+      var cy = m.t + i * bw + bw / 2;
+      var b = num(r.Beta), lo = num(r["IC 95% inferior"]), hi = num(r["IC 95% superior"]);
+      var c = color(r.Sector);
+      texto(L.s, m.l - 12, cy + 4, nombre(r.Sector), { anchor: "end", fill: "#e9eff7", size: 12 });
+      L.s.appendChild(svgEl("line", {
+        x1: X(lo), x2: X(hi), y1: cy, y2: cy, stroke: c, "stroke-width": 7,
+        "stroke-linecap": "round", opacity: .34
+      }));
+      L.s.appendChild(svgEl("circle", {
+        cx: X(b), cy: cy, r: 7.5, fill: c, stroke: "#080c12", "stroke-width": 2.5
+      }));
+      texto(L.s, X(hi) + 10, cy + 4, fmt(b, 3), { fill: "#e9eff7", size: 12, mono: true });
+      zonaHover(L.s, { x: m.l, y: cy - bw / 2, width: L.w - m.l - m.r, height: bw },
+        nombre(r.Sector) + "\nBeta " + fmt(b, 4) +
+        "\nIC 95 %: " + fmt(lo, 3) + " a " + fmt(hi, 3) +
+        "\nR² " + fmt(num(r.R2), 3) + "\np " + (num(r["p-valor"]) < 0.001 ? "< 0,001" : fmt(num(r["p-valor"]), 3)),
+        tip, host);
+    });
+  }
+
+  function leyenda() {
+    var cont = el("leg-betas");
+    cont.textContent = "";
+    ORDEN.forEach(function (s) {
+      var b = document.createElement("button");
+      b.className = "chip" + (ocultos[s] ? " off" : "");
+      b.type = "button";
+      b.setAttribute("aria-pressed", ocultos[s] ? "false" : "true");
+      var d = document.createElement("i");
+      d.className = "dot";
+      d.style.background = COL[s];
+      b.appendChild(d);
+      b.appendChild(document.createTextNode(ETQ[s]));
+      b.addEventListener("click", function () {
+        ocultos[s] = !ocultos[s];
+        if (ORDEN.every(function (x) { return ocultos[x]; })) ocultos[s] = false;
+        leyenda(); dibujarBetas(); dibujarKe();
+      });
+      cont.appendChild(b);
+    });
+  }
+
+  // ---------- simulador del costo de capital ----------
+  var primaReal = 15.4;
+  function dibujarKe() {
+    var host = el("c-ke");
+    var rows = visibles(porOrden("costo"));
+    if (!rows.length) { host.textContent = ""; return; }
+    var prima = parseFloat(el("prima").value);
+    var rf = num((DATOS.costo[0] || {})["Rf (%)"]);
+    var h = 300;
+    var L = lienzo(host, h, "Costo de capital de cada sector segun la prima de mercado elegida");
+    var m = { l: 46, r: 16, t: 24, b: 48 };
+    var kes = rows.map(function (r) { return rf + num(r.Beta) * prima; });
+    var top = Math.max(Math.max.apply(null, kes) * 1.17, 10);
+    var Y = function (v) { return h - m.b - (v / top) * (h - m.b - m.t); };
+    var bw = (L.w - m.l - m.r) / rows.length;
+    var tip = tooltip(host);
+
+    var paso = top > 30 ? 10 : 5;
+    for (var g = 0; g <= top; g += paso) {
+      L.s.appendChild(svgEl("line", {
+        x1: m.l, x2: L.w - m.r, y1: Y(g), y2: Y(g), stroke: "#1e2b3a", "stroke-width": 1
+      }));
+      texto(L.s, m.l - 8, Y(g) + 4, g + "%", { anchor: "end", size: 10 });
+    }
+    L.s.appendChild(svgEl("line", {
+      x1: m.l, x2: L.w - m.r, y1: Y(rf), y2: Y(rf),
+      stroke: "#8396ab", "stroke-dasharray": "4 4", opacity: .75
+    }));
+    texto(L.s, m.l + 6, Y(rf) - 7, "Rf " + fmt(rf, 2) + " %", { size: 10 });
+
+    rows.forEach(function (r, i) {
+      var ke = rf + num(r.Beta) * prima;
+      var x = m.l + i * bw + bw * 0.2, an = bw * 0.6;
+      var c = color(r.Sector);
+      var alto = Math.max(0, h - m.b - Y(ke));
+      var b = svgEl("rect", { x: x, y: Y(ke), width: an, height: alto, rx: 4, fill: c });
+      b.setAttribute("style", "transition:y .18s,height .18s");
+      L.s.appendChild(b);
+      texto(L.s, x + an / 2, Y(ke) - 9, pct(ke, 1),
+        { anchor: "middle", fill: "#e9eff7", size: 12.5, mono: true, weight: 600 });
+      texto(L.s, x + an / 2, h - m.b + 18, nombre(r.Sector),
+        { anchor: "middle", size: 11 });
+      texto(L.s, x + an / 2, h - m.b + 33, "β " + fmt(num(r.Beta), 3),
+        { anchor: "middle", size: 10, mono: true });
+      zonaHover(L.s, { x: m.l + i * bw, y: m.t, width: bw, height: h - m.b - m.t },
+        nombre(r.Sector) + "\nKe " + pct(ke, 2) +
+        "\nβ " + fmt(num(r.Beta), 4) + "\nRf " + pct(rf, 3) + "\nPrima " + pct(prima, 1),
+        tip, host);
+    });
+  }
+
+  // ---------- frontera ----------
+  function dibujarFrontera() {
+    var host = el("c-front");
+    var sec = porOrden("desempeno").map(function (r) {
+      return {
+        n: nombre(r.Sector), c: color(r.Sector),
+        v: num(r["Volatilidad anual %"]), r: num(r["Retorno anual %"]), s: num(r.Sharpe), tipo: "s"
+      };
+    });
+    var car = (DATOS.frontera || []).map(function (r) {
+      return {
+        n: r.Cartera, c: "#7c5cff", v: num(r["Volatilidad anual %"]),
+        r: num(r["Retorno anual %"]), s: num(r.Sharpe), tipo: "c"
+      };
+    });
+    var todo = sec.concat(car).filter(function (p) { return isFinite(p.v) && isFinite(p.r); });
+    if (!todo.length) { host.textContent = ""; return; }
+
+    var h = 300;
+    var L = lienzo(host, h, "Retorno frente a volatilidad de los sectores y de las carteras");
+    var m = { l: 46, r: 18, t: 20, b: 48 };
+    var vs = todo.map(function (p) { return p.v; }), rs = todo.map(function (p) { return p.r; });
+    var v0 = Math.min.apply(null, vs) * 0.88, v1 = Math.max.apply(null, vs) * 1.07;
+    var r0 = Math.min.apply(null, rs) * 0.82, r1 = Math.max.apply(null, rs) * 1.1;
+    var X = function (v) { return m.l + ((v - v0) / (v1 - v0)) * (L.w - m.l - m.r); };
+    var Y = function (v) { return h - m.b - ((v - r0) / (r1 - r0)) * (h - m.b - m.t); };
+    var tip = tooltip(host);
+
+    for (var i = 0; i <= 4; i++) {
+      var yv = r0 + (r1 - r0) * i / 4, xv = v0 + (v1 - v0) * i / 4;
+      L.s.appendChild(svgEl("line", { x1: m.l, x2: L.w - m.r, y1: Y(yv), y2: Y(yv), stroke: "#1e2b3a" }));
+      texto(L.s, m.l - 8, Y(yv) + 4, fmt(yv, 0) + "%", { anchor: "end", size: 10 });
+      texto(L.s, X(xv), h - m.b + 17, fmt(xv, 0) + "%", { anchor: "middle", size: 10 });
+    }
+    texto(L.s, (m.l + L.w - m.r) / 2, h - 8, "Volatilidad anual", { anchor: "middle", size: 11 });
+
+    car.forEach(function (p) {
+      var g = svgEl("path", {
+        d: "M0,-11 L3,-3.4 L11,-3.4 L4.6,1.3 L6.9,9 L0,4.3 L-6.9,9 L-4.6,1.3 L-11,-3.4 L-3,-3.4 Z",
+        transform: "translate(" + X(p.v) + "," + Y(p.r) + ")",
+        fill: "#7c5cff", stroke: "#080c12", "stroke-width": 1.5
+      });
+      L.s.appendChild(g);
+    });
+    sec.forEach(function (p) {
+      L.s.appendChild(svgEl("circle", {
+        cx: X(p.v), cy: Y(p.r), r: 9, fill: p.c, stroke: "#080c12", "stroke-width": 2.5
+      }));
+      texto(L.s, X(p.v), Y(p.r) - 17, p.n, { anchor: "middle", size: 10.5 });
+    });
+    todo.forEach(function (p) {
+      var z = svgEl("circle", { cx: X(p.v), cy: Y(p.r), r: 16, fill: "transparent" });
+      z.style.cursor = "crosshair";
+      z.addEventListener("pointermove", function (ev) {
+        var rc = host.getBoundingClientRect();
+        tip.ver(ev.clientX - rc.left, ev.clientY - rc.top,
+          p.n + "\nRetorno " + pct(p.r, 2) + "\nVolatilidad " + pct(p.v, 2) +
+          "\nSharpe " + fmt(p.s, 4));
+      });
+      z.addEventListener("pointerleave", tip.ir);
+      L.s.appendChild(z);
+    });
+  }
+
+  // ---------- correlaciones ----------
+  function dibujarCorr() {
+    var host = el("c-corr");
+    var rows = DATOS.correlaciones || [];
+    if (!rows.length) { host.textContent = ""; return; }
+    var h = 300;
+    var L = lienzo(host, h, "Matriz de correlaciones entre los retornos de los cuatro sectores");
+    var m = { l: 56, r: 14, t: 32, b: 14 };
+    var corto = { Mineria: "Min.", Banca: "Ban.", Construccion: "Con.", Consumo: "Cns." };
+    var cw = (L.w - m.l - m.r) / 4, ch = (h - m.t - m.b) / 4;
+    var tip = tooltip(host);
+
+    ORDEN.forEach(function (s, j) {
+      texto(L.s, m.l + j * cw + cw / 2, m.t - 11, corto[s], { anchor: "middle", size: 11 });
+      texto(L.s, m.l - 10, m.t + j * ch + ch / 2 + 4, corto[s], { anchor: "end", size: 11 });
+    });
+
+    rows.forEach(function (r) {
+      var i = ORDEN.indexOf(clave(r.Sector));
+      if (i < 0) return;
+      ORDEN.forEach(function (c, j) {
+        var v = num(r[c]);
+        if (!isFinite(v)) return;
+        var mismo = r.Sector === c;
+        var op = mismo ? 0.12 : Math.max(0.1, Math.min(0.95, v / 0.6));
+        L.s.appendChild(svgEl("rect", {
+          x: m.l + j * cw + 2, y: m.t + i * ch + 2,
+          width: cw - 4, height: ch - 4, rx: 4,
+          fill: "#4da3ff", opacity: op
+        }));
+        texto(L.s, m.l + j * cw + cw / 2, m.t + i * ch + ch / 2 + 4,
+          mismo ? "—" : fmt(v, 3).replace("0,", ","),
+          { anchor: "middle", size: 12, mono: true, fill: mismo ? "#8396ab" : (v > 0.42 ? "#06121f" : "#e9eff7") });
+        zonaHover(L.s, { x: m.l + j * cw, y: m.t + i * ch, width: cw, height: ch },
+          nombre(r.Sector) + " con " + nombre(c) + "\n" + fmt(v, 4), tip, host);
+      });
+    });
+  }
+
+  // ---------- tablas ----------
+  function tablaOrdenable(datos, campos, cabecera, cuerpo, formato) {
+    var estado = { campo: null, asc: false };
+
+    function pinta() {
+      var rows = datos.slice();
+      if (estado.campo) {
+        rows.sort(function (a, b) {
+          var x = num(a[estado.campo]), y = num(b[estado.campo]);
+          if (isNaN(x) && isNaN(y)) {
+            return String(a[estado.campo]).localeCompare(String(b[estado.campo])) * (estado.asc ? 1 : -1);
+          }
+          if (isNaN(x)) return 1;
+          if (isNaN(y)) return -1;
+          return (x - y) * (estado.asc ? 1 : -1);
+        });
+      }
+      cuerpo.textContent = "";
+      rows.forEach(function (r) {
+        var tr = document.createElement("tr");
+        campos.forEach(function (c, i) {
+          var cel = document.createElement(i === 0 ? "th" : "td");
+          if (i === 0) {
+            cel.scope = "row";
+            cel.style.cssText = "font-weight:500;color:var(--fg);text-transform:none;letter-spacing:0;font-size:.85rem;cursor:default";
+            if (COL[clave(r[c])]) {
+              var d = document.createElement("i");
+              d.className = "dot";
+              d.style.cssText = "background:" + color(r[c]) + ";margin-right:8px;display:inline-block";
+              cel.appendChild(d);
+            }
+            cel.appendChild(document.createTextNode(nombre(r[c])));
+          } else {
+            var txt = formato ? formato(c, r[c], cel) : r[c];
+            cel.textContent = txt;
+          }
+          tr.appendChild(cel);
+        });
+        cuerpo.appendChild(tr);
+      });
+    }
+
+    cabecera.textContent = "";
+    campos.forEach(function (c) {
+      var th = document.createElement("th");
+      th.textContent = c;
+      th.setAttribute("scope", "col");
+      th.addEventListener("click", function () {
+        estado.asc = estado.campo === c ? !estado.asc : false;
+        estado.campo = c;
+        Array.prototype.forEach.call(cabecera.children, function (x) {
+          x.className = "";
+        });
+        th.className = estado.asc ? "asc" : "desc";
+        pinta();
+      });
+      cabecera.appendChild(th);
+    });
+    pinta();
+  }
+
+  function tablas() {
+    var campos = ["Sector", "Beta", "Retorno anual %", "Volatilidad anual %",
+      "Ke del CAPM %", "Sharpe", "Treynor %", "Alfa de Jensen anual %", "p del alfa"];
+    var dec = { Beta: 4, Sharpe: 4, "p del alfa": 3 };
+    tablaOrdenable(porOrden("desempeno"), campos, el("t-head"), el("t-body"),
+      function (campo, valor, celda) {
+        var v = num(valor);
+        if (!isFinite(v)) return valor;
+        if (campo === "Alfa de Jensen anual %") {
+          celda.className = v > 0 ? "pos" : "neg";
+        }
+        return fmt(v, dec[campo] === undefined ? 2 : dec[campo]);
+      });
+
+    var cc = ["Nemonico", "Empresa", "Sector BVL", "Cartera asignada", "Reasignada", "Moneda"];
+    var comp = (DATOS.composicion || []).slice().sort(function (a, b) {
+      var d = ORDEN.indexOf(clave(a["Cartera asignada"])) - ORDEN.indexOf(clave(b["Cartera asignada"]));
+      return d || a.Nemonico.localeCompare(b.Nemonico);
+    });
+    tablaOrdenable(comp, cc, el("tc-head"), el("tc-body"), function (campo, valor, celda) {
+      if (campo === "Reasignada") celda.className = valor === "si" ? "pos" : "";
+      if (campo === "Cartera asignada") return nombre(valor);
+      return valor;
+    });
+  }
+
+  // ---------- descargas ----------
+  function descargas() {
+    var p = el("dl-prod");
+    p.textContent = "";
+    PRODUCTOS.forEach(function (x) {
+      var a = document.createElement("a");
+      a.href = x[2];
+      a.setAttribute("download", "");
+      var i = document.createElement("span");
+      i.className = "ico";
+      i.textContent = "PDF";
+      var c = document.createElement("span");
+      var t = document.createElement("span");
+      t.className = "t";
+      t.textContent = x[0];
+      var d = document.createElement("span");
+      d.className = "d";
+      d.textContent = x[1];
+      c.appendChild(t);
+      c.appendChild(document.createElement("br"));
+      c.appendChild(d);
+      a.appendChild(i);
+      a.appendChild(c);
+      p.appendChild(a);
+    });
+
+    var NOM = {
+      composicion: ["Composición de las carteras", "tabla0_composicion_carteras.csv"],
+      descriptiva: ["Descriptiva de los retornos", "tabla1_descriptiva.csv"],
+      correlaciones: ["Correlaciones entre sectores", "tabla3_correlaciones.csv"],
+      betas: ["Betas sectoriales", "tabla4_betas.csv"],
+      costo: ["Costo de capital", "tabla5_costo_capital.csv"],
+      frontera: ["Carteras de la frontera", "tabla8_frontera_carteras.csv"],
+      desempeno: ["Desempeño ajustado", "tabla9_desempeno_ajustado.csv"],
+      diversificacion: ["Ganancia de diversificar", "tabla10_ganancia_diversificacion.csv"]
+    };
+    var cont = el("dl-datos");
+    cont.textContent = "";
+    Object.keys(NOM).forEach(function (k) {
+      var a = document.createElement("a");
+      a.href = "datos/" + NOM[k][1];
+      a.setAttribute("download", "");
+      var i = document.createElement("span");
+      i.className = "ico";
+      i.textContent = "CSV";
+      var c = document.createElement("span");
+      var t = document.createElement("span");
+      t.className = "t";
+      t.textContent = NOM[k][0];
+      var d = document.createElement("span");
+      d.className = "d";
+      d.textContent = (DATOS[k] || []).length + " filas";
+      c.appendChild(t);
+      c.appendChild(document.createElement("br"));
+      c.appendChild(d);
+      a.appendChild(i);
+      a.appendChild(c);
+      cont.appendChild(a);
+    });
+  }
+
+  // ---------- navegacion ----------
+  function navegacion() {
+    var links = Array.prototype.slice.call(document.querySelectorAll(".nav a"));
+    var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
+    function marca() {
+      var y = window.scrollY + 90, act = -1;
+      secs.forEach(function (s, i) { if (s && s.offsetTop <= y) act = i; });
+      links.forEach(function (a, i) { a.className = i === act ? "on" : ""; });
+    }
+    window.addEventListener("scroll", marca, { passive: true });
+    marca();
+  }
+
+  // ---------- arranque ----------
+  function dibujarTodo() {
+    dibujarBetas(); dibujarKe(); dibujarFrontera(); dibujarCorr();
+  }
+
+  function iniciar() {
+    primaReal = num((DATOS.costo[0] || {})["Prima de mercado (%)"]);
+    if (!isFinite(primaReal)) primaReal = 15.4;
+    var r = el("prima");
+    r.value = primaReal;
+    el("prima-val").textContent = pct(primaReal, 1);
+
+    portada();
+    leyenda();
+    tablas();
+    descargas();
+    dibujarTodo();
+    navegacion();
+
+    r.addEventListener("input", function () {
+      el("prima-val").textContent = pct(parseFloat(r.value), 1);
+      dibujarKe();
+    });
+    el("prima-reset").addEventListener("click", function () {
+      r.value = primaReal;
+      el("prima-val").textContent = pct(primaReal, 1);
+      dibujarKe();
+    });
+
+    var t;
+    window.addEventListener("resize", function () {
+      clearTimeout(t);
+      t = setTimeout(dibujarTodo, 140);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciar);
+  } else {
+    iniciar();
+  }
+})();
+</script>
+</body>
+</html>
