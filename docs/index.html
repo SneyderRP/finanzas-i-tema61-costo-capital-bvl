@@ -2,910 +2,1573 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Costo de capital por sector en la BVL</title>
-<meta name="description" content="Betas sectoriales y costo de capital en la Bolsa de Valores de Lima, 2021-2026. Meglinho Sneyder Rojas Poma, UNCP.">
+<meta name="description" content="Betas y costo de capital de cuatro sectores de la Bolsa de Valores de Lima: mineria, banca, consumo y construccion. Periodo 2021-2026.">
+<meta name="author" content="Meglinho Sneyder Rojas Poma">
 <style>
 :root{
-  --bg:#080c12; --panel:#111924; --panel2:#0d141d; --line:#1e2b3a;
-  --fg:#e9eff7; --muted:#8396ab; --accent:#4da3ff; --accent2:#7c5cff;
-  --mineria:#5b9bd5; --banca:#ffa94d; --construccion:#f06565; --consumo:#2ec4a0;
-  --ok:#2ec4a0; --warn:#ffa94d;
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --serif:Georgia,"Times New Roman",serif;
-  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
-  color-scheme:dark;
+  --fondo:#0d1117; --panel:#151b23; --panel2:#1b222c; --borde:#2a323d;
+  --texto:#e6edf3; --suave:#9aa4b2; --tenue:#6e7781;
+  --mineria:#e8a33d; --banca:#4ea1e8; --construccion:#9b7fe0; --consumo:#4fc9a0;
+  --acento:#58a6ff; --alerta:#f0883e;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:var(--bg); color:var(--fg); font-family:var(--sans);
-  line-height:1.55; -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-.wrap{
-  max-width:1120px; margin:0 auto;
-  padding-left:max(18px,env(safe-area-inset-left,0px));
-  padding-right:max(18px,env(safe-area-inset-right,0px));
-}
-a{color:var(--accent); text-decoration:none}
-a:hover{text-decoration:underline}
-h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.015em}
-button{font-family:inherit}
-:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
 
-/* ---------- cabecera ---------- */
-.top{
-  position:sticky; top:0; z-index:40; backdrop-filter:blur(12px);
-  background:rgba(8,12,18,.86); border-bottom:1px solid var(--line);
+/* ---------- umbral: la portada que se ve antes de entrar ---------- */
+#umbral{
+  position:fixed;inset:0;z-index:200;background:var(--fondo);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .72s ease,visibility .72s;
 }
-.top .wrap{display:flex; align-items:center; gap:18px; height:54px}
-.brand{font-weight:600; font-size:.9rem; white-space:nowrap}
-.brand span{color:var(--muted); font-weight:400}
-.nav{display:flex; gap:4px; margin-left:auto; overflow-x:auto; scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav a{
-  color:var(--muted); font-size:.82rem; padding:6px 11px; border-radius:7px;
-  white-space:nowrap; transition:color .18s,background .18s;
+#umbral.fuera{opacity:0;visibility:hidden}
+#esfera{
+  position:absolute;inset:0;width:100%;height:100%;
+  /* La esfera se aparta del centro en pantallas anchas para que el texto
+     no quede encima de los puntos y los dos se lean sin estorbarse. */
 }
-.nav a:hover,.nav a.on{color:var(--fg); background:var(--panel); text-decoration:none}
+.umbral-texto{
+  position:relative;z-index:2;text-align:center;padding:0 26px;max-width:720px;
+  animation:sube .9s .25s both ease-out;
+}
+/* En pantalla ancha el texto se va a la izquierda y la esfera queda a la
+   derecha, de modo que ninguno de los dos se lee por encima del otro. El
+   canvas sigue ocupando todo: lo que se desplaza es el centro que dibuja. */
+@media(min-width:900px){
+  /* #umbral es flex en columna, de modo que align-items manda en horizontal y
+     justify-content en vertical, al reves de lo que sugiere el nombre. */
+  #umbral{align-items:flex-start;justify-content:center}
+  .umbral-texto{
+    text-align:left;margin-left:max(42px,7vw);max-width:min(600px,48vw);padding:0;
+  }
+  .umbral-texto h1,.umbral-bajada,.umbral-firma{text-shadow:none}
+  .umbral-pie{text-align:left;padding-left:max(42px,7vw)}
+}
+@keyframes sube{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.umbral-texto h1{
+  font-size:clamp(25px,4.3vw,42px);margin:0 0 20px;line-height:1.2;
+  text-shadow:0 2px 26px rgba(13,17,23,.92);
+}
+.umbral-bajada{
+  color:var(--suave);font-size:16px;margin:0 0 30px;
+  text-shadow:0 2px 20px rgba(13,17,23,.92);
+}
+.umbral-btn{
+  background:rgba(88,166,255,.1);border:1px solid var(--acento);color:var(--acento);
+  border-radius:999px;padding:12px 34px;font:550 15px inherit;cursor:pointer;
+  font-family:inherit;transition:background .16s,transform .16s;
+}
+.umbral-btn:hover{background:rgba(88,166,255,.2);transform:translateY(-1px)}
+.umbral-btn:focus-visible{outline:2px solid var(--acento);outline-offset:3px}
+.umbral-firma{
+  color:var(--tenue);font-size:12.5px;margin:30px 0 0;line-height:1.8;
+  text-shadow:0 2px 16px rgba(13,17,23,.92);
+}
+.umbral-pie{
+  position:absolute;bottom:22px;left:0;right:0;z-index:2;text-align:center;
+  color:var(--tenue);font-size:11.5px;margin:0;padding:0 26px;line-height:1.7;
+}
+.umbral-pie b{color:var(--suave);font-weight:500}
+/* En pantalla estrecha no hay sitio para poner la esfera al lado, de modo que
+   queda detras del texto. Ahi se atenua para que haga de fondo y no compita
+   con las letras. */
+@media(max-width:899px){
+  #esfera{opacity:.4}
+}
+@media(max-width:640px){
+  .umbral-firma{margin-top:22px}
+  .umbral-pie{font-size:10.5px;bottom:14px}
+  .umbral-texto h1{font-size:clamp(22px,6.4vw,30px)}
+  .umbral-bajada{font-size:14.5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .umbral-texto{animation:none}
+  #umbral{transition:none}
+}
+body{
+  margin:0;background:var(--fondo);color:var(--texto);
+  font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--acento);text-decoration:none}
+a:hover{text-decoration:underline}
+.caja{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ---------- barra ---------- */
+.barra{
+  position:sticky;top:0;z-index:50;background:rgba(13,17,23,.93);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--borde);
+}
+.barra .caja{display:flex;align-items:center;gap:26px;height:56px}
+.marca{font-weight:650;font-size:14px;white-space:nowrap}
+.marca span{color:var(--tenue);font-weight:400}
+.menu{display:flex;gap:20px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.menu::-webkit-scrollbar{display:none}
+.menu a{color:var(--suave);font-size:13.5px;white-space:nowrap;padding:4px 0;border-bottom:2px solid transparent}
+.menu a:hover,.menu a.activo{color:var(--texto);border-color:var(--acento);text-decoration:none}
 
 /* ---------- portada ---------- */
-.hero{padding:54px 0 38px; border-bottom:1px solid var(--line); position:relative; overflow:hidden}
-.hero::before{
-  content:""; position:absolute; top:-180px; right:-140px; width:460px; height:460px;
-  background:radial-gradient(circle,rgba(77,163,255,.15),transparent 68%); pointer-events:none;
+.portada{padding:68px 0 54px;border-bottom:1px solid var(--borde)}
+.etiqueta{
+  display:inline-block;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--acento);border:1px solid rgba(88,166,255,.32);border-radius:999px;
+  padding:4px 13px;margin-bottom:20px;
 }
-.eyebrow{font-size:.7rem; letter-spacing:.17em; text-transform:uppercase; color:var(--accent); font-weight:600}
-.hero h1{font-size:clamp(1.7rem,4.6vw,2.9rem); line-height:1.1; margin:.5rem 0 .7rem; max-width:17ch}
-.hero .lead{color:var(--muted); font-size:1rem; max-width:62ch}
-.hero .lead b{color:var(--fg); font-weight:600}
-.autor{margin-top:20px; font-size:.86rem; color:var(--muted)}
-.autor b{color:var(--fg); font-weight:600}
-
-.kpis{display:grid; gap:12px; margin-top:30px; grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
-.kpi{
-  background:linear-gradient(158deg,var(--panel),var(--panel2));
-  border:1px solid var(--line); border-radius:13px; padding:17px 19px;
-  position:relative; overflow:hidden; transition:transform .22s,border-color .22s;
-}
-.kpi::after{content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--accent)}
-.kpi:hover{transform:translateY(-2px); border-color:var(--accent)}
-.kpi .lbl{font-size:.69rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em}
-.kpi .val{font-family:var(--serif); font-size:clamp(1.5rem,3.6vw,2.05rem); margin-top:5px; line-height:1.08; font-variant-numeric:tabular-nums}
-.kpi .sub{font-size:.74rem; color:var(--muted); margin-top:3px}
+h1{font-size:clamp(27px,4.6vw,44px);line-height:1.17;margin:0 0 18px;font-weight:650;letter-spacing:-.02em}
+.bajada{font-size:17px;color:var(--suave);max-width:730px;margin:0 0 26px}
+.firma{font-size:13.5px;color:var(--tenue);line-height:1.9}
+.firma b{color:var(--suave);font-weight:550}
 
 /* ---------- secciones ---------- */
-section{padding:46px 0; border-bottom:1px solid var(--line)}
-section:last-of-type{border-bottom:none}
-h2{font-size:clamp(1.15rem,2.4vw,1.42rem)}
-.snote{color:var(--muted); font-size:.89rem; margin:.5rem 0 20px; max-width:76ch}
-.snote b{color:var(--fg); font-weight:600}
-.card{background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:20px}
-.grid2{display:grid; gap:15px; grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+section{padding:52px 0;border-bottom:1px solid var(--borde)}
+h2{font-size:23px;margin:0 0 9px;font-weight:620;letter-spacing:-.01em}
+h3{font-size:15.5px;margin:30px 0 11px;font-weight:600;color:var(--texto)}
+.sub{color:var(--suave);font-size:14.5px;max-width:790px;margin:0 0 26px}
+p{margin:0 0 14px}
 
-.chart{position:relative; width:100%}
-.chart svg{display:block; width:100%; height:auto; overflow:visible}
-.tip{
-  position:absolute; pointer-events:none; opacity:0; z-index:20;
-  background:#050a10; border:1px solid var(--line); border-radius:9px;
-  padding:8px 11px; font-size:.78rem; white-space:pre; line-height:1.45;
-  box-shadow:0 10px 28px rgba(0,0,0,.7); transition:opacity .13s;
+/* ---------- tarjetas ---------- */
+.rejilla{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.tarjeta{
+  background:var(--panel);border:1px solid var(--borde);border-radius:11px;
+  padding:19px;position:relative;overflow:hidden;
 }
-.legend{display:flex; flex-wrap:wrap; gap:7px; margin-top:14px}
-.chip{
-  display:inline-flex; align-items:center; gap:7px; font-size:.78rem; color:var(--muted);
-  background:var(--panel2); border:1px solid var(--line); border-radius:999px;
-  padding:5px 12px; cursor:pointer; transition:.18s;
-}
-.chip:hover{color:var(--fg); border-color:var(--accent)}
-.chip.off{opacity:.38}
-.dot{width:9px; height:9px; border-radius:50%; flex:none}
+.tarjeta::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--c,var(--borde))}
+.tarjeta h4{margin:0 0 3px;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:.02em}
+.cifra{font:600 30px/1.1 var(--mono);letter-spacing:-.02em;margin:7px 0 2px;color:var(--c,var(--texto))}
+.pie{font-size:12px;color:var(--tenue);font-family:var(--mono)}
 
-/* ---------- simulador ---------- */
-.sim{background:linear-gradient(140deg,rgba(77,163,255,.07),transparent); border-color:rgba(77,163,255,.3)}
-.ctrl{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:18px}
-.ctrl label{font-size:.82rem; color:var(--muted); white-space:nowrap}
-.ctrl output{
-  font-family:var(--mono); font-size:1.02rem; color:var(--accent); font-weight:600;
-  min-width:74px; text-align:right; font-variant-numeric:tabular-nums;
+/* ---------- paneles ---------- */
+.lienzo{
+  background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+  padding:22px;margin:18px 0;
 }
+.lienzo.compacto{padding:16px}
+.titulo-fig{font-size:13.5px;font-weight:600;color:var(--suave);margin:0 0 3px}
+.nota{font-size:12.5px;color:var(--tenue);margin:11px 0 0;line-height:1.6}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- controles ---------- */
+.controles{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:0 0 18px}
+.campo{display:flex;flex-direction:column;gap:5px;min-width:160px}
+.campo label{font-size:12px;color:var(--suave);font-weight:550}
 input[type=range]{
-  -webkit-appearance:none; appearance:none; flex:1; min-width:170px; height:5px;
-  background:var(--line); border-radius:3px; outline:none;
+  -webkit-appearance:none;appearance:none;height:5px;border-radius:3px;
+  background:var(--panel2);outline:none;width:100%;cursor:pointer;
 }
 input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none; width:19px; height:19px; border-radius:50%;
-  background:var(--accent); cursor:grab; border:3px solid var(--bg);
-  box-shadow:0 0 0 1px var(--accent);
+  -webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+  background:var(--acento);cursor:pointer;border:2px solid var(--fondo);
 }
 input[type=range]::-moz-range-thumb{
-  width:19px; height:19px; border-radius:50%; background:var(--accent);
-  cursor:grab; border:3px solid var(--bg); box-shadow:0 0 0 1px var(--accent);
+  width:15px;height:15px;border-radius:50%;background:var(--acento);
+  cursor:pointer;border:2px solid var(--fondo);
 }
+select,input[type=text],input[type=date],input[type=search]{
+  background:var(--panel2);border:1px solid var(--borde);color:var(--texto);
+  border-radius:7px;padding:7px 10px;font-size:13.5px;font-family:inherit;outline:none;
+}
+select:focus,input:focus{border-color:var(--acento)}
 .btn{
-  background:var(--panel2); color:var(--fg); border:1px solid var(--line);
-  border-radius:8px; padding:7px 14px; font-size:.8rem; cursor:pointer; transition:.18s;
+  background:var(--panel2);border:1px solid var(--borde);color:var(--suave);
+  border-radius:7px;padding:6px 13px;font-size:13px;cursor:pointer;font-family:inherit;
+  transition:border-color .12s,color .12s;
 }
-.btn:hover{border-color:var(--accent); color:var(--accent)}
+.btn:hover{color:var(--texto);border-color:var(--tenue)}
+.btn.on{background:rgba(88,166,255,.13);border-color:var(--acento);color:var(--acento)}
+.valor{font:600 14px var(--mono);color:var(--acento)}
+
+/* ---------- leyenda ---------- */
+.leyenda{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 0}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;
+  background:var(--panel2);border:1px solid var(--borde);border-radius:999px;
+  padding:4px 12px;cursor:pointer;user-select:none;transition:opacity .14s;
+}
+.chip.off{opacity:.32}
+.punto{width:9px;height:9px;border-radius:50%;flex:none}
 
 /* ---------- tablas ---------- */
-.tw{overflow-x:auto; -webkit-overflow-scrolling:touch}
-table{width:100%; border-collapse:collapse; font-size:.85rem; min-width:560px}
-th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
-th:first-child,td:first-child{text-align:left; position:sticky; left:0; background:var(--panel)}
+.marco{overflow-x:auto;border:1px solid var(--borde);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 13px;text-align:right;border-bottom:1px solid var(--borde);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
 thead th{
-  color:var(--muted); font-weight:600; font-size:.7rem; text-transform:uppercase;
-  letter-spacing:.08em; cursor:pointer; user-select:none; background:var(--panel);
+  background:var(--panel2);color:var(--suave);font-weight:600;font-size:12px;
+  position:sticky;top:0;cursor:pointer;user-select:none;
 }
-thead th:hover{color:var(--fg)}
-thead th::after{content:"\2195"; opacity:.26; margin-left:6px; font-size:.85em}
-thead th.asc::after{content:"\2191"; opacity:1; color:var(--accent)}
-thead th.desc::after{content:"\2193"; opacity:1; color:var(--accent)}
-tbody td{font-variant-numeric:tabular-nums}
-tbody tr{transition:background .15s}
-tbody tr:hover{background:rgba(77,163,255,.06)}
+thead th:hover{color:var(--texto)}
+thead th::after{content:"";opacity:.4;font-size:9px;margin-left:5px}
+thead th.asc::after{content:"\25B2";opacity:.85}
+thead th.desc::after{content:"\25BC";opacity:.85}
 tbody tr:last-child td{border-bottom:none}
-.pos{color:var(--ok)} .neg{color:var(--construccion)}
+tbody tr:hover{background:rgba(88,166,255,.055)}
+td.num{font-family:var(--mono);font-size:12.5px}
+.vacio{padding:26px;text-align:center;color:var(--tenue);font-size:13.5px}
+
+/* ---------- pestanas ---------- */
+.pestanas{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 15px}
+.pestanas button{
+  background:none;border:1px solid var(--borde);color:var(--suave);
+  border-radius:7px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;
+}
+.pestanas button:hover{color:var(--texto)}
+.pestanas button.on{background:var(--panel2);border-color:var(--acento);color:var(--acento)}
+
+/* ---------- arbol ---------- */
+.arbol{font-size:13.5px}
+.arbol details{margin:0}
+.arbol summary{
+  cursor:pointer;padding:7px 10px;border-radius:7px;display:flex;
+  align-items:center;gap:9px;list-style:none;
+}
+.arbol summary::-webkit-details-marker{display:none}
+.arbol summary:hover{background:var(--panel2)}
+.arbol summary .flecha{
+  color:var(--tenue);font-size:10px;transition:transform .14s;flex:none;width:9px;
+}
+.arbol details[open]>summary .flecha{transform:rotate(90deg)}
+.arbol .dentro{margin-left:19px;border-left:1px solid var(--borde);padding-left:9px}
+.arbol .hoja{
+  padding:5px 10px;display:flex;align-items:center;gap:9px;
+  color:var(--suave);border-radius:6px;
+}
+.arbol .hoja:hover{background:rgba(255,255,255,.028)}
+.arbol .peso{margin-left:auto;font:11.5px var(--mono);color:var(--tenue);flex:none}
+.arbol .ext{
+  font:10px var(--mono);text-transform:uppercase;color:var(--tenue);
+  border:1px solid var(--borde);border-radius:4px;padding:1px 5px;flex:none;min-width:38px;
+  text-align:center;
+}
+.arbol .ajeno{
+  font-size:10.5px;color:var(--alerta);border:1px solid rgba(240,136,62,.3);
+  border-radius:4px;padding:1px 6px;flex:none;
+}
+.carpeta-raiz{
+  background:var(--panel);border:1px solid var(--borde);border-radius:10px;
+  padding:9px;margin:0 0 11px;
+}
 
 /* ---------- descargas ---------- */
-.dl{display:grid; gap:11px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.dl a{
-  display:flex; align-items:center; gap:13px; background:var(--panel);
-  border:1px solid var(--line); border-radius:11px; padding:14px 16px;
-  color:var(--fg); transition:.19s;
+.descargas{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(255px,1fr))}
+.descarga{
+  display:flex;align-items:center;gap:13px;background:var(--panel);
+  border:1px solid var(--borde);border-radius:10px;padding:15px 17px;
+  color:var(--texto);transition:border-color .14s;
 }
-.dl a:hover{border-color:var(--accent); background:var(--panel2); text-decoration:none; transform:translateY(-1px)}
-.dl .ico{
-  width:36px; height:36px; border-radius:9px; background:rgba(77,163,255,.13);
-  display:grid; place-items:center; color:var(--accent); font-size:.65rem;
-  font-weight:700; letter-spacing:.04em; flex:none;
+.descarga:hover{border-color:var(--acento);text-decoration:none}
+.descarga .tipo{
+  font:600 10.5px var(--mono);color:var(--acento);border:1px solid rgba(88,166,255,.3);
+  border-radius:5px;padding:4px 7px;flex:none;min-width:46px;text-align:center;
 }
-.dl .t{font-size:.88rem; font-weight:500}
-.dl .d{font-size:.74rem; color:var(--muted)}
+.descarga .cuerpo{min-width:0}
+.descarga .cuerpo b{display:block;font-size:13.5px;font-weight:580}
+.descarga .cuerpo small{color:var(--tenue);font-size:12px}
+.descarga.falta{opacity:.5;pointer-events:none}
 
-/* ---------- pie ---------- */
-footer{padding:36px 0 56px; color:var(--muted); font-size:.82rem}
-footer p{margin:.5rem 0; max-width:80ch}
-code{font-family:var(--mono); font-size:.92em; color:var(--accent)}
+/* ---------- avisos ---------- */
 .aviso{
-  background:var(--panel2); border-left:3px solid var(--warn);
-  border-radius:0 9px 9px 0; padding:13px 17px; margin:18px 0; font-size:.84rem;
+  background:rgba(240,136,62,.07);border:1px solid rgba(240,136,62,.26);
+  border-left-width:3px;border-radius:9px;padding:15px 18px;margin:18px 0;font-size:13.5px;
 }
-.aviso b{color:var(--fg)}
+.aviso b{color:var(--alerta)}
+.dato{
+  background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.22);
+  border-left-width:3px;border-radius:9px;padding:15px 18px;margin:18px 0;font-size:13.5px;
+}
 
-@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
-@media (max-width:620px){
-  .hero{padding:34px 0 26px}
-  section{padding:34px 0}
-  .brand span{display:none}
+/* ---------- comparador ---------- */
+.enfrentados{display:grid;gap:13px;grid-template-columns:1fr 1fr}
+@media(max-width:620px){.enfrentados{grid-template-columns:1fr}}
+.cara{background:var(--panel);border:1px solid var(--borde);border-radius:11px;padding:18px;border-top:3px solid var(--c)}
+.cara h4{margin:0 0 14px;font-size:16px;color:var(--c)}
+.cara dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:13px}
+.cara dt{color:var(--suave)}
+.cara dd{margin:0;font-family:var(--mono);font-size:13px;text-align:right}
+.cara dd.gana{color:var(--consumo);font-weight:600}
+.cara dd.pierde{color:var(--tenue)}
+
+/* ---------- consejo flotante ---------- */
+#tip{
+  position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;z-index:99;
+  background:#0b0f14;border:1px solid var(--borde);border-radius:8px;padding:8px 11px;
+  font:12.5px/1.55 var(--mono);box-shadow:0 7px 26px rgba(0,0,0,.6);max-width:250px;
+}
+#tip b{font-family:inherit;color:var(--acento)}
+
+/* ---------- bibliografia ---------- */
+.refs{list-style:none;counter-reset:r;padding:0;margin:0;font-size:13.5px}
+.refs li{
+  counter-increment:r;position:relative;padding:13px 16px 13px 50px;
+  border-bottom:1px solid var(--borde);line-height:1.6;
+}
+.refs li:last-child{border-bottom:none}
+.refs li::before{
+  content:counter(r);position:absolute;left:14px;top:13px;
+  font:11.5px var(--mono);color:var(--tenue);
+}
+.refs li:hover{background:rgba(255,255,255,.022)}
+.refs .doi{
+  display:inline-block;margin-left:7px;font:11.5px var(--mono);
+  color:var(--acento);border:1px solid rgba(88,166,255,.26);border-radius:5px;
+  padding:1px 8px;white-space:nowrap;
+}
+.refs .doi:hover{background:rgba(88,166,255,.12);text-decoration:none}
+.refs .sin{
+  display:inline-block;margin-left:7px;font:11px var(--mono);color:var(--tenue);
+}
+
+footer{padding:38px 0 54px;color:var(--tenue);font-size:12.5px;line-height:1.85}
+.metodo{font-size:13.5px;color:var(--suave)}
+.metodo ol{padding-left:20px;margin:0 0 16px}
+.metodo li{margin:0 0 9px}
+.formula{
+  font:13.5px var(--mono);background:var(--panel2);border:1px solid var(--borde);
+  border-radius:8px;padding:12px 15px;margin:12px 0;overflow-x:auto;color:var(--texto);
+}
+@media(max-width:640px){
+  .portada{padding:44px 0 36px}
+  section{padding:38px 0}
+  .marca span{display:none}
 }
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="wrap">
-    <div class="brand">Tema 61 <span>&middot; Finanzas I &middot; UNCP</span></div>
-    <nav class="nav" id="nav">
-      <a href="#riesgo">Riesgo</a>
-      <a href="#capital">Costo de capital</a>
-      <a href="#carteras">Carteras</a>
-      <a href="#datos">Datos</a>
-      <a href="#descargas">Descargas</a>
-    </nav>
+<div id="umbral">
+  <canvas id="esfera" aria-hidden="true"></canvas>
+  <div class="umbral-texto">
+    <div class="etiqueta">Tema 61 &middot; Unidad II &middot; Finanzas I</div>
+    <h1>Costo de capital por sector<br>en la Bolsa de Valores de Lima</h1>
+    <p class="umbral-bajada">Minería, banca, consumo y construcción.<br>
+    918 sesiones entre noviembre de 2021 y octubre de 2026.</p>
+    <button class="umbral-btn" id="entrar">Entrar al informe</button>
+    <p class="umbral-firma">
+      Meglinho Sneyder Rojas Poma &middot; código 2024200522B<br>
+      Universidad Nacional del Centro del Perú &middot; Huancayo
+    </p>
   </div>
-</header>
-
-<div class="wrap">
-
-  <div class="hero">
-    <div class="eyebrow">Unidad II &middot; 2026-II</div>
-    <h1>Betas sectoriales y costo de capital en la Bolsa de Valores de Lima</h1>
-    <p class="lead">
-      Qué rendimiento le exige el mercado a cada sector de la bolsa peruana, estimado con
-      <b id="h-dias">—</b> días de cotización entre noviembre de 2021 y octubre de 2026.
-      La minería amplifica el mercado con una beta de <b id="h-bmax">—</b>; el consumo lo
-      amortigua con <b id="h-bmin">—</b>.
-    </p>
-    <p class="autor">
-      <b>Meglinho Sneyder Rojas Poma</b> &middot; código 2024200522B &middot;
-      Escuela Profesional de Economía, Universidad Nacional del Centro del Perú
-    </p>
-
-    <div class="kpis">
-      <div class="kpi">
-        <div class="lbl">Observaciones</div>
-        <div class="val" id="k-obs">—</div>
-        <div class="sub">días por sector, panel balanceado</div>
-      </div>
-      <div class="kpi">
-        <div class="lbl">Costo de capital</div>
-        <div class="val" id="k-ke">—</div>
-        <div class="sub">del consumo a la minería</div>
-      </div>
-      <div class="kpi">
-        <div class="lbl">Prima de mercado</div>
-        <div class="val" id="k-prima">—</div>
-        <div class="sub">realizada en la ventana</div>
-      </div>
-      <div class="kpi">
-        <div class="lbl">Diversificar suma</div>
-        <div class="val" id="k-sharpe">—</div>
-        <div class="sub">de mejora en el ratio de Sharpe</div>
-      </div>
-    </div>
-  </div>
-
-  <section id="riesgo">
-    <h2>Riesgo sistemático por sector</h2>
-    <p class="snote">
-      La beta mide cuánto se mueve un sector cuando el mercado se mueve uno por ciento.
-      Cada punto es la estimación por mínimos cuadrados con errores de Newey-West; la banda,
-      su intervalo de confianza al 95 %. <b>La banca es el único sector cuyo intervalo
-      contiene el 1</b>, de modo que su riesgo no se distingue del mercado.
-      Pasa el cursor por cada barra para ver el detalle.
-    </p>
-    <div class="card">
-      <div class="chart" id="c-betas"></div>
-      <div class="legend" id="leg-betas"></div>
-    </div>
-  </section>
-
-  <section id="capital">
-    <h2>Simulador del costo de capital</h2>
-    <p class="snote">
-      El CAPM dice que <code>Ke = Rf + beta × prima</code>. Mueve la prima de mercado y mira
-      cómo cambia lo que cada sector tiene que rendir. La línea punteada marca la
-      <b>prima realizada en la ventana</b>, que es la que usa el artículo.
-    </p>
-    <div class="card sim">
-      <div class="ctrl">
-        <label for="prima">Prima de mercado</label>
-        <input type="range" id="prima" min="2" max="20" step="0.1" value="15.4"
-               aria-label="Prima de mercado en porcentaje">
-        <output id="prima-val">15,4 %</output>
-        <button class="btn" id="prima-reset">Volver a la realizada</button>
-      </div>
-      <div class="chart" id="c-ke"></div>
-    </div>
-  </section>
-
-  <section id="carteras">
-    <h2>Diversificación entre sectores</h2>
-    <p class="snote">
-      Frontera eficiente de Markowitz sobre las cuatro carteras sectoriales. La construcción
-      pesa <b id="h-const">—</b> % en la cartera de máximo Sharpe pese a tener el segundo peor
-      retorno, porque es el sector con las correlaciones más bajas. Eso es diversificación:
-      lo que vale no es el retorno de un activo, sino que se mueva distinto a los demás.
-    </p>
-    <div class="grid2">
-      <div class="card">
-        <h3 style="font-size:.92rem;margin-bottom:12px">Riesgo frente a retorno</h3>
-        <div class="chart" id="c-front"></div>
-      </div>
-      <div class="card">
-        <h3 style="font-size:.92rem;margin-bottom:12px">Correlaciones entre sectores</h3>
-        <div class="chart" id="c-corr"></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="datos">
-    <h2>Desempeño ajustado por riesgo</h2>
-    <p class="snote">
-      La banca lidera en Sharpe y en Treynor: rindió casi lo mismo que la minería con una beta
-      34 % menor. <b>Ningún alfa de Jensen es significativo al 5 %</b>, de modo que la
-      diferencia se describe pero no prueba que un sector haya batido al mercado.
-      Haz clic en una columna para ordenar.
-    </p>
-    <div class="card tw">
-      <table id="t-desempeno">
-        <thead><tr id="t-head"></tr></thead>
-        <tbody id="t-body"></tbody>
-      </table>
-    </div>
-
-    <h3 style="font-size:1rem;margin:30px 0 10px">Las dieciséis acciones del panel</h3>
-    <p class="snote">
-      La Bolsa de Valores de Lima clasifica por tipo de empresa, no por actividad económica,
-      de modo que diez de las dieciséis se reasignaron con criterio económico. La columna
-      lo declara.
-    </p>
-    <div class="card tw">
-      <table id="t-comp">
-        <thead><tr id="tc-head"></tr></thead>
-        <tbody id="tc-body"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section id="descargas">
-    <h2>Descargas</h2>
-    <p class="snote">Los productos del trabajo y las tablas que alimentan esta página.</p>
-    <h3 style="font-size:.95rem;margin-bottom:11px">Productos</h3>
-    <div class="dl" id="dl-prod"></div>
-    <h3 style="font-size:.95rem;margin:26px 0 11px">Datos en CSV</h3>
-    <div class="dl" id="dl-datos"></div>
-
-    <div class="aviso">
-      <b>Sobre los artículos de la revisión.</b> Los treinta artículos en inglés son de sus
-      editoriales y las traducciones al español son obras derivadas, de modo que no se
-      republican aquí. Cada uno se consulta por su DOI, que figura en las referencias del
-      artículo.
-    </div>
-  </section>
-
-  <footer>
-    <p><b>Fuentes.</b> Dos vías de extracción. El backend de la Bolsa de Valores de Lima aporta
-      la clasificación sectorial y la moneda de cotización; la API de Yahoo Finance aporta los
-      precios diarios, el rendimiento del Tesoro de Estados Unidos a diez años y el tipo de
-      cambio. Ventana congelada al 31 de octubre de 2026.</p>
-    <p><b>Reproducibilidad.</b> Cada número de esta página sale de las tablas que generan
-      <code>04_analisis.py</code> y <code>05_markowitz.py</code>, y esta página la escribe
-      <code>06_generar_web.py</code> desde esas mismas tablas. El código completo está en el
-      repositorio.</p>
-    <p style="margin-top:18px">Finanzas I (055D), ciclo V, periodo 2026-II &middot;
-      Dr. Ciro Iván Machacuay Meza &middot; Universidad Nacional del Centro del Perú</p>
-  </footer>
+  <p class="umbral-pie" id="umbral-pie"></p>
 </div>
 
+<div class="barra"><div class="caja">
+  <div class="marca">Costo de capital en la BVL <span>&middot; Finanzas I</span></div>
+  <nav class="menu">
+    <a href="#resultados">Resultados</a>
+    <a href="#capm">Simulador</a>
+    <a href="#panel">Panel diario</a>
+    <a href="#cartera">Tu cartera</a>
+    <a href="#comparar">Comparar</a>
+    <a href="#tablas">Tablas</a>
+    <a href="#archivos">Archivos</a>
+    <a href="#bibliografia">Bibliografía</a>
+    <a href="#metodo">Metodo</a>
+  </nav>
+</div></div>
+
+<header class="portada"><div class="caja">
+  <div class="etiqueta">Tema 61 &middot; Unidad II</div>
+  <h1>Costo de capital por sector en la Bolsa de Valores de Lima</h1>
+  <p class="bajada">Betas sectoriales estimadas por minimos cuadrados con errores robustos a
+  heterocedasticidad y autocorrelacion, costo de capital por el CAPM y frontera eficiente de
+  Markowitz para cuatro carteras: mineria, banca, consumo y construccion. 918 sesiones diarias
+  entre noviembre de 2021 y octubre de 2026.</p>
+  <p class="firma">
+    <b>Meglinho Sneyder Rojas Poma</b> &middot; codigo 2024200522B<br>
+    Escuela Profesional de Economia, Facultad de Economia<br>
+    Universidad Nacional del Centro del Peru, Huancayo<br>
+    Finanzas I (055D), ciclo V, periodo 2026-II &middot; Dr. Ciro Ivan Machacuay Meza
+  </p>
+</div></header>
+
+<section id="resultados"><div class="caja">
+  <h2>Lo que salio</h2>
+  <p class="sub">El costo de capital de cada sector sale de su beta. Un sector con beta alta se
+  mueve mas que el mercado y por eso a sus accionistas se les exige mas retorno. Las cuatro
+  betas son significativas al 1 por ciento.</p>
+  <div class="rejilla" id="tarjetas"></div>
+
+  <div class="lienzo">
+    <p class="titulo-fig">Beta de cada sector, con su intervalo de confianza al 95 por ciento</p>
+    <div id="fig-betas"></div>
+    <p class="nota">La linea vertical en 1,0 marca la beta del mercado. Una barra que no la cruza
+    dice que el sector es distinto del mercado con 95 por ciento de confianza. Pasa el cursor
+    sobre cada barra para ver las cifras.</p>
+  </div>
+
+  <div class="dato" id="hallazgo"></div>
+</div></section>
+
+<section id="capm"><div class="caja">
+  <h2>Simulador del CAPM</h2>
+  <p class="sub">La prima de mercado es el supuesto que mas pesa en el resultado. Mueve el
+  deslizador y mira como cambia el costo de capital de los cuatro sectores. La tasa libre de
+  riesgo y la beta se quedan quietas porque son datos estimados, no supuestos.</p>
+
+  <div class="lienzo">
+    <div class="controles">
+      <div class="campo" style="min-width:290px">
+        <label>Prima de mercado: <span class="valor" id="v-prima"></span></label>
+        <input type="range" id="prima" min="0" max="25" step="0.1">
+      </div>
+      <button class="btn" id="btn-prima-est">Prima estimada</button>
+      <button class="btn" id="btn-prima-ref">Prima de referencia 7,5</button>
+    </div>
+    <div id="fig-capm"></div>
+    <p class="nota" id="nota-capm"></p>
+  </div>
+  <div class="formula">Ke = Rf + beta &times; prima de mercado</div>
+</div></section>
+
+<section id="panel"><div class="caja">
+  <h2>El panel diario</h2>
+  <p class="sub">Cada sector arranca en 100 el primer dia de la muestra. La curva acumula el
+  retorno diario de la cartera del sector, de modo que su altura al final es cuanto valdrian
+  100 soles invertidos al inicio. Elige el tramo que quieras ver.</p>
+
+  <div class="lienzo">
+    <div class="controles">
+      <button class="btn on" data-rango="todo">Todo</button>
+      <button class="btn" data-rango="3a">3 anios</button>
+      <button class="btn" data-rango="1a">1 anio</button>
+      <button class="btn" data-rango="6m">6 meses</button>
+      <div class="campo" style="min-width:140px">
+        <label for="desde">Desde</label>
+        <input type="date" id="desde">
+      </div>
+      <div class="campo" style="min-width:140px">
+        <label for="hasta">Hasta</label>
+        <input type="date" id="hasta">
+      </div>
+    </div>
+    <div id="fig-panel"></div>
+    <div class="leyenda" id="leyenda-panel"></div>
+    <p class="nota" id="nota-panel"></p>
+  </div>
+</div></section>
+
+<section id="cartera"><div class="caja">
+  <h2>Arma tu propia cartera</h2>
+  <p class="sub">Reparte 100 por ciento entre los cuatro sectores y mira que retorno y que
+  riesgo te queda. El calculo usa la misma matriz de covarianzas anualizada que produjo la
+  frontera del articulo, de modo que tus numeros son comparables con los de la tabla 8.</p>
+
+  <div class="lienzo">
+    <div class="rejilla" style="grid-template-columns:repeat(auto-fit,minmax(185px,1fr));margin-bottom:22px" id="pesos"></div>
+    <div class="controles" style="margin-bottom:22px">
+      <button class="btn" data-pre="igual">Partes iguales</button>
+      <button class="btn" data-pre="tangente">La tangente</button>
+      <button class="btn" data-pre="minvar">Minima varianza</button>
+      <button class="btn" data-pre="cero">Vaciar</button>
+    </div>
+    <div class="rejilla" id="resultado-cartera" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))"></div>
+    <div id="fig-frontera" style="margin-top:24px"></div>
+    <p class="nota" id="nota-frontera"></p>
+  </div>
+</div></section>
+
+<section id="comparar"><div class="caja">
+  <h2>Comparar dos sectores</h2>
+  <p class="sub">Elige dos y mira sus cifras enfrentadas. En verde queda el que sale mejor en
+  cada indicador. Para el riesgo y para el costo de capital, mejor es menos.</p>
+
+  <div class="controles">
+    <div class="campo"><label for="sec-a">Sector A</label><select id="sec-a"></select></div>
+    <div class="campo"><label for="sec-b">Sector B</label><select id="sec-b"></select></div>
+  </div>
+  <div class="enfrentados" id="enfrentados"></div>
+  <p class="nota" id="nota-comparar"></p>
+</div></section>
+
+<section id="tablas"><div class="caja">
+  <h2>Las tablas del articulo</h2>
+  <p class="sub">Las once tablas, como salieron del codigo. Haz clic en una cabecera para
+  ordenar por esa columna, y escribe en el buscador para filtrar filas. Cada tabla se descarga
+  aparte en CSV, y las once juntas van en un libro de Excel.</p>
+
+  <div class="pestanas" id="pestanas"></div>
+  <div class="controles">
+    <div class="campo" style="min-width:230px">
+      <label for="buscar">Filtrar filas</label>
+      <input type="search" id="buscar" placeholder="escribe para filtrar">
+    </div>
+    <span class="pie" id="conteo"></span>
+    <a class="btn" id="baja-csv" download>Descargar esta tabla en CSV</a>
+  </div>
+  <div class="marco" id="marco-tabla"></div>
+  <p class="nota" id="nota-tabla"></p>
+</div></section>
+
+<section id="archivos"><div class="caja">
+  <h2>Los archivos</h2>
+  <p class="sub">Las tres carpetas del trabajo, con sus subcarpetas tal como estan. Abre una
+  carpeta para ver que tiene dentro.</p>
+
+  <h3>Carpetas, para descargar completas</h3>
+  <div class="descargas" id="zips"></div>
+
+  <h3>Los productos</h3>
+  <div class="descargas" id="productos"></div>
+
+  <h3>Los datos</h3>
+  <div class="descargas" id="datos"></div>
+
+  <h3>El arbol completo</h3>
+  <div class="arbol" id="arbol"></div>
+
+  <div class="aviso" id="aviso-ajeno"></div>
+</div></section>
+
+<section id="bibliografia"><div class="caja">
+  <h2>La bibliografía</h2>
+  <p class="sub" id="sub-bib"></p>
+  <div class="controles">
+    <div class="campo" style="min-width:250px">
+      <label for="buscar-ref">Buscar por autor, título o revista</label>
+      <input type="search" id="buscar-ref" placeholder="escribe para filtrar">
+    </div>
+    <span class="pie" id="conteo-ref"></span>
+  </div>
+  <ol class="refs" id="refs"></ol>
+</div></section>
+
+<section id="metodo"><div class="caja">
+  <h2>Como se hizo</h2>
+  <div class="metodo">
+    <ol>
+      <li><b>Las carteras.</b> Dieciseis acciones de la BVL repartidas en cuatro carteras
+      sectoriales. Diez de las dieciseis quedaron en una cartera distinta de la que les da la
+      clasificacion oficial de la BVL, porque esa clasificacion agrupa por sector de la empresa
+      y aqui hace falta agrupar por el negocio del que sale el flujo. La tabla 0 dice una por
+      una cual se movio y cual no.</li>
+      <li><b>El retorno de cada cartera.</b> Promedio simple de los retornos logaritmicos
+      diarios de sus acciones, en moneda de cotizacion. Nueve de las dieciseis cotizan en
+      dolares, de modo que su retorno no lleva el efecto del tipo de cambio.</li>
+      <li><b>La beta.</b> Minimos cuadrados del retorno del sector contra el retorno del
+      indice general, con errores estandar de Newey y West a cinco rezagos, que corrigen
+      heterocedasticidad y autocorrelacion. Antes se verifico con la prueba de Dickey-Fuller
+      aumentada que las series son estacionarias en niveles, tabla 2.</li>
+      <li><b>El costo de capital.</b> CAPM con la tasa del bono soberano peruano a diez anios
+      como tasa libre de riesgo y la prima de mercado estimada del propio periodo. El
+      simulador de arriba deja cambiar esa prima porque es el supuesto que mas mueve el
+      resultado.</li>
+      <li><b>La frontera.</b> Veinte mil carteras aleatorias con pesos de una Dirichlet para
+      dibujar la nube, mas la cartera tangente y la de minima varianza resueltas sobre la
+      matriz de covarianzas anualizada. El codigo de Python usa doscientas mil carteras con
+      semilla fija; la nube que ves aqui la dibuja tu navegador con veinte mil y la misma
+      semilla, de modo que sale igual en cada visita pero no es pixel a pixel la figura 9 del
+      articulo.</li>
+    </ol>
+
+    <div class="aviso">
+      <b>Sobre la fecha de los datos.</b> La muestra se congelo el 30 de octubre de 2026 y no
+      se vuelve a mover. El portal de la BVL solo entrega la sesion del dia en que se le
+      pregunta, sin historico, de modo que una reejecucion posterior trae la sesion de ese otro
+      dia y no la del cierre de la muestra. Por eso el codigo lleva un interruptor que, cuando
+      esta encendido, usa la captura guardada en lugar de pedirla otra vez. El numeral 2.4.5
+      del articulo lo explica, y la carpeta de datos crudos guarda la captura original con su
+      fecha.
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="caja">
+  <p>Meglinho Sneyder Rojas Poma &middot; codigo 2024200522B &middot; estudiante n.&ordm; 36<br>
+  Finanzas I (055D), ciclo V, periodo 2026-II &middot; Dr. Ciro Ivan Machacuay Meza<br>
+  Escuela Profesional de Economia, Universidad Nacional del Centro del Peru, Huancayo</p>
+  <p id="pie-datos"></p>
+  <p>Los articulos en ingles de la carpeta de productos pertenecen a sus editoriales y las
+  traducciones al espanol son obras derivadas de ellos. El arbol de archivos los lista para
+  que se vea el trabajo hecho, pero esta pagina no los distribuye. Se consultan por su DOI,
+  que figura en las referencias del articulo.</p>
+</div></footer>
+
+<div id="tip"></div>
+
 <script>
-const DATOS = {"composicion": [{"Nemonico": "SCCO", "Empresa": "Southern Copper Corp.", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "US$"}, {"Nemonico": "BVN", "Empresa": "Buenaventura", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "US$"}, {"Nemonico": "CVERDEC1", "Empresa": "Cerro Verde", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "US$"}, {"Nemonico": "VOLCABC1", "Empresa": "Volcan", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "MINSURI1", "Empresa": "Minsur", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "NEXAPEC1", "Empresa": "Nexa Resources Peru", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "BAP", "Empresa": "Credicorp Ltd.", "Sector BVL": "DIVERSAS", "Cartera asignada": "Banca", "Reasignada": "si", "Moneda": "US$"}, {"Nemonico": "IFS", "Empresa": "Intercorp Financial Serv.", "Sector BVL": "DIVERSAS", "Cartera asignada": "Banca", "Reasignada": "si", "Moneda": "US$"}, {"Nemonico": "BBVAC1", "Empresa": "Banco BBVA Peru", "Sector BVL": "BANCOS Y FINANCIERAS", "Cartera asignada": "Banca", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "ALICORC1", "Empresa": "Alicorp", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Consumo", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "BACKUSI1", "Empresa": "UCP Backus & Johnston", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Consumo", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "INRETC1", "Empresa": "InRetail Perú Corp.", "Sector BVL": "DIVERSAS", "Cartera asignada": "Consumo", "Reasignada": "si", "Moneda": "US$"}, {"Nemonico": "CPACASC1", "Empresa": "Cementos Pacasmayo", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "UNACEMC1", "Empresa": "UNACEM ", "Sector BVL": "DIVERSAS", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "CORAREI1", "Empresa": "Corp. Aceros Arequipa", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "SIDERC1", "Empresa": "SIDERPERU", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}], "descriptiva": [{"Sector": "Banca", "N": "918", "Media": "0.10601372549019608", "Desv": "1.6313978007070016", "Minimo": "-10.8572", "Mediana": "0.12425", "Maximo": "9.9256", "Volatilidad anual": "25.897637220530637", "Retorno anual": "26.715458823529413"}, {"Sector": "Construccion", "N": "918", "Media": "0.06530631808278867", "Desv": "1.2239110179643817", "Minimo": "-9.0102", "Mediana": "0.0", "Maximo": "11.9535", "Volatilidad anual": "19.428985082433964", "Retorno anual": "16.457192156862742"}, {"Sector": "Consumo", "N": "918", "Media": "0.04446699346405229", "Desv": "1.034485600337833", "Minimo": "-4.0063", "Mediana": "0.02265", "Maximo": "8.0464", "Volatilidad anual": "16.421949800227573", "Retorno anual": "11.205682352941178"}, {"Sector": "Mineria", "N": "918", "Media": "0.10742047930283226", "Desv": "1.7793194455976677", "Minimo": "-10.0083", "Mediana": "0.06155", "Maximo": "9.9653", "Volatilidad anual": "28.2458205359565", "Retorno anual": "27.06996078431373"}], "correlaciones": [{"Sector": "Banca", "Banca": "1.0", "Construccion": "0.2051", "Consumo": "0.4553", "Mineria": "0.5337"}, {"Sector": "Construccion", "Banca": "0.2051", "Construccion": "1.0", "Consumo": "0.2447", "Mineria": "0.2968"}, {"Sector": "Consumo", "Banca": "0.4553", "Construccion": "0.2447", "Consumo": "1.0", "Mineria": "0.3849"}, {"Sector": "Mineria", "Banca": "0.5337", "Construccion": "0.2968", "Consumo": "0.3849", "Mineria": "1.0"}], "betas": [{"Sector": "Mineria", "Beta": "1.6155419031703906", "Error estandar": "0.09067078317124186", "z": "17.81766790432658", "p-valor": "5.154084197530963e-71", "IC 95% inferior": "1.437830433704716", "IC 95% superior": "1.793253372636065", "R2": "0.7657253951943006", "N": "918"}, {"Sector": "Banca", "Beta": "1.068905076571089", "Error estandar": "0.09250460897967945", "z": "11.555154801053169", "p-valor": "6.952209579568072e-31", "IC 95% inferior": "0.8875993745669568", "IC 95% superior": "1.2502107785752212", "R2": "0.5880604942840991", "N": "918"}, {"Sector": "Consumo", "Beta": "0.5474576487499785", "Error estandar": "0.054905898657944305", "z": "9.970834867134393", "p-valor": "2.0450252197702008e-23", "IC 95% inferior": "0.43984406484160155", "IC 95% superior": "0.6550712326583554", "R2": "0.41858267200249255", "N": "918"}, {"Sector": "Construccion", "Beta": "0.8679455749885476", "Error estandar": "0.06529546806370762", "z": "13.292585239479541", "p-valor": "2.5559224624891467e-40", "IC 95% inferior": "0.7399688092299954", "IC 95% superior": "0.9959223407470998", "R2": "0.3985263265241581", "N": "918"}], "costo": [{"Sector": "Mineria", "Beta": "1.6155", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "28.7326", "Ke con prima de referencia (%)": "16.0026"}, {"Sector": "Banca", "Beta": "1.0689", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "20.3255", "Ke con prima de referencia (%)": "11.9028"}, {"Sector": "Consumo", "Beta": "0.5475", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "12.3058", "Ke con prima de referencia (%)": "7.992"}, {"Sector": "Construccion", "Beta": "0.8679", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "17.2348", "Ke con prima de referencia (%)": "10.3956"}], "frontera": [{"Cartera": "Maximo Sharpe (tangente)", "Minería %": "23.5", "Banca %": "40.0", "Construcción %": "36.4", "Consumo %": "0.0", "Retorno anual %": "23.06", "Volatilidad anual %": "18.26", "Sharpe": "1.0502"}, {"Cartera": "Minima varianza global", "Minería %": "0.9", "Banca %": "6.7", "Construcción %": "37.4", "Consumo %": "55.0", "Retorno anual %": "14.35", "Volatilidad anual %": "13.87", "Sharpe": "0.7546"}, {"Cartera": "Ponderacion igual", "Minería %": "25.0", "Banca %": "25.0", "Construcción %": "25.0", "Consumo %": "25.0", "Retorno anual %": "20.36", "Volatilidad anual %": "16.45", "Sharpe": "1.0016"}], "desempeno": [{"Sector": "Minería", "Beta": "1.6155", "Retorno anual %": "27.07", "Volatilidad anual %": "28.25", "Ke del CAPM %": "28.73", "Sharpe": "0.8208", "Treynor %": "14.35", "Alfa de Jensen anual %": "-4.23", "p del alfa": "0.557", "Retorno menos Ke %": "-1.66"}, {"Sector": "Banca", "Beta": "1.0689", "Retorno anual %": "26.72", "Volatilidad anual %": "25.9", "Ke del CAPM %": "20.33", "Sharpe": "0.8815", "Treynor %": "21.36", "Alfa de Jensen anual %": "5.57", "p del alfa": "0.517", "Retorno menos Ke %": "6.39"}, {"Sector": "Construcción", "Beta": "0.8679", "Retorno anual %": "16.46", "Volatilidad anual %": "19.43", "Ke del CAPM %": "17.23", "Sharpe": "0.647", "Treynor %": "14.48", "Alfa de Jensen anual %": "0.3", "p del alfa": "0.967", "Retorno menos Ke %": "-0.78"}, {"Sector": "Consumo", "Beta": "0.5475", "Retorno anual %": "11.21", "Volatilidad anual %": "16.42", "Ke del CAPM %": "12.31", "Sharpe": "0.4457", "Treynor %": "13.37", "Alfa de Jensen anual %": "0.4", "p del alfa": "0.953", "Retorno menos Ke %": "-1.1"}], "diversificacion": [{"Indicador": "Mejor Sharpe de un sector por separado", "Valor": "0.8815"}, {"Indicador": "Sharpe de la cartera tangente", "Valor": "1.0502"}, {"Indicador": "Mejora porcentual del Sharpe", "Valor": "19.1"}, {"Indicador": "Volatilidad del sector menos volatil (%)", "Valor": "16.42"}, {"Indicador": "Volatilidad de la cartera de minima varianza (%)", "Valor": "13.87"}, {"Indicador": "Reduccion porcentual de la volatilidad", "Valor": "15.5"}]};
-const PRODUCTOS = [["Journal", "El articulo completo, 30 paginas", "productos/journal.pdf"], ["Poster del journal", "El poster de la investigacion", "productos/poster.pdf"], ["Beamer", "La presentacion de la exposicion", "productos/beamer.pdf"]];
+const DATOS = {"composicion": [{"Nemonico": "SCCO", "Empresa": "Southern Copper Corp.", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "US$"}, {"Nemonico": "BVN", "Empresa": "Buenaventura", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "US$"}, {"Nemonico": "CVERDEC1", "Empresa": "Cerro Verde", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "US$"}, {"Nemonico": "VOLCABC1", "Empresa": "Volcan", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "MINSURI1", "Empresa": "Minsur", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "NEXAPEC1", "Empresa": "Nexa Resources Peru", "Sector BVL": "MINERAS", "Cartera asignada": "Mineria", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "BAP", "Empresa": "Credicorp Ltd.", "Sector BVL": "DIVERSAS", "Cartera asignada": "Banca", "Reasignada": "si", "Moneda": "US$"}, {"Nemonico": "IFS", "Empresa": "Intercorp Financial Serv.", "Sector BVL": "DIVERSAS", "Cartera asignada": "Banca", "Reasignada": "si", "Moneda": "US$"}, {"Nemonico": "BBVAC1", "Empresa": "Banco BBVA Peru", "Sector BVL": "BANCOS Y FINANCIERAS", "Cartera asignada": "Banca", "Reasignada": "no", "Moneda": "S/"}, {"Nemonico": "ALICORC1", "Empresa": "Alicorp", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Consumo", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "BACKUSI1", "Empresa": "UCP Backus & Johnston", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Consumo", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "INRETC1", "Empresa": "InRetail Perú Corp.", "Sector BVL": "DIVERSAS", "Cartera asignada": "Consumo", "Reasignada": "si", "Moneda": "US$"}, {"Nemonico": "CPACASC1", "Empresa": "Cementos Pacasmayo", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "UNACEMC1", "Empresa": "UNACEM ", "Sector BVL": "DIVERSAS", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "CORAREI1", "Empresa": "Corp. Aceros Arequipa", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}, {"Nemonico": "SIDERC1", "Empresa": "SIDERPERU", "Sector BVL": "INDUSTRIALES", "Cartera asignada": "Construccion", "Reasignada": "si", "Moneda": "S/"}], "descriptiva": [{"Sector": "Banca", "N": "918", "Media": "0.10601372549019608", "Desv": "1.6313978007070016", "Minimo": "-10.8572", "Mediana": "0.12425", "Maximo": "9.9256", "Volatilidad anual": "25.897637220530637", "Retorno anual": "26.715458823529413"}, {"Sector": "Construccion", "N": "918", "Media": "0.06530631808278867", "Desv": "1.2239110179643817", "Minimo": "-9.0102", "Mediana": "0.0", "Maximo": "11.9535", "Volatilidad anual": "19.428985082433964", "Retorno anual": "16.457192156862742"}, {"Sector": "Consumo", "N": "918", "Media": "0.04446699346405229", "Desv": "1.034485600337833", "Minimo": "-4.0063", "Mediana": "0.02265", "Maximo": "8.0464", "Volatilidad anual": "16.421949800227573", "Retorno anual": "11.205682352941178"}, {"Sector": "Mineria", "N": "918", "Media": "0.10742047930283226", "Desv": "1.7793194455976677", "Minimo": "-10.0083", "Mediana": "0.06155", "Maximo": "9.9653", "Volatilidad anual": "28.2458205359565", "Retorno anual": "27.06996078431373"}], "adf": [{"Variable": "Y_retorno_sector", "p-valor ADF": "0.0", "Orden": "I(0)"}, {"Variable": "X1_retorno_mercado", "p-valor ADF": "0.0", "Orden": "I(0)"}, {"Variable": "X2_treasury_10a", "p-valor ADF": "0.0", "Orden": "I(0)"}, {"Variable": "X3_tipo_cambio", "p-valor ADF": "0.0", "Orden": "I(0)"}], "correlaciones": [{"Sector": "Banca", "Banca": "1.0", "Construccion": "0.2051", "Consumo": "0.4553", "Mineria": "0.5337"}, {"Sector": "Construccion", "Banca": "0.2051", "Construccion": "1.0", "Consumo": "0.2447", "Mineria": "0.2968"}, {"Sector": "Consumo", "Banca": "0.4553", "Construccion": "0.2447", "Consumo": "1.0", "Mineria": "0.3849"}, {"Sector": "Mineria", "Banca": "0.5337", "Construccion": "0.2968", "Consumo": "0.3849", "Mineria": "1.0"}], "betas": [{"Sector": "Mineria", "Beta": "1.6155419031703906", "Error estandar": "0.09067078317124186", "z": "17.81766790432658", "p-valor": "5.154084197530963e-71", "IC 95% inferior": "1.437830433704716", "IC 95% superior": "1.793253372636065", "R2": "0.7657253951943006", "N": "918"}, {"Sector": "Banca", "Beta": "1.068905076571089", "Error estandar": "0.09250460897967945", "z": "11.555154801053169", "p-valor": "6.952209579568072e-31", "IC 95% inferior": "0.8875993745669568", "IC 95% superior": "1.2502107785752212", "R2": "0.5880604942840991", "N": "918"}, {"Sector": "Consumo", "Beta": "0.5474576487499785", "Error estandar": "0.054905898657944305", "z": "9.970834867134393", "p-valor": "2.0450252197702008e-23", "IC 95% inferior": "0.43984406484160155", "IC 95% superior": "0.6550712326583554", "R2": "0.41858267200249255", "N": "918"}, {"Sector": "Construccion", "Beta": "0.8679455749885476", "Error estandar": "0.06529546806370762", "z": "13.292585239479541", "p-valor": "2.5559224624891467e-40", "IC 95% inferior": "0.7399688092299954", "IC 95% superior": "0.9959223407470998", "R2": "0.3985263265241581", "N": "918"}], "costo": [{"Sector": "Mineria", "Beta": "1.6155", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "28.7326", "Ke con prima de referencia (%)": "16.0026"}, {"Sector": "Banca", "Beta": "1.0689", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "20.3255", "Ke con prima de referencia (%)": "11.9028"}, {"Sector": "Consumo", "Beta": "0.5475", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "12.3058", "Ke con prima de referencia (%)": "7.992"}, {"Sector": "Construccion", "Beta": "0.8679", "Rf (%)": "3.886", "Prima de mercado (%)": "15.3797", "Costo de capital Ke (%)": "17.2348", "Ke con prima de referencia (%)": "10.3956"}], "robustez": [{"Sector": "Mineria", "Beta": "1.0932771469627833", "Error estandar": "0.09879149287717245", "z": "11.066511043841151", "p-valor": "1.8236305101013977e-28", "IC 95% inferior": "0.8996493789445801", "IC 95% superior": "1.2869049149809866", "R2": "0.33239228372855245", "N": "918"}, {"Sector": "Banca", "Beta": "0.7931025585497384", "Error estandar": "0.1040191980547997", "z": "7.624578667986979", "p-valor": "2.4483272289760514e-14", "IC 95% inferior": "0.5892286766615922", "IC 95% superior": "0.9969764404378847", "R2": "0.44073580894179976", "N": "918"}, {"Sector": "Consumo", "Beta": "0.37854444042749136", "Error estandar": "0.052925872465737205", "z": "7.1523514453644745", "p-valor": "8.530382756782068e-13", "IC 95% inferior": "0.2748116365442863", "IC 95% superior": "0.4822772443106964", "R2": "0.32425108645999823", "N": "918"}, {"Sector": "Construccion", "Beta": "0.5342996221394939", "Error estandar": "0.06225789371127987", "z": "8.582038200927597", "p-valor": "9.320667397825674e-18", "IC 95% inferior": "0.4122763927120626", "IC 95% superior": "0.6563228515669252", "R2": "0.17496902787385793", "N": "918"}], "diagnostico": [{"Especificacion": "Mineria", "R2": "0.7657", "Durbin-Watson": "2.051", "Jarque-Bera": "2104.55", "p-valor JB": "0.0", "Asimetria": "-0.0298", "Curtosis": "10.417", "N": "918"}, {"Especificacion": "Banca", "R2": "0.5881", "Durbin-Watson": "2.1139", "Jarque-Bera": "323.8", "p-valor JB": "0.0", "Asimetria": "-0.1267", "Curtosis": "5.898", "N": "918"}, {"Especificacion": "Consumo", "R2": "0.4186", "Durbin-Watson": "1.8779", "Jarque-Bera": "1969.67", "p-valor JB": "0.0", "Asimetria": "0.8339", "Curtosis": "9.979", "N": "918"}, {"Especificacion": "Construccion", "R2": "0.3985", "Durbin-Watson": "2.0331", "Jarque-Bera": "7640.36", "p-valor JB": "0.0", "Asimetria": "0.6099", "Curtosis": "17.08", "N": "918"}], "frontera": [{"Cartera": "Maximo Sharpe (tangente)", "Minería %": "23.5", "Banca %": "40.0", "Construcción %": "36.4", "Consumo %": "0.0", "Retorno anual %": "23.06", "Volatilidad anual %": "18.26", "Sharpe": "1.0502"}, {"Cartera": "Minima varianza global", "Minería %": "0.9", "Banca %": "6.7", "Construcción %": "37.4", "Consumo %": "55.0", "Retorno anual %": "14.35", "Volatilidad anual %": "13.87", "Sharpe": "0.7546"}, {"Cartera": "Ponderacion igual", "Minería %": "25.0", "Banca %": "25.0", "Construcción %": "25.0", "Consumo %": "25.0", "Retorno anual %": "20.36", "Volatilidad anual %": "16.45", "Sharpe": "1.0016"}], "desempeno": [{"Sector": "Minería", "Beta": "1.6155", "Retorno anual %": "27.07", "Volatilidad anual %": "28.25", "Ke del CAPM %": "28.73", "Sharpe": "0.8208", "Treynor %": "14.35", "Alfa de Jensen anual %": "-4.23", "p del alfa": "0.557", "Retorno menos Ke %": "-1.66"}, {"Sector": "Banca", "Beta": "1.0689", "Retorno anual %": "26.72", "Volatilidad anual %": "25.9", "Ke del CAPM %": "20.33", "Sharpe": "0.8815", "Treynor %": "21.36", "Alfa de Jensen anual %": "5.57", "p del alfa": "0.517", "Retorno menos Ke %": "6.39"}, {"Sector": "Construcción", "Beta": "0.8679", "Retorno anual %": "16.46", "Volatilidad anual %": "19.43", "Ke del CAPM %": "17.23", "Sharpe": "0.647", "Treynor %": "14.48", "Alfa de Jensen anual %": "0.3", "p del alfa": "0.967", "Retorno menos Ke %": "-0.78"}, {"Sector": "Consumo", "Beta": "0.5475", "Retorno anual %": "11.21", "Volatilidad anual %": "16.42", "Ke del CAPM %": "12.31", "Sharpe": "0.4457", "Treynor %": "13.37", "Alfa de Jensen anual %": "0.4", "p del alfa": "0.953", "Retorno menos Ke %": "-1.1"}], "diversificacion": [{"Indicador": "Mejor Sharpe de un sector por separado", "Valor": "0.8815"}, {"Indicador": "Sharpe de la cartera tangente", "Valor": "1.0502"}, {"Indicador": "Mejora porcentual del Sharpe", "Valor": "19.1"}, {"Indicador": "Volatilidad del sector menos volatil (%)", "Valor": "16.42"}, {"Indicador": "Volatilidad de la cartera de minima varianza (%)", "Valor": "13.87"}, {"Indicador": "Reduccion porcentual de la volatilidad", "Valor": "15.5"}]};
+const DER = {"fechas": ["2021-11-02", "2021-11-03", "2021-11-04", "2021-11-05", "2021-11-08", "2021-11-09", "2021-11-10", "2021-11-11", "2021-11-12", "2021-11-15", "2021-11-16", "2021-11-17", "2021-11-18", "2021-11-19", "2021-11-22", "2021-11-23", "2021-11-24", "2021-11-29", "2021-11-30", "2021-12-01", "2021-12-02", "2021-12-03", "2021-12-06", "2021-12-07", "2021-12-08", "2021-12-09", "2021-12-10", "2021-12-13", "2021-12-14", "2021-12-15", "2021-12-16", "2021-12-17", "2021-12-20", "2021-12-21", "2021-12-22", "2021-12-23", "2021-12-28", "2021-12-29", "2021-12-30", "2021-12-31", "2022-01-03", "2022-01-04", "2022-01-05", "2022-01-06", "2022-01-07", "2022-01-10", "2022-01-11", "2022-01-12", "2022-01-13", "2022-01-14", "2022-01-19", "2022-01-20", "2022-01-21", "2022-01-24", "2022-01-25", "2022-01-26", "2022-01-27", "2022-01-28", "2022-01-31", "2022-02-01", "2022-02-02", "2022-02-03", "2022-02-04", "2022-02-07", "2022-02-08", "2022-02-09", "2022-02-10", "2022-02-11", "2022-02-14", "2022-02-15", "2022-02-16", "2022-02-17", "2022-02-18", "2022-02-23", "2022-02-24", "2022-02-25", "2022-02-28", "2022-03-01", "2022-03-02", "2022-03-03", "2022-03-04", "2022-03-07", "2022-03-08", "2022-03-09", "2022-03-10", "2022-03-11", "2022-03-14", "2022-03-15", "2022-03-16", "2022-03-17", "2022-03-18", "2022-03-21", "2022-03-22", "2022-03-23", "2022-03-24", "2022-03-25", "2022-03-29", "2022-03-30", "2022-03-31", "2022-04-05", "2022-04-06", "2022-04-07", "2022-04-12", "2022-04-13", "2022-04-14", "2022-04-19", "2022-04-20", "2022-04-21", "2022-04-26", "2022-04-27", "2022-04-28", "2022-05-03", "2022-05-04", "2022-05-05", "2022-05-10", "2022-05-11", "2022-05-12", "2022-05-17", "2022-05-18", "2022-05-19", "2022-05-24", "2022-05-25", "2022-05-26", "2022-06-01", "2022-06-02", "2022-06-07", "2022-06-08", "2022-06-09", "2022-06-14", "2022-06-15", "2022-06-16", "2022-06-22", "2022-06-23", "2022-06-28", "2022-06-29", "2022-06-30", "2022-07-06", "2022-07-07", "2022-07-12", "2022-07-13", "2022-07-14", "2022-07-19", "2022-07-20", "2022-07-21", "2022-07-26", "2022-07-27", "2022-07-28", "2022-08-02", "2022-08-03", "2022-08-04", "2022-08-09", "2022-08-10", "2022-08-11", "2022-08-16", "2022-08-17", "2022-08-18", "2022-08-23", "2022-08-24", "2022-08-25", "2022-08-30", "2022-08-31", "2022-09-01", "2022-09-07", "2022-09-08", "2022-09-13", "2022-09-14", "2022-09-15", "2022-09-20", "2022-09-21", "2022-09-22", "2022-09-27", "2022-09-28", "2022-09-29", "2022-10-04", "2022-10-05", "2022-10-06", "2022-10-11", "2022-10-12", "2022-10-13", "2022-10-18", "2022-10-19", "2022-10-20", "2022-10-25", "2022-10-26", "2022-10-27", "2022-11-01", "2022-11-02", "2022-11-03", "2022-11-04", "2022-11-07", "2022-11-08", "2022-11-09", "2022-11-10", "2022-11-11", "2022-11-14", "2022-11-15", "2022-11-16", "2022-11-17", "2022-11-18", "2022-11-21", "2022-11-22", "2022-11-23", "2022-11-28", "2022-11-29", "2022-11-30", "2022-12-01", "2022-12-02", "2022-12-05", "2022-12-06", "2022-12-07", "2022-12-08", "2022-12-09", "2022-12-12", "2022-12-13", "2022-12-14", "2022-12-15", "2022-12-16", "2022-12-19", "2022-12-20", "2022-12-21", "2022-12-22", "2022-12-23", "2022-12-28", "2022-12-29", "2022-12-30", "2023-01-04", "2023-01-05", "2023-01-06", "2023-01-09", "2023-01-10", "2023-01-11", "2023-01-12", "2023-01-13", "2023-01-18", "2023-01-19", "2023-01-20", "2023-01-23", "2023-01-24", "2023-01-25", "2023-01-26", "2023-01-27", "2023-01-30", "2023-01-31", "2023-02-01", "2023-02-02", "2023-02-03", "2023-02-06", "2023-02-07", "2023-02-08", "2023-02-09", "2023-02-10", "2023-02-13", "2023-02-14", "2023-02-15", "2023-02-16", "2023-02-17", "2023-02-22", "2023-02-23", "2023-02-24", "2023-02-27", "2023-02-28", "2023-03-01", "2023-03-02", "2023-03-03", "2023-03-06", "2023-03-07", "2023-03-08", "2023-03-09", "2023-03-10", "2023-03-13", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-20", "2023-03-21", "2023-03-22", "2023-03-23", "2023-03-24", "2023-03-28", "2023-03-29", "2023-03-30", "2023-04-04", "2023-04-05", "2023-04-06", "2023-04-11", "2023-04-12", "2023-04-13", "2023-04-18", "2023-04-19", "2023-04-20", "2023-04-25", "2023-04-26", "2023-04-27", "2023-05-02", "2023-05-03", "2023-05-04", "2023-05-09", "2023-05-10", "2023-05-11", "2023-05-16", "2023-05-17", "2023-05-18", "2023-05-23", "2023-05-24", "2023-05-25", "2023-05-31", "2023-06-01", "2023-06-06", "2023-06-07", "2023-06-08", "2023-06-13", "2023-06-14", "2023-06-15", "2023-06-21", "2023-06-22", "2023-06-27", "2023-06-28", "2023-06-29", "2023-07-06", "2023-07-11", "2023-07-12", "2023-07-13", "2023-07-18", "2023-07-19", "2023-07-20", "2023-07-25", "2023-07-26", "2023-07-27", "2023-08-01", "2023-08-02", "2023-08-03", "2023-08-08", "2023-08-09", "2023-08-10", "2023-08-15", "2023-08-16", "2023-08-17", "2023-08-22", "2023-08-23", "2023-08-24", "2023-08-29", "2023-08-30", "2023-08-31", "2023-09-06", "2023-09-07", "2023-09-12", "2023-09-13", "2023-09-14", "2023-09-19", "2023-09-20", "2023-09-21", "2023-09-26", "2023-09-27", "2023-09-28", "2023-10-03", "2023-10-04", "2023-10-05", "2023-10-10", "2023-10-11", "2023-10-12", "2023-10-17", "2023-10-18", "2023-10-19", "2023-10-24", "2023-10-25", "2023-10-26", "2023-10-31", "2023-11-01", "2023-11-02", "2023-11-03", "2023-11-06", "2023-11-07", "2023-11-08", "2023-11-09", "2023-11-10", "2023-11-13", "2023-11-14", "2023-11-15", "2023-11-16", "2023-11-17", "2023-11-20", "2023-11-21", "2023-11-22", "2023-11-27", "2023-11-28", "2023-11-29", "2023-11-30", "2023-12-01", "2023-12-04", "2023-12-05", "2023-12-06", "2023-12-07", "2023-12-08", "2023-12-11", "2023-12-12", "2023-12-13", "2023-12-14", "2023-12-15", "2023-12-18", "2023-12-19", "2023-12-20", "2023-12-21", "2023-12-22", "2023-12-27", "2023-12-28", "2023-12-29", "2024-01-03", "2024-01-04", "2024-01-05", "2024-01-08", "2024-01-09", "2024-01-10", "2024-01-11", "2024-01-12", "2024-01-17", "2024-01-18", "2024-01-19", "2024-01-22", "2024-01-23", "2024-01-24", "2024-01-25", "2024-01-26", "2024-01-29", "2024-01-30", "2024-01-31", "2024-02-01", "2024-02-02", "2024-02-05", "2024-02-06", "2024-02-07", "2024-02-08", "2024-02-09", "2024-02-12", "2024-02-13", "2024-02-14", "2024-02-15", "2024-02-16", "2024-02-21", "2024-02-22", "2024-02-23", "2024-02-26", "2024-02-27", "2024-02-28", "2024-02-29", "2024-03-01", "2024-03-04", "2024-03-05", "2024-03-06", "2024-03-07", "2024-03-08", "2024-03-11", "2024-03-12", "2024-03-13", "2024-03-14", "2024-03-15", "2024-03-18", "2024-03-19", "2024-03-20", "2024-03-21", "2024-03-22", "2024-03-25", "2024-03-26", "2024-03-27", "2024-03-28", "2024-04-02", "2024-04-03", "2024-04-04", "2024-04-09", "2024-04-10", "2024-04-11", "2024-04-16", "2024-04-17", "2024-04-18", "2024-04-23", "2024-04-24", "2024-04-25", "2024-04-30", "2024-05-02", "2024-05-07", "2024-05-08", "2024-05-09", "2024-05-14", "2024-05-15", "2024-05-16", "2024-05-21", "2024-05-22", "2024-05-23", "2024-05-29", "2024-05-30", "2024-06-04", "2024-06-05", "2024-06-06", "2024-06-11", "2024-06-12", "2024-06-13", "2024-06-18", "2024-06-25", "2024-06-26", "2024-06-27", "2024-07-02", "2024-07-03", "2024-07-09", "2024-07-10", "2024-07-11", "2024-07-16", "2024-07-17", "2024-07-18", "2024-07-23", "2024-07-24", "2024-07-25", "2024-07-30", "2024-07-31", "2024-08-01", "2024-08-06", "2024-08-07", "2024-08-08", "2024-08-13", "2024-08-14", "2024-08-15", "2024-08-20", "2024-08-21", "2024-08-22", "2024-08-27", "2024-08-28", "2024-08-29", "2024-09-04", "2024-09-05", "2024-09-10", "2024-09-11", "2024-09-12", "2024-09-17", "2024-09-18", "2024-09-19", "2024-09-24", "2024-09-25", "2024-09-26", "2024-10-01", "2024-10-02", "2024-10-03", "2024-10-09", "2024-10-10", "2024-10-15", "2024-10-16", "2024-10-17", "2024-10-22", "2024-10-23", "2024-10-24", "2024-10-29", "2024-10-30", "2024-10-31", "2024-11-04", "2024-11-05", "2024-11-06", "2024-11-07", "2024-11-08", "2024-11-11", "2024-11-12", "2024-11-13", "2024-11-14", "2024-11-15", "2024-11-18", "2024-11-19", "2024-11-20", "2024-11-21", "2024-11-22", "2024-11-25", "2024-11-26", "2024-11-27", "2024-12-02", "2024-12-03", "2024-12-04", "2024-12-05", "2024-12-06", "2024-12-10", "2024-12-11", "2024-12-12", "2024-12-13", "2024-12-16", "2024-12-17", "2024-12-18", "2024-12-19", "2024-12-20", "2024-12-23", "2024-12-24", "2024-12-27", "2024-12-30", "2024-12-31", "2025-01-02", "2025-01-03", "2025-01-06", "2025-01-07", "2025-01-08", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16", "2025-01-17", "2025-01-22", "2025-01-23", "2025-01-24", "2025-01-27", "2025-01-28", "2025-01-29", "2025-01-30", "2025-01-31", "2025-02-03", "2025-02-04", "2025-02-05", "2025-02-06", "2025-02-07", "2025-02-10", "2025-02-11", "2025-02-12", "2025-02-13", "2025-02-14", "2025-02-19", "2025-02-20", "2025-02-21", "2025-02-24", "2025-02-25", "2025-02-26", "2025-02-27", "2025-02-28", "2025-03-03", "2025-03-04", "2025-03-05", "2025-03-06", "2025-03-07", "2025-03-10", "2025-03-11", "2025-03-12", "2025-03-13", "2025-03-14", "2025-03-17", "2025-03-18", "2025-03-19", "2025-03-20", "2025-03-21", "2025-03-24", "2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28", "2025-04-01", "2025-04-02", "2025-04-03", "2025-04-08", "2025-04-09", "2025-04-10", "2025-04-15", "2025-04-16", "2025-04-22", "2025-04-23", "2025-04-24", "2025-04-29", "2025-04-30", "2025-05-06", "2025-05-07", "2025-05-08", "2025-05-13", "2025-05-14", "2025-05-15", "2025-05-20", "2025-05-21", "2025-05-22", "2025-05-28", "2025-05-29", "2025-06-03", "2025-06-04", "2025-06-05", "2025-06-10", "2025-06-11", "2025-06-12", "2025-06-17", "2025-06-18", "2025-06-24", "2025-06-25", "2025-06-26", "2025-07-01", "2025-07-02", "2025-07-03", "2025-07-08", "2025-07-09", "2025-07-10", "2025-07-15", "2025-07-16", "2025-07-17", "2025-07-22", "2025-07-23", "2025-07-24", "2025-07-29", "2025-07-30", "2025-07-31", "2025-08-05", "2025-08-07", "2025-08-12", "2025-08-13", "2025-08-14", "2025-08-19", "2025-08-20", "2025-08-21", "2025-08-26", "2025-08-27", "2025-08-28", "2025-09-03", "2025-09-04", "2025-09-09", "2025-09-10", "2025-09-11", "2025-09-16", "2025-09-17", "2025-09-18", "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-30", "2025-10-01", "2025-10-02", "2025-10-07", "2025-10-09", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-24", "2025-11-25", "2025-11-26", "2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-26", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-02", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-12", "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-27", "2026-05-28", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-28", "2026-07-29", "2026-07-30", "2026-08-04", "2026-08-05", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-25", "2026-08-26", "2026-08-27", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-09", "2026-09-10", "2026-09-15", "2026-09-16", "2026-09-17", "2026-09-22", "2026-09-23", "2026-09-24", "2026-09-29", "2026-09-30", "2026-10-01", "2026-10-06", "2026-10-07", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30"], "indice": {"mineria": [100.0, 99.23, 97.61, 100.43, 101.39, 101.31, 99.57, 102.01, 103.54, 103.64, 102.7, 102.79, 104.15, 104.31, 101.88, 103.74, 104.52, 107.81, 112.25, 109.6, 112.17, 110.82, 110.65, 114.0, 113.67, 114.71, 112.75, 115.36, 113.4, 111.64, 115.49, 114.51, 113.12, 114.74, 115.1, 115.67, 114.86, 114.09, 115.33, 114.75, 115.39, 118.94, 122.91, 124.11, 126.39, 125.72, 129.42, 133.99, 132.53, 132.5, 134.66, 134.33, 134.05, 130.08, 129.35, 128.33, 127.84, 127.13, 127.46, 127.03, 127.63, 125.67, 126.31, 127.31, 133.12, 133.96, 133.61, 134.38, 130.12, 134.59, 138.24, 137.33, 135.2, 136.97, 135.03, 139.29, 138.29, 144.38, 144.26, 146.78, 149.1, 153.5, 154.31, 153.04, 155.6, 155.47, 149.64, 147.23, 148.93, 150.22, 150.69, 153.1, 150.82, 152.87, 152.3, 152.85, 151.36, 150.78, 149.88, 149.62, 149.63, 150.64, 148.64, 148.87, 149.07, 147.05, 146.36, 141.73, 140.78, 145.48, 145.67, 145.92, 146.29, 133.47, 132.03, 132.65, 129.0, 125.81, 122.23, 126.07, 124.85, 124.51, 127.46, 127.39, 128.35, 128.31, 126.95, 126.15, 125.08, 125.3, 122.82, 119.58, 111.89, 109.39, 109.13, 105.76, 103.57, 109.2, 110.15, 109.09, 106.72, 108.3, 106.88, 109.78, 110.87, 112.34, 111.29, 111.01, 112.33, 113.48, 114.15, 116.91, 117.44, 119.37, 114.88, 118.2, 119.54, 120.29, 119.81, 119.09, 116.71, 113.21, 114.59, 116.2, 115.56, 115.34, 115.55, 114.98, 114.09, 114.91, 115.43, 119.45, 119.79, 120.18, 118.59, 121.13, 119.34, 119.51, 119.41, 119.81, 119.08, 119.46, 121.92, 123.48, 123.13, 124.23, 122.49, 121.54, 129.45, 126.93, 130.26, 128.83, 130.98, 132.96, 130.8, 133.74, 132.77, 131.46, 131.17, 129.17, 130.29, 129.97, 129.17, 130.24, 131.6, 132.97, 132.18, 128.48, 130.62, 131.19, 130.96, 132.61, 128.97, 129.48, 129.79, 126.7, 123.35, 122.98, 125.46, 125.66, 124.48, 124.85, 124.75, 125.84, 124.89, 127.28, 127.39, 130.91, 134.06, 137.38, 138.46, 140.01, 138.88, 140.95, 141.21, 139.61, 138.7, 141.39, 139.93, 140.7, 138.66, 136.67, 138.24, 139.61, 138.65, 136.46, 135.38, 136.15, 135.74, 135.3, 134.43, 133.72, 132.64, 136.5, 135.78, 133.73, 131.14, 129.96, 127.64, 128.37, 130.22, 131.95, 130.67, 133.57, 131.67, 128.72, 129.79, 127.67, 125.48, 124.58, 127.72, 125.76, 125.29, 126.23, 125.22, 125.96, 125.33, 125.53, 125.25, 125.31, 126.42, 127.66, 127.41, 128.37, 126.89, 129.66, 128.51, 130.57, 132.38, 129.96, 130.45, 129.45, 128.21, 127.79, 129.17, 128.82, 128.88, 130.25, 128.62, 124.75, 123.8, 125.31, 124.33, 122.07, 121.35, 118.33, 119.12, 117.89, 117.87, 118.59, 120.46, 121.55, 121.17, 121.44, 120.93, 119.2, 118.52, 117.56, 117.47, 116.97, 117.23, 118.94, 119.42, 119.44, 119.84, 117.77, 118.38, 118.31, 117.67, 117.5, 115.44, 116.78, 116.09, 116.42, 116.57, 115.43, 115.36, 115.75, 116.33, 116.91, 116.55, 117.86, 117.83, 117.88, 119.51, 118.42, 118.95, 119.39, 121.5, 119.38, 120.23, 120.85, 119.89, 119.89, 120.94, 120.04, 119.56, 117.15, 117.97, 116.46, 116.13, 116.58, 115.57, 116.65, 116.63, 114.41, 114.06, 113.48, 113.89, 113.15, 112.05, 111.37, 112.68, 114.45, 114.38, 115.39, 112.66, 115.79, 115.58, 115.39, 113.77, 114.7, 115.93, 115.76, 115.76, 117.71, 117.16, 115.53, 116.75, 115.47, 113.74, 113.13, 114.35, 115.57, 114.0, 114.72, 115.29, 119.41, 125.74, 125.66, 129.83, 133.3, 131.78, 132.98, 133.69, 134.46, 135.57, 136.76, 137.54, 138.49, 137.38, 138.77, 139.66, 140.57, 142.58, 143.15, 145.21, 147.53, 145.74, 148.51, 148.41, 148.66, 148.91, 148.01, 149.62, 148.15, 148.92, 146.49, 143.63, 144.7, 146.01, 147.07, 145.54, 144.66, 144.69, 145.79, 146.19, 145.98, 146.65, 146.54, 147.07, 144.54, 146.01, 144.71, 143.68, 145.5, 144.84, 146.18, 145.7, 148.93, 146.98, 148.91, 150.34, 154.14, 154.77, 158.51, 157.77, 158.24, 158.11, 156.76, 156.34, 155.45, 151.95, 150.75, 151.36, 151.5, 152.97, 151.89, 155.41, 156.49, 159.47, 160.0, 159.88, 162.14, 160.87, 161.39, 164.2, 162.95, 164.15, 158.63, 160.46, 167.72, 174.67, 174.96, 175.06, 180.54, 163.34, 159.65, 158.11, 156.22, 151.1, 152.14, 151.65, 153.07, 154.08, 153.41, 153.62, 152.26, 152.4, 150.92, 150.73, 151.1, 149.59, 151.43, 151.66, 150.07, 149.03, 146.65, 146.86, 146.08, 145.01, 144.97, 146.89, 144.93, 144.38, 142.89, 145.26, 144.01, 142.86, 144.03, 142.65, 142.3, 141.2, 140.18, 137.72, 140.2, 139.57, 138.37, 138.83, 140.04, 141.79, 140.1, 141.87, 143.08, 146.97, 146.44, 149.87, 150.03, 151.22, 149.47, 148.57, 150.69, 151.15, 152.04, 152.36, 156.09, 155.55, 155.97, 157.27, 156.82, 153.2, 155.75, 157.0, 156.0, 156.82, 153.91, 150.5, 151.54, 153.08, 151.08, 151.25, 150.57, 151.71, 152.33, 151.48, 150.54, 149.15, 149.53, 149.34, 149.01, 149.86, 150.69, 150.08, 149.28, 147.07, 150.03, 149.68, 147.82, 147.51, 146.4, 146.22, 146.01, 146.52, 145.09, 146.06, 145.56, 145.12, 144.25, 146.04, 146.67, 147.36, 149.54, 150.64, 150.19, 151.78, 152.49, 152.37, 151.52, 151.9, 151.47, 151.43, 147.69, 149.01, 149.08, 149.33, 147.44, 147.95, 149.93, 150.05, 148.8, 150.84, 148.75, 147.71, 148.9, 150.26, 150.62, 150.16, 150.55, 146.75, 145.41, 146.44, 146.47, 145.14, 145.58, 143.7, 146.31, 146.85, 147.82, 145.42, 142.83, 146.57, 145.75, 148.91, 149.75, 151.08, 152.94, 153.05, 153.99, 155.75, 153.33, 158.0, 155.62, 157.79, 157.67, 157.84, 156.4, 150.21, 151.76, 157.73, 156.22, 155.39, 150.78, 149.26, 148.59, 150.68, 150.17, 150.28, 148.83, 147.55, 147.58, 149.98, 148.61, 150.14, 151.73, 152.0, 149.69, 151.55, 151.0, 152.4, 152.39, 156.36, 155.99, 155.58, 160.62, 161.29, 159.81, 157.87, 155.99, 159.97, 160.07, 160.15, 161.98, 160.0, 159.2, 160.21, 159.22, 158.7, 158.34, 159.61, 159.71, 158.93, 157.18, 154.25, 156.43, 155.49, 156.03, 156.97, 158.19, 158.14, 154.53, 154.28, 155.46, 158.57, 158.67, 159.47, 162.5, 160.66, 155.09, 157.73, 161.12, 159.14, 158.37, 158.82, 158.18, 163.59, 163.29, 150.42, 166.18, 167.33, 164.26, 164.14, 163.95, 167.8, 170.17, 161.26, 160.62, 163.06, 166.24, 168.33, 170.45, 169.79, 164.56, 162.22, 164.94, 163.05, 162.36, 165.0, 165.11, 168.67, 168.17, 167.13, 162.34, 162.14, 164.49, 162.53, 160.52, 160.19, 164.56, 170.04, 169.87, 167.36, 166.56, 167.83, 176.28, 174.19, 175.92, 181.47, 181.06, 184.13, 181.89, 182.86, 183.88, 184.07, 190.62, 195.18, 199.94, 200.76, 205.56, 197.2, 204.71, 202.38, 204.68, 211.52, 223.06, 221.54, 221.01, 227.38, 233.52, 237.24, 240.58, 243.45, 245.63, 247.36, 246.38, 252.71, 261.24, 262.61, 267.74, 267.8, 242.4, 239.6, 256.57, 247.6, 243.04, 251.56, 258.84, 259.42, 262.47, 253.72, 254.18, 255.59, 258.77, 260.64, 261.25, 265.46, 271.95, 268.39, 281.1, 279.11, 266.93, 271.62, 260.83, 255.71, 256.13, 267.2, 261.56, 252.52, 246.65, 247.82, 250.32, 235.96, 222.17, 216.13, 223.52, 232.6, 236.25, 233.91, 230.84, 243.62, 246.17, 245.0, 241.94, 252.41, 252.33, 246.02, 238.83, 246.47, 241.77, 244.78, 247.02, 245.85, 244.92, 250.03, 252.46, 259.14, 261.21, 259.15, 267.26, 264.76, 255.45, 262.73, 262.97, 260.05, 265.02, 269.49, 259.12, 254.39, 267.09, 263.53, 277.17, 283.29, 279.11, 275.2, 266.72, 260.03, 265.32, 266.39, 270.32, 273.17, 277.0, 272.39, 278.66, 281.77, 278.67, 278.26, 287.7, 289.82, 282.47, 280.44, 279.19, 280.55, 290.05, 294.53, 296.14, 295.23, 290.2, 289.4, 293.03, 293.67, 294.05, 296.36, 300.16, 296.74, 303.2, 302.12, 305.88, 292.48, 289.35, 294.29, 297.6, 301.44, 297.63, 295.27, 290.72, 289.4, 289.72, 289.33, 285.72, 286.66, 280.84, 279.76, 282.78, 279.18, 271.42, 280.84, 280.79, 280.16, 270.12], "banca": [100.0, 99.52, 97.49, 97.84, 98.1, 96.67, 95.05, 95.33, 93.86, 94.52, 93.64, 92.22, 91.46, 91.86, 90.15, 92.25, 93.76, 96.07, 100.77, 94.29, 93.86, 91.71, 91.3, 92.8, 92.22, 91.46, 90.4, 89.21, 90.15, 88.65, 91.05, 91.08, 90.31, 93.02, 93.76, 94.29, 93.47, 93.43, 94.31, 93.28, 94.04, 95.42, 94.61, 96.16, 98.26, 96.04, 98.37, 104.18, 106.46, 105.66, 109.0, 107.87, 105.61, 105.34, 106.49, 105.66, 105.1, 106.71, 106.48, 105.41, 106.47, 103.4, 103.91, 104.52, 109.16, 109.87, 112.07, 110.32, 107.24, 112.46, 113.15, 112.51, 110.51, 110.84, 107.41, 114.03, 114.48, 115.06, 113.02, 116.28, 115.32, 110.37, 113.3, 118.12, 117.88, 117.5, 116.83, 117.67, 120.25, 120.74, 120.63, 122.81, 123.75, 124.46, 123.12, 123.36, 122.7, 122.11, 123.48, 124.08, 121.22, 119.17, 117.29, 115.6, 116.33, 116.82, 117.99, 114.69, 111.76, 112.64, 111.7, 112.92, 113.57, 104.92, 105.22, 103.2, 100.64, 103.36, 100.98, 101.58, 101.07, 101.8, 102.23, 101.98, 105.96, 106.57, 105.38, 105.92, 104.19, 106.61, 104.73, 103.69, 102.59, 102.79, 103.03, 102.96, 102.64, 105.77, 104.94, 103.84, 102.53, 106.39, 106.55, 108.44, 108.11, 108.61, 110.09, 109.51, 109.7, 108.65, 108.26, 110.31, 111.57, 112.33, 108.68, 108.72, 109.28, 108.71, 109.08, 107.82, 106.12, 105.73, 105.01, 105.91, 105.07, 104.84, 105.8, 106.74, 104.28, 105.83, 106.63, 110.02, 109.01, 111.52, 110.59, 112.23, 111.62, 112.45, 113.21, 113.59, 113.46, 111.3, 112.65, 113.96, 116.12, 118.84, 115.44, 114.87, 119.41, 117.87, 118.42, 115.78, 119.14, 116.91, 113.72, 116.1, 114.3, 112.48, 111.24, 112.74, 114.58, 115.56, 114.76, 115.34, 116.06, 115.08, 115.36, 112.48, 113.84, 114.03, 112.32, 114.82, 111.73, 110.64, 110.04, 108.69, 109.51, 108.54, 110.4, 110.72, 110.18, 111.16, 110.81, 111.23, 110.17, 113.29, 114.15, 115.66, 115.43, 117.15, 115.49, 116.77, 116.9, 118.3, 117.65, 117.02, 113.94, 115.35, 113.88, 115.75, 114.33, 110.91, 112.79, 112.41, 112.43, 111.49, 110.58, 112.89, 112.36, 112.41, 108.36, 109.02, 107.32, 108.36, 108.56, 109.01, 109.44, 108.97, 107.85, 108.26, 110.25, 111.06, 108.9, 111.4, 111.56, 110.71, 110.8, 108.53, 107.14, 105.14, 107.95, 106.77, 107.46, 105.59, 103.53, 106.59, 105.61, 105.74, 104.6, 104.64, 107.42, 106.38, 106.49, 106.18, 104.54, 105.71, 105.32, 106.94, 106.91, 105.66, 104.35, 104.97, 103.84, 102.4, 101.32, 100.93, 101.26, 100.97, 100.64, 99.72, 98.26, 99.12, 97.47, 97.33, 96.65, 97.9, 98.49, 99.0, 99.77, 99.92, 100.45, 100.94, 101.07, 101.66, 101.13, 100.68, 100.41, 100.82, 101.83, 100.48, 100.6, 99.53, 100.33, 100.15, 100.32, 99.54, 99.3, 99.8, 98.91, 100.72, 98.33, 99.23, 99.62, 99.63, 98.49, 98.01, 97.37, 97.03, 97.43, 98.41, 97.67, 98.12, 97.78, 97.25, 98.57, 97.46, 99.03, 98.82, 99.75, 98.8, 98.98, 97.7, 96.36, 96.32, 95.8, 95.98, 94.53, 91.3, 93.13, 93.39, 93.11, 92.56, 90.47, 92.13, 92.07, 91.98, 92.3, 92.61, 92.7, 93.51, 90.19, 89.26, 90.97, 91.03, 90.53, 91.39, 87.79, 91.22, 90.92, 91.37, 92.54, 93.71, 92.09, 91.02, 90.16, 91.3, 91.46, 91.46, 92.06, 91.93, 92.1, 90.73, 92.47, 92.27, 90.73, 92.3, 92.57, 98.44, 103.1, 101.78, 103.29, 104.12, 104.64, 105.1, 105.96, 106.1, 107.29, 107.43, 107.78, 108.74, 106.98, 108.43, 107.24, 109.34, 107.98, 107.16, 109.35, 109.55, 108.83, 109.42, 109.93, 110.21, 111.3, 110.37, 112.51, 112.77, 113.72, 113.43, 112.49, 113.6, 116.12, 115.69, 116.67, 115.89, 119.49, 122.07, 127.56, 129.07, 131.34, 131.33, 132.18, 130.68, 131.79, 129.6, 125.77, 130.49, 127.49, 130.38, 128.78, 130.53, 127.71, 126.4, 126.92, 126.23, 124.76, 125.11, 124.11, 124.39, 127.49, 127.34, 125.22, 123.13, 122.63, 119.56, 120.04, 120.33, 119.75, 118.63, 119.46, 120.21, 116.72, 118.0, 114.47, 116.85, 117.38, 118.33, 119.04, 117.24, 117.15, 117.9, 120.19, 120.73, 118.65, 122.89, 123.28, 124.84, 123.11, 123.11, 124.59, 124.87, 122.31, 123.76, 122.34, 120.33, 121.15, 120.21, 120.43, 120.66, 119.81, 118.13, 118.58, 117.71, 119.94, 122.42, 121.62, 119.7, 118.97, 119.02, 118.85, 118.49, 116.27, 118.2, 118.54, 116.43, 117.19, 114.97, 118.58, 118.32, 118.02, 118.67, 119.32, 119.26, 118.71, 118.07, 117.69, 120.57, 121.4, 119.6, 121.35, 122.07, 121.91, 119.98, 124.18, 123.3, 124.94, 124.22, 124.66, 124.93, 123.71, 124.18, 122.66, 125.4, 126.1, 127.93, 128.52, 128.94, 129.44, 129.61, 130.1, 130.52, 128.69, 127.09, 128.19, 128.61, 129.34, 128.89, 127.53, 128.37, 131.19, 132.62, 133.62, 132.28, 133.61, 133.87, 136.0, 136.06, 131.3, 133.69, 132.6, 134.87, 136.72, 136.19, 137.94, 137.52, 136.94, 141.57, 140.07, 138.0, 137.22, 136.56, 135.32, 135.42, 135.96, 135.51, 136.42, 135.49, 136.69, 137.76, 137.72, 137.27, 138.85, 139.85, 139.91, 141.31, 144.52, 145.87, 143.99, 141.99, 144.0, 143.13, 143.7, 141.12, 144.0, 145.51, 145.23, 144.83, 144.76, 147.46, 147.73, 149.35, 150.35, 149.35, 150.49, 149.68, 149.29, 151.25, 151.51, 153.55, 150.54, 148.95, 150.39, 151.67, 150.91, 150.87, 149.74, 151.1, 152.24, 150.3, 148.92, 147.54, 150.43, 150.16, 153.41, 153.83, 155.06, 157.64, 158.52, 158.6, 158.54, 156.19, 161.46, 159.15, 158.81, 157.16, 159.69, 160.51, 156.7, 160.13, 164.47, 159.65, 154.32, 154.54, 155.69, 155.76, 155.51, 157.04, 157.14, 155.54, 155.56, 155.5, 161.25, 160.04, 164.36, 168.9, 168.97, 168.09, 166.15, 166.5, 167.32, 167.83, 169.59, 170.9, 173.15, 174.07, 174.96, 174.11, 172.47, 174.91, 178.6, 178.68, 176.72, 180.22, 178.39, 179.29, 179.21, 178.87, 179.01, 179.05, 179.87, 182.28, 182.27, 180.99, 180.07, 180.44, 179.87, 182.44, 186.45, 185.28, 186.82, 183.87, 183.17, 184.3, 184.32, 185.61, 185.17, 187.58, 184.28, 180.99, 183.26, 186.36, 187.62, 189.58, 182.56, 180.39, 180.7, 178.83, 178.84, 177.02, 177.47, 174.23, 172.67, 173.44, 173.94, 171.84, 171.35, 171.67, 173.16, 176.85, 178.35, 178.06, 177.81, 174.77, 176.63, 177.1, 175.36, 173.37, 171.26, 171.8, 173.69, 172.09, 172.12, 166.72, 170.11, 172.36, 170.49, 169.29, 170.64, 172.43, 173.42, 172.19, 175.59, 176.27, 179.03, 182.1, 179.23, 183.06, 184.68, 182.45, 187.37, 184.43, 188.52, 188.19, 191.54, 192.92, 189.84, 193.35, 192.41, 196.5, 194.05, 196.15, 196.39, 193.91, 195.96, 198.8, 198.7, 204.49, 204.76, 207.76, 212.7, 215.69, 216.55, 219.01, 225.11, 225.11, 227.41, 226.36, 232.57, 235.71, 236.71, 232.46, 236.45, 240.99, 234.57, 233.85, 238.83, 236.68, 237.98, 238.24, 233.76, 227.95, 230.78, 237.29, 238.54, 231.56, 233.05, 239.17, 233.66, 233.25, 230.23, 226.22, 231.44, 224.84, 221.58, 221.26, 232.37, 230.18, 222.78, 221.75, 224.37, 228.46, 224.57, 224.14, 222.53, 223.1, 232.09, 230.51, 232.45, 224.78, 235.94, 234.48, 233.8, 233.04, 237.13, 236.16, 237.92, 213.44, 226.45, 223.91, 224.25, 221.41, 223.42, 222.31, 222.68, 222.57, 225.87, 223.7, 221.4, 221.32, 222.86, 226.23, 238.82, 245.28, 240.35, 241.0, 247.23, 238.11, 233.38, 257.73, 256.05, 263.13, 268.53, 273.85, 274.47, 266.0, 272.99, 275.15, 273.37, 279.61, 279.44, 281.09, 276.92, 281.89, 283.49, 281.14, 279.81, 288.3, 288.65, 282.25, 279.34, 275.72, 279.4, 283.41, 283.03, 284.3, 278.96, 276.8, 277.19, 276.18, 276.13, 273.0, 276.57, 274.19, 278.03, 286.37, 288.74, 287.1, 282.14, 274.14, 283.04, 279.56, 281.11, 282.88, 278.71, 272.75, 272.95, 272.56, 276.26, 270.87, 277.01, 278.08, 273.43, 279.47, 273.3, 270.66, 273.56, 273.08, 270.39, 263.78], "construccion": [100.0, 99.87, 99.03, 101.6, 102.76, 103.19, 101.63, 104.33, 106.66, 109.16, 110.18, 111.34, 113.98, 114.28, 110.97, 111.76, 113.15, 115.76, 116.06, 113.14, 115.26, 112.85, 113.51, 115.79, 115.79, 119.93, 119.6, 121.46, 120.96, 119.69, 119.61, 119.83, 118.03, 119.04, 119.77, 119.13, 118.47, 118.19, 119.49, 119.44, 117.62, 119.43, 123.33, 123.91, 124.74, 125.85, 124.94, 125.33, 123.73, 124.25, 123.94, 123.48, 124.5, 122.21, 122.59, 122.37, 123.16, 124.34, 124.36, 122.22, 123.48, 123.79, 123.32, 122.64, 125.15, 125.58, 125.69, 125.83, 124.08, 125.14, 125.26, 125.08, 123.79, 123.55, 120.79, 122.04, 122.37, 122.0, 122.78, 122.36, 122.13, 121.01, 120.44, 119.88, 121.27, 122.33, 121.0, 119.48, 119.05, 119.05, 119.05, 119.05, 118.72, 118.0, 117.81, 118.9, 120.83, 123.2, 123.89, 121.7, 120.51, 120.35, 118.9, 108.66, 108.66, 109.21, 108.89, 107.86, 106.66, 111.19, 112.9, 114.03, 115.9, 106.76, 107.12, 107.88, 106.69, 102.22, 102.84, 103.93, 104.69, 104.84, 105.72, 106.58, 107.29, 106.66, 109.06, 110.52, 109.63, 109.4, 109.21, 105.27, 102.12, 101.87, 101.87, 100.99, 99.59, 100.57, 103.33, 102.23, 102.13, 107.21, 107.58, 109.03, 110.11, 109.93, 109.93, 109.98, 109.95, 110.57, 112.92, 113.83, 114.04, 115.43, 115.43, 115.57, 118.11, 118.48, 118.45, 118.45, 115.05, 110.2, 110.66, 112.25, 112.08, 110.35, 110.42, 110.97, 110.79, 108.79, 109.05, 109.97, 110.43, 110.95, 110.58, 112.05, 113.38, 113.86, 112.41, 111.92, 112.89, 114.6, 115.96, 113.42, 113.7, 113.7, 113.01, 112.77, 114.19, 114.86, 112.08, 113.01, 114.42, 111.71, 111.44, 110.33, 109.2, 110.51, 109.54, 107.67, 108.96, 109.62, 109.1, 107.85, 108.36, 108.92, 108.92, 107.67, 107.68, 108.95, 108.95, 108.95, 108.2, 108.61, 107.93, 108.52, 109.93, 109.59, 109.91, 110.3, 111.55, 111.79, 110.66, 110.67, 110.94, 110.82, 111.13, 113.24, 114.73, 114.49, 112.44, 112.9, 112.86, 112.53, 112.22, 112.22, 113.06, 112.72, 112.16, 111.21, 110.49, 109.74, 109.26, 108.89, 108.84, 108.84, 107.81, 107.96, 108.24, 109.23, 108.95, 108.33, 108.3, 107.98, 107.1, 106.66, 106.02, 105.75, 105.03, 104.25, 102.44, 104.09, 103.88, 103.72, 104.37, 104.54, 104.22, 105.55, 105.81, 105.29, 104.65, 104.65, 105.15, 105.15, 105.09, 105.52, 105.59, 105.39, 105.12, 104.21, 102.64, 102.65, 103.68, 103.72, 103.72, 102.79, 101.78, 101.92, 101.1, 99.83, 99.83, 99.36, 98.25, 98.56, 97.24, 98.94, 98.06, 99.61, 98.82, 99.78, 99.17, 97.7, 97.55, 97.49, 97.3, 95.09, 96.01, 95.81, 95.63, 95.01, 95.61, 95.55, 94.83, 94.32, 93.84, 94.1, 93.27, 93.29, 93.29, 93.29, 94.06, 94.06, 92.85, 92.85, 92.53, 92.17, 91.4, 91.72, 91.74, 90.04, 91.57, 89.8, 89.68, 89.63, 89.94, 89.86, 91.64, 91.3, 91.11, 90.69, 91.51, 91.49, 91.49, 92.52, 91.85, 91.79, 91.6, 90.57, 90.74, 90.46, 90.18, 89.99, 89.38, 89.1, 89.44, 88.87, 88.87, 88.72, 87.39, 85.38, 85.25, 85.03, 85.3, 84.88, 85.3, 83.53, 82.89, 83.09, 83.09, 83.69, 83.75, 83.64, 83.33, 84.91, 85.21, 84.12, 85.73, 86.92, 87.22, 88.22, 88.15, 87.97, 88.88, 89.51, 89.47, 89.48, 89.29, 89.48, 87.27, 87.46, 86.22, 86.91, 88.08, 88.08, 85.7, 86.06, 86.06, 86.12, 88.97, 88.51, 88.3, 88.89, 88.34, 89.0, 90.14, 88.14, 88.29, 89.23, 88.88, 90.08, 91.55, 92.63, 93.14, 93.43, 93.19, 92.56, 92.98, 93.34, 92.51, 92.98, 93.68, 92.81, 93.51, 94.66, 94.9, 95.61, 96.23, 95.38, 95.22, 94.98, 95.57, 95.57, 95.57, 95.57, 96.01, 96.01, 96.78, 98.66, 98.48, 98.66, 100.29, 101.47, 103.24, 103.24, 103.24, 104.87, 104.27, 104.27, 103.92, 102.48, 103.34, 103.1, 103.1, 104.05, 103.84, 104.24, 104.15, 104.3, 105.47, 105.88, 106.06, 105.12, 102.62, 100.37, 100.37, 100.37, 99.78, 98.56, 96.27, 96.95, 98.25, 98.9, 99.24, 99.24, 98.74, 99.52, 99.86, 100.95, 105.95, 106.2, 105.12, 106.65, 106.65, 105.97, 105.18, 104.24, 103.56, 105.2, 105.48, 104.93, 105.25, 105.45, 105.45, 104.62, 106.2, 105.87, 104.87, 105.44, 106.45, 106.45, 107.89, 109.95, 110.21, 111.14, 111.57, 111.85, 111.36, 111.18, 111.18, 112.16, 111.57, 111.65, 111.16, 111.55, 111.55, 112.4, 112.4, 112.5, 111.32, 111.12, 110.56, 111.57, 111.57, 113.03, 112.32, 113.76, 112.96, 114.08, 114.32, 113.78, 113.95, 113.88, 114.82, 113.88, 114.08, 113.59, 113.48, 113.67, 113.67, 111.63, 112.51, 111.8, 111.76, 111.65, 112.3, 111.53, 112.51, 113.64, 114.03, 114.36, 113.43, 116.83, 116.93, 117.24, 117.67, 118.73, 119.86, 121.8, 123.0, 123.03, 122.71, 121.48, 120.33, 120.96, 115.65, 116.0, 116.33, 116.84, 117.41, 118.87, 117.87, 117.79, 116.76, 116.94, 116.48, 115.43, 116.34, 115.49, 116.21, 116.78, 115.28, 114.15, 114.49, 114.49, 114.12, 114.66, 115.53, 115.71, 115.99, 114.78, 116.14, 114.39, 115.22, 115.4, 115.51, 116.32, 117.15, 116.66, 116.85, 115.99, 115.14, 115.14, 114.34, 114.85, 115.61, 114.47, 114.76, 114.92, 114.32, 114.97, 115.24, 115.42, 114.79, 116.24, 116.27, 115.29, 114.25, 113.03, 112.19, 112.19, 113.27, 112.72, 112.67, 113.77, 112.91, 111.42, 112.87, 112.69, 112.38, 112.38, 112.24, 111.95, 113.2, 113.05, 113.05, 112.04, 112.19, 114.77, 114.69, 115.85, 116.36, 117.23, 117.08, 118.34, 118.16, 118.83, 118.3, 119.51, 119.28, 122.13, 118.23, 118.42, 118.07, 117.89, 118.58, 119.47, 119.47, 118.98, 119.16, 119.42, 120.36, 120.11, 121.02, 121.2, 120.77, 120.77, 120.39, 120.26, 120.58, 119.93, 118.14, 118.14, 118.14, 119.28, 116.14, 117.38, 117.73, 119.58, 119.44, 123.51, 122.77, 122.35, 122.6, 123.1, 123.1, 122.15, 123.16, 122.79, 122.44, 122.44, 121.59, 121.59, 122.38, 122.38, 124.51, 123.21, 122.96, 123.45, 122.77, 122.51, 120.23, 120.92, 123.32, 122.75, 123.62, 121.86, 121.92, 122.14, 123.18, 122.8, 122.93, 122.93, 122.93, 123.05, 122.78, 123.28, 122.51, 123.42, 123.08, 123.4, 123.26, 123.01, 123.03, 122.84, 123.59, 123.36, 122.84, 123.03, 123.16, 122.26, 123.13, 125.48, 123.23, 124.65, 122.18, 121.99, 124.17, 125.27, 127.05, 127.62, 126.06, 125.01, 125.33, 125.05, 125.37, 122.28, 123.13, 121.12, 121.12, 121.46, 122.27, 120.07, 121.46, 120.47, 120.47, 120.47, 121.09, 121.79, 122.13, 122.13, 125.27, 141.18, 141.18, 140.26, 142.66, 144.54, 145.26, 146.66, 148.35, 150.84, 150.04, 153.68, 157.73, 154.58, 155.37, 154.98, 155.75, 156.02, 157.69, 160.37, 162.23, 164.2, 167.16, 168.9, 173.32, 178.29, 180.13, 175.32, 172.81, 167.48, 163.29, 164.45, 163.02, 162.39, 164.2, 166.0, 168.03, 167.24, 164.72, 165.38, 164.77, 166.65, 167.5, 165.99, 168.56, 166.85, 167.14, 167.39, 169.33, 166.35, 167.47, 164.03, 165.1, 163.8, 162.05, 161.97, 162.28, 162.32, 159.2, 160.41, 158.66, 154.32, 154.33, 156.44, 158.53, 159.72, 159.54, 160.59, 158.08, 161.57, 161.57, 162.15, 162.63, 163.54, 163.42, 154.16, 157.11, 157.27, 157.34, 157.11, 155.49, 156.53, 157.02, 154.94, 155.2, 156.05, 155.44, 155.1, 155.6, 155.81, 156.95, 156.39, 154.95, 153.75, 152.25, 151.51, 147.66, 156.02, 157.95, 161.72, 161.89, 165.75, 164.91, 165.54, 166.7, 167.88, 169.1, 169.42, 169.14, 169.56, 169.35, 168.94, 168.63, 167.2, 167.76, 167.49, 168.11, 168.11, 168.11, 168.11, 168.13, 169.08, 171.48, 171.72, 169.78, 169.82, 170.44, 169.86, 169.54, 170.72, 170.42, 171.88, 174.14, 174.83, 176.52, 177.29, 177.29, 182.17, 182.14, 183.18, 183.66, 180.85, 184.02, 184.09, 183.02, 183.84, 184.34, 184.56, 185.67, 186.05, 186.86, 184.82, 185.06, 184.34, 184.61, 185.37, 185.97, 183.23], "consumo": [100.0, 98.72, 99.18, 100.85, 100.17, 100.59, 100.99, 100.99, 100.1, 100.91, 98.55, 96.79, 97.25, 98.15, 97.3, 97.95, 97.6, 98.11, 98.22, 96.62, 98.57, 97.51, 97.13, 98.71, 98.67, 101.17, 99.58, 98.16, 98.46, 97.01, 97.65, 98.12, 95.05, 95.83, 95.95, 95.99, 96.22, 96.05, 96.62, 97.19, 97.39, 98.92, 100.38, 102.09, 102.99, 101.55, 101.88, 102.98, 103.67, 103.32, 105.23, 104.76, 103.66, 103.1, 102.35, 102.61, 102.98, 102.96, 102.75, 103.04, 102.66, 101.85, 102.8, 102.83, 104.14, 104.27, 106.5, 106.65, 104.05, 105.48, 104.13, 102.86, 103.57, 103.87, 102.78, 105.39, 103.49, 106.83, 105.84, 106.16, 105.28, 102.28, 102.49, 103.41, 102.44, 101.87, 101.8, 101.42, 103.04, 102.9, 102.99, 103.43, 103.44, 103.28, 103.37, 102.64, 101.84, 102.54, 102.2, 102.57, 101.92, 101.92, 99.64, 97.19, 97.17, 97.1, 99.42, 101.55, 101.12, 103.0, 101.46, 99.74, 100.4, 96.85, 94.3, 94.26, 92.79, 92.39, 91.74, 91.97, 91.53, 91.08, 91.84, 93.14, 93.5, 94.62, 96.48, 97.02, 96.39, 95.92, 94.87, 92.14, 88.52, 85.05, 85.13, 84.74, 84.01, 85.87, 84.36, 83.68, 82.73, 83.16, 85.5, 92.67, 93.46, 94.08, 94.08, 97.9, 97.27, 97.62, 98.9, 101.52, 102.52, 103.08, 100.69, 101.44, 102.43, 102.36, 101.4, 101.27, 98.98, 97.58, 98.73, 98.75, 97.91, 96.72, 97.76, 98.21, 97.33, 99.12, 99.32, 97.78, 97.87, 98.91, 99.26, 100.41, 99.8, 100.17, 99.84, 101.1, 101.3, 99.59, 100.06, 100.38, 100.28, 100.11, 100.87, 101.88, 102.78, 101.17, 101.36, 102.0, 102.88, 104.86, 103.56, 103.83, 104.65, 104.45, 103.36, 102.83, 103.21, 104.55, 103.72, 103.54, 103.28, 103.13, 102.9, 101.25, 102.47, 104.9, 104.25, 105.16, 102.3, 100.81, 100.66, 100.31, 100.1, 99.47, 100.55, 100.78, 100.73, 100.98, 101.02, 100.96, 99.48, 100.75, 101.64, 101.31, 101.14, 101.33, 101.31, 102.17, 102.57, 103.43, 103.19, 102.8, 102.4, 104.01, 102.95, 103.59, 102.72, 101.47, 101.17, 101.0, 101.98, 100.98, 101.11, 101.97, 101.58, 101.56, 101.56, 100.38, 100.46, 101.15, 101.92, 100.72, 100.5, 100.36, 100.16, 99.58, 101.15, 101.31, 99.99, 100.68, 100.96, 101.78, 101.89, 102.01, 102.2, 100.27, 101.46, 101.52, 101.94, 104.25, 103.02, 103.72, 103.09, 101.99, 102.3, 101.28, 101.04, 101.78, 102.09, 102.73, 102.06, 102.34, 101.9, 101.96, 102.8, 102.05, 99.93, 100.83, 99.86, 100.17, 99.37, 97.27, 96.96, 96.92, 97.3, 96.86, 97.23, 97.35, 97.13, 96.97, 97.63, 97.51, 98.16, 97.54, 98.89, 98.89, 98.48, 99.29, 98.76, 97.92, 97.64, 97.53, 96.82, 96.71, 96.66, 96.66, 96.7, 96.34, 96.28, 95.94, 96.26, 95.43, 95.71, 95.71, 95.25, 95.32, 94.46, 93.16, 90.69, 90.14, 89.62, 89.48, 88.94, 88.56, 88.3, 88.47, 88.04, 87.33, 87.29, 87.63, 88.22, 87.28, 86.26, 86.16, 86.5, 85.48, 85.66, 85.86, 86.48, 86.85, 87.62, 87.54, 88.48, 86.72, 87.94, 87.66, 87.53, 87.53, 87.0, 88.06, 88.12, 87.85, 88.04, 88.31, 88.31, 88.41, 87.67, 87.62, 88.02, 88.51, 89.02, 89.27, 89.96, 91.38, 91.42, 91.69, 92.48, 91.76, 91.46, 91.46, 91.38, 92.18, 92.82, 91.83, 93.2, 93.79, 94.25, 93.46, 94.07, 94.06, 93.79, 94.5, 94.18, 96.35, 96.92, 96.5, 95.57, 96.03, 95.59, 95.73, 96.85, 96.5, 97.46, 98.17, 98.36, 98.89, 97.4, 97.75, 96.7, 98.26, 98.09, 98.24, 99.53, 99.53, 98.72, 100.73, 101.96, 101.29, 101.53, 100.94, 102.36, 102.16, 102.07, 101.69, 101.49, 100.7, 101.3, 101.54, 101.23, 100.57, 101.83, 101.81, 102.33, 101.99, 102.45, 102.03, 101.85, 101.25, 101.94, 101.95, 101.13, 103.19, 102.6, 103.28, 102.8, 103.19, 102.84, 101.71, 102.17, 101.88, 101.28, 101.57, 101.59, 102.33, 101.95, 102.58, 102.71, 101.25, 100.59, 97.88, 98.01, 97.92, 97.39, 96.35, 95.86, 95.08, 95.28, 94.29, 94.49, 94.99, 95.14, 95.21, 95.48, 97.68, 99.3, 101.12, 101.0, 102.01, 102.37, 102.19, 101.33, 102.31, 103.95, 101.93, 101.51, 100.97, 100.27, 98.54, 97.4, 98.93, 99.92, 98.98, 99.09, 99.05, 99.76, 99.31, 98.78, 97.63, 97.03, 97.52, 97.02, 96.41, 96.73, 96.31, 96.4, 96.53, 96.08, 96.93, 96.77, 96.8, 96.63, 96.57, 97.2, 96.08, 95.65, 95.08, 95.46, 95.53, 95.9, 95.22, 94.77, 95.12, 95.96, 95.25, 96.1, 96.27, 96.1, 95.58, 95.84, 96.03, 95.6, 95.64, 96.06, 96.28, 95.71, 94.82, 94.51, 95.92, 96.78, 96.87, 97.65, 97.64, 97.62, 99.38, 100.24, 100.63, 100.11, 99.13, 99.17, 100.77, 100.56, 101.71, 100.57, 100.52, 101.35, 101.83, 101.88, 100.61, 100.7, 101.33, 101.35, 101.05, 99.52, 101.06, 99.9, 99.67, 100.18, 100.41, 99.86, 99.92, 98.74, 99.32, 99.2, 98.94, 99.67, 99.42, 101.24, 101.37, 101.85, 102.47, 103.08, 104.54, 105.08, 105.1, 104.92, 104.5, 104.01, 105.09, 105.51, 103.91, 104.59, 104.48, 104.34, 103.96, 105.78, 105.95, 105.77, 104.42, 104.88, 104.52, 104.3, 104.07, 102.39, 102.57, 103.05, 101.64, 102.28, 102.45, 102.85, 103.01, 102.98, 103.96, 104.64, 104.83, 104.93, 102.04, 102.91, 102.85, 102.31, 105.46, 104.79, 106.0, 105.62, 104.98, 103.84, 104.59, 104.79, 104.1, 105.33, 104.68, 104.67, 109.33, 107.34, 107.83, 106.2, 106.36, 107.82, 107.71, 107.96, 107.16, 107.56, 107.2, 106.78, 107.17, 107.65, 107.46, 108.09, 106.88, 105.92, 104.73, 104.68, 105.09, 104.53, 103.53, 103.63, 103.38, 104.11, 103.62, 104.28, 105.07, 104.74, 102.48, 101.93, 101.9, 102.09, 102.8, 102.22, 102.22, 102.21, 103.3, 105.08, 106.21, 105.09, 106.55, 106.08, 106.55, 105.47, 106.93, 107.33, 106.58, 106.84, 106.32, 106.75, 106.0, 106.0, 105.94, 106.57, 105.66, 105.52, 105.46, 105.21, 104.92, 104.59, 104.46, 104.55, 104.01, 102.5, 101.78, 102.04, 101.87, 101.65, 101.08, 100.55, 99.91, 100.03, 100.64, 100.03, 100.03, 100.07, 97.7, 97.61, 98.13, 99.05, 97.4, 97.47, 97.33, 97.83, 98.01, 97.84, 97.85, 97.1, 97.46, 96.82, 97.78, 97.92, 97.55, 96.86, 96.79, 97.55, 98.47, 97.1, 96.7, 97.99, 97.68, 97.89, 98.78, 98.55, 97.49, 97.62, 98.2, 97.52, 95.77, 94.8, 95.13, 96.92, 96.43, 97.44, 97.47, 98.33, 97.72, 97.06, 97.09, 97.79, 97.53, 99.13, 98.39, 98.92, 99.79, 99.74, 99.57, 99.93, 100.88, 101.26, 101.62, 102.3, 103.91, 104.15, 104.81, 106.44, 110.44, 111.12, 112.71, 113.7, 113.97, 115.65, 115.27, 115.77, 116.52, 116.66, 116.07, 117.14, 116.84, 117.96, 118.97, 118.06, 116.15, 115.84, 116.98, 115.6, 115.51, 118.55, 117.73, 117.93, 117.55, 117.53, 117.51, 117.97, 117.71, 119.55, 119.19, 119.24, 119.81, 119.78, 120.83, 120.47, 120.56, 121.25, 120.63, 118.61, 118.77, 120.29, 119.33, 116.75, 117.69, 118.51, 119.48, 118.99, 117.84, 118.5, 116.57, 117.33, 117.53, 117.76, 116.21, 116.87, 118.7, 118.61, 119.11, 120.34, 121.56, 120.22, 118.98, 119.12, 119.61, 121.12, 122.3, 122.63, 122.71, 124.59, 124.63, 124.63, 124.72, 124.06, 125.17, 125.36, 123.72, 123.21, 124.97, 124.17, 124.31, 127.4, 125.24, 124.39, 131.44, 130.86, 133.64, 135.64, 135.19, 134.37, 132.14, 135.3, 135.4, 134.01, 135.96, 137.21, 137.51, 138.32, 138.41, 139.16, 138.18, 140.48, 142.13, 142.35, 141.41, 141.44, 141.41, 140.27, 139.91, 138.45, 138.8, 138.81, 139.03, 142.19, 141.78, 141.5, 140.31, 141.55, 140.86, 143.8, 144.93, 147.25, 146.26, 145.27, 143.78, 144.96, 144.38, 144.54, 144.97, 143.71, 142.92, 144.27, 145.66, 146.24, 146.31, 149.3, 148.7, 147.24, 149.9, 146.64, 146.83, 150.11, 148.99, 149.51, 148.25]}, "dias": 252, "mu": {"mineria": 27.069961, "banca": 26.715459, "construccion": 16.457192, "consumo": 11.205682}, "cov": {"mineria|mineria": 797.826378, "mineria|banca": 390.428088, "mineria|construccion": 162.902509, "mineria|consumo": 178.519046, "banca|mineria": 390.428088, "banca|banca": 670.687614, "banca|construccion": 103.222702, "banca|consumo": 193.623025, "construccion|mineria": 162.902509, "construccion|banca": 103.222702, "construccion|construccion": 377.485461, "construccion|consumo": 78.082645, "consumo|mineria": 178.519046, "consumo|banca": 193.623025, "consumo|construccion": 78.082645, "consumo|consumo": 269.680435}, "gana": "cumccuccccccuubbmbumucmcccmbcmubbbbubcubmmubcmbbcbmcbbucbmuccummbumcbmcumubbmcbmmbbmcubbmmbbmucccbbmmcmbcuuuccbcucccbcmcbmubuccubcbbbbbbmcuccuucmbummcubmcmcmbcbbmccmubcubmcbumcbbuccmmbbuumcmcbucmucmbbucmmmbcmucbcmmccmmccbumcbummmmmummccmcbccbmucubccubumubbuumbccbcumcccbubucbcmumbmcmcmbmmumumcmcbcucumccubcbummmbbucbbbccmbmucmbcbcmbmcccmmbcmccmcbmmcmmuuubucbbumcbcbbbmbcubcubcbccbbmcmmucuuucbmubmbmmmmbmcmbcmccbmbmmbmbuubbcbcbbcbbmbcbbbcbccccucbmbmmcmmmmmuubucmbmbbmmmcmbcbbbmucubmmbbmucbbcbcuccbcccccbbccubmcubmcbcbcbmbcucbbucbmmcbmmumumbcbubumcuuuucbubuccbbbmbubccbcbbmbccbcuucuuuububbmmcmmbbbcuuubcbbcumbubmubcmbubucbbcuumcmcumbmmmubcmcbcmcbcubmcucbbmbmcccbcbbmcmbmumbbmuuccmcmbubmbcbmbuccmcbbmbcmmmbcmccmmbbmcmuummcubmmcumbmmccbmbcccmubcbmcbbmmcbbbmcbmcbcccbmmmcmcmucmmubmmbcmcbccmbmbubmcummcmucbbummbcmcubucmbccubbubummmbcmccumububuuubcmmmmcmbbbbumbcubcmmcbcbmcbmmummuummcucbmmmuuummcbmubumccbmmbccuubcbbcbcumcuu", "letra": {"m": "mineria", "b": "banca", "c": "construccion", "u": "consumo"}};
+const ARBOL = [{"n": "1. Productos", "b": 103721443, "d": [{"n": "Artículos traducidos Meglinho Sneyder Rojas Poma", "b": 29425135, "d": [], "f": [{"n": "paper 1 Meglinho Sneyder Rojas Poma.pdf", "b": 1834804}, {"n": "paper 11 Meglinho Sneyder Rojas Poma.pdf", "b": 1168718}, {"n": "paper 12 Meglinho Sneyder Rojas Poma.pdf", "b": 1115487}, {"n": "paper 13 Meglinho Sneyder Rojas Poma.pdf", "b": 864366}, {"n": "paper 14 Meglinho Sneyder Rojas Poma.pdf", "b": 1022710}, {"n": "paper 15 Meglinho Sneyder Rojas Poma.pdf", "b": 789180}, {"n": "paper 16 Meglinho Sneyder Rojas Poma.pdf", "b": 361163}, {"n": "paper 17 Meglinho Sneyder Rojas Poma.pdf", "b": 1319228}, {"n": "paper 18 Meglinho Sneyder Rojas Poma.pdf", "b": 1168007}, {"n": "paper 19 Meglinho Sneyder Rojas Poma.pdf", "b": 729132}, {"n": "paper 2 Meglinho Sneyder Rojas Poma.pdf", "b": 464760}, {"n": "paper 20 Meglinho Sneyder Rojas Poma.pdf", "b": 2392429}, {"n": "paper 21 Meglinho Sneyder Rojas Poma.pdf", "b": 997849}, {"n": "paper 22 Meglinho Sneyder Rojas Poma.pdf", "b": 468179}, {"n": "paper 23 Meglinho Sneyder Rojas Poma.pdf", "b": 1899845}, {"n": "paper 24 Meglinho Sneyder Rojas Poma.pdf", "b": 808950}, {"n": "paper 25 Meglinho Sneyder Rojas Poma.pdf", "b": 364090}, {"n": "paper 26 Meglinho Sneyder Rojas Poma.pdf", "b": 907082}, {"n": "paper 27 Meglinho Sneyder Rojas Poma.pdf", "b": 883910}, {"n": "paper 28 Meglinho Sneyder Rojas Poma.pdf", "b": 593450}, {"n": "paper 29 Meglinho Sneyder Rojas Poma.pdf", "b": 924073}, {"n": "paper 3 Meglinho Sneyder Rojas Poma.pdf", "b": 2888937}, {"n": "paper 30 Meglinho Sneyder Rojas Poma.pdf", "b": 761183}, {"n": "paper 4 Meglinho Sneyder Rojas Poma.pdf", "b": 622819}, {"n": "paper 5 Meglinho Sneyder Rojas Poma.pdf", "b": 1174164}, {"n": "paper 6 Meglinho Sneyder Rojas Poma.pdf", "b": 719992}, {"n": "paper 7 Meglinho Sneyder Rojas Poma.pdf", "b": 638197}, {"n": "paper 8 Meglinho Sneyder Rojas Poma.pdf", "b": 508385}, {"n": "paper 9 Meglinho Sneyder Rojas Poma.pdf", "b": 1034046}], "ajeno": true}, {"n": "Articulos ingles Meglinho Sneyder Rojas Poma", "b": 57924731, "d": [], "f": [{"n": "paper 1 Meglinho Sneyder Rojas Poma.pdf", "b": 553038}, {"n": "paper 10 Meglinho Sneyder Rojas Poma.pdf", "b": 3148769}, {"n": "paper 11 Meglinho Sneyder Rojas Poma.pdf", "b": 926940}, {"n": "paper 12 Meglinho Sneyder Rojas Poma.pdf", "b": 5310913}, {"n": "paper 13 Meglinho Sneyder Rojas Poma.pdf", "b": 692579}, {"n": "paper 14 Meglinho Sneyder Rojas Poma.pdf", "b": 1603943}, {"n": "paper 15 Meglinho Sneyder Rojas Poma.pdf", "b": 873307}, {"n": "paper 16 Meglinho Sneyder Rojas Poma.pdf", "b": 380943}, {"n": "paper 17 Meglinho Sneyder Rojas Poma.pdf", "b": 5709591}, {"n": "paper 18 Meglinho Sneyder Rojas Poma.pdf", "b": 1063111}, {"n": "paper 19 Meglinho Sneyder Rojas Poma.pdf", "b": 694281}, {"n": "paper 2 Meglinho Sneyder Rojas Poma.pdf", "b": 373825}, {"n": "paper 20 Meglinho Sneyder Rojas Poma.pdf", "b": 5465911}, {"n": "paper 21 Meglinho Sneyder Rojas Poma.pdf", "b": 2415824}, {"n": "paper 22 Meglinho Sneyder Rojas Poma.pdf", "b": 504816}, {"n": "paper 23 Meglinho Sneyder Rojas Poma.pdf", "b": 4187792}, {"n": "paper 24 Meglinho Sneyder Rojas Poma.pdf", "b": 428327}, {"n": "paper 25 Meglinho Sneyder Rojas Poma.pdf", "b": 443706}, {"n": "paper 26 Meglinho Sneyder Rojas Poma.pdf", "b": 745258}, {"n": "paper 27 Meglinho Sneyder Rojas Poma.pdf", "b": 873930}, {"n": "paper 28 Meglinho Sneyder Rojas Poma.pdf", "b": 420264}, {"n": "paper 29 Meglinho Sneyder Rojas Poma.pdf", "b": 1222797}, {"n": "paper 3 Meglinho Sneyder Rojas Poma.pdf", "b": 3602544}, {"n": "paper 30 Meglinho Sneyder Rojas Poma.pdf", "b": 659509}, {"n": "paper 4 Meglinho Sneyder Rojas Poma.pdf", "b": 691612}, {"n": "paper 5 Meglinho Sneyder Rojas Poma.pdf", "b": 2125020}, {"n": "paper 6 Meglinho Sneyder Rojas Poma.pdf", "b": 679437}, {"n": "paper 7 Meglinho Sneyder Rojas Poma.pdf", "b": 440413}, {"n": "paper 8 Meglinho Sneyder Rojas Poma.pdf", "b": 556019}, {"n": "paper 9 Meglinho Sneyder Rojas Poma.pdf", "b": 11130312}], "ajeno": true}, {"n": "Beamer Meglinho Sneyder Rojas Poma", "b": 1506510, "d": [], "f": [{"n": "Beamer Meglinho Sneyder Rojas Poma.pdf", "b": 1506510}], "ajeno": false}, {"n": "Jorunal Meglinho Sneyder Rojas Poma", "b": 2808330, "d": [], "f": [{"n": "Journal Meglinho Sneyder Rojas Poma.pdf", "b": 2808330}], "ajeno": false}, {"n": "Poster Journal Meglinho Sneuyder Rojas Poma", "b": 1444816, "d": [], "f": [{"n": "Poster Jorunal Meglinho Sneyder Rojas Poma.pdf", "b": 1444816}], "ajeno": false}, {"n": "Posters Meglinho Sneyder Rojas Poma", "b": 10611921, "d": [], "f": [{"n": "Poster_01_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 252122}, {"n": "Poster_02_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 196467}, {"n": "Poster_03_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 231754}, {"n": "Poster_04_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 159125}, {"n": "Poster_05_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 1270691}, {"n": "Poster_06_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 212142}, {"n": "Poster_07_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 179663}, {"n": "Poster_08_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 337337}, {"n": "Poster_09_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 727706}, {"n": "Poster_10_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 371134}, {"n": "Poster_11_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 227751}, {"n": "Poster_12_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 512951}, {"n": "Poster_13_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 292080}, {"n": "Poster_14_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 305861}, {"n": "Poster_15_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 289284}, {"n": "Poster_16_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 179338}, {"n": "Poster_17_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 374073}, {"n": "Poster_18_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 295512}, {"n": "Poster_19_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 594211}, {"n": "Poster_20_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 582641}, {"n": "Poster_21_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 506435}, {"n": "Poster_22_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 158068}, {"n": "Poster_23_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 560435}, {"n": "Poster_24_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 203398}, {"n": "Poster_25_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 255332}, {"n": "Poster_26_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 170568}, {"n": "Poster_27_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 451061}, {"n": "Poster_28_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 222100}, {"n": "Poster_29_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 224745}, {"n": "Poster_30_Meglinho_Sneyder_Rojas_Poma.pdf", "b": 267936}], "ajeno": false}], "f": [], "ajeno": false, "slug": "producto", "ruta": "Producto Meglinho Sneyder Rojas Poma"}, {"n": "2. Desarrollo", "b": 14230093, "d": [{"n": "Beamer Meglinho Sneyder Rojas Poma", "b": 1264437, "d": [], "f": [{"n": "Beamer Meglinho Sneyder Rojas Poma.zip", "b": 1264437}], "ajeno": false}, {"n": "Journal Meglinho Sneyder Rojas Poma", "b": 2583858, "d": [], "f": [{"n": "Journal Meglinho Sneyder Rojas Poma.zip", "b": 2583858}], "ajeno": false}, {"n": "Poster Journal Meglinho Sneyder Rojas Poma", "b": 1261628, "d": [], "f": [{"n": "Poster  Jorunal Meglinho Sneyder Rojas Poma.zip", "b": 1261628}], "ajeno": false}, {"n": "Poster Meglinho Sneyder Rojas Poma", "b": 9120170, "d": [], "f": [{"n": "Poster_01_Meglinho_Sneyder_Rojas_Poma.zip", "b": 203783}, {"n": "Poster_02_Meglinho_Sneyder_Rojas_Poma.zip", "b": 139067}, {"n": "Poster_03_Meglinho_Sneyder_Rojas_Poma.zip", "b": 189626}, {"n": "Poster_04_Meglinho_Sneyder_Rojas_Poma.zip", "b": 118561}, {"n": "Poster_05_Meglinho_Sneyder_Rojas_Poma.zip", "b": 1220162}, {"n": "Poster_06_Meglinho_Sneyder_Rojas_Poma.zip", "b": 163885}, {"n": "Poster_07_Meglinho_Sneyder_Rojas_Poma.zip", "b": 139944}, {"n": "Poster_08_Meglinho_Sneyder_Rojas_Poma.zip", "b": 268098}, {"n": "Poster_09_Meglinho_Sneyder_Rojas_Poma.zip", "b": 665353}, {"n": "Poster_10_Meglinho_Sneyder_Rojas_Poma.zip", "b": 323146}, {"n": "Poster_11_Meglinho_Sneyder_Rojas_Poma.zip", "b": 177080}, {"n": "Poster_12_Meglinho_Sneyder_Rojas_Poma.zip", "b": 471715}, {"n": "Poster_13_Meglinho_Sneyder_Rojas_Poma.zip", "b": 220140}, {"n": "Poster_14_Meglinho_Sneyder_Rojas_Poma.zip", "b": 265674}, {"n": "Poster_15_Meglinho_Sneyder_Rojas_Poma.zip", "b": 215377}, {"n": "Poster_16_Meglinho_Sneyder_Rojas_Poma.zip", "b": 114887}, {"n": "Poster_17_Meglinho_Sneyder_Rojas_Poma.zip", "b": 334910}, {"n": "Poster_18_Meglinho_Sneyder_Rojas_Poma.zip", "b": 237800}, {"n": "Poster_19_Meglinho_Sneyder_Rojas_Poma.zip", "b": 544924}, {"n": "Poster_20_Meglinho_Sneyder_Rojas_Poma.zip", "b": 534719}, {"n": "Poster_21_Meglinho_Sneyder_Rojas_Poma.zip", "b": 458928}, {"n": "Poster_22_Meglinho_Sneyder_Rojas_Poma.zip", "b": 120299}, {"n": "Poster_23_Meglinho_Sneyder_Rojas_Poma.zip", "b": 520227}, {"n": "Poster_24_Meglinho_Sneyder_Rojas_Poma.zip", "b": 136264}, {"n": "Poster_25_Meglinho_Sneyder_Rojas_Poma.zip", "b": 197385}, {"n": "Poster_26_Meglinho_Sneyder_Rojas_Poma.zip", "b": 132031}, {"n": "Poster_27_Meglinho_Sneyder_Rojas_Poma.zip", "b": 410224}, {"n": "Poster_28_Meglinho_Sneyder_Rojas_Poma.zip", "b": 183894}, {"n": "Poster_29_Meglinho_Sneyder_Rojas_Poma.zip", "b": 184349}, {"n": "Poster_30_Meglinho_Sneyder_Rojas_Poma.zip", "b": 227718}], "ajeno": false}], "f": [], "ajeno": false, "slug": "desarrollo", "ruta": "Desarrllo Meglinho Sneyder Rojas Poma"}, {"n": "3. Base de datos y código", "b": 16052494, "d": [{"n": "codigo", "b": 4846952, "d": [], "f": [{"n": "00_config.py", "b": 6297}, {"n": "01_extraccion_api.py", "b": 8926}, {"n": "02_scraping_web.py", "b": 8148}, {"n": "03_limpieza_datos.py", "b": 10085}, {"n": "04_analisis.py", "b": 12905}, {"n": "05_markowitz.py", "b": 4698635}, {"n": "06_generar_web.py", "b": 25715}, {"n": "plantilla_web.html", "b": 72367}, {"n": "utilidades.py", "b": 3874}], "ajeno": false}, {"n": "datos_crudos", "b": 4923450, "d": [{"n": "api", "b": 3744679, "d": [], "f": [{"n": "yahoo_ALICORC1.json", "b": 134003}, {"n": "yahoo_ATACOBC1.json", "b": 152187}, {"n": "yahoo_BACKUSI1.json", "b": 117096}, {"n": "yahoo_BAP.json", "b": 143994}, {"n": "yahoo_BBVAC1.json", "b": 145813}, {"n": "yahoo_BUENAVI1.json", "b": 92450}, {"n": "yahoo_BVN.json", "b": 145144}, {"n": "yahoo_CORAREI1.json", "b": 140742}, {"n": "yahoo_CPACASC1.json", "b": 132549}, {"n": "yahoo_CPACASI1.json", "b": 118456}, {"n": "yahoo_CREDITC1.json", "b": 139307}, {"n": "yahoo_CVERDEC1.json", "b": 109993}, {"n": "yahoo_ENGIEC1.json", "b": 133310}, {"n": "yahoo_FERREYC1.json", "b": 140314}, {"n": "yahoo_GLORIAI1.json", "b": 116685}, {"n": "yahoo_IFS.json", "b": 144003}, {"n": "yahoo_INRETC1.json", "b": 116151}, {"n": "yahoo_INTERBC1.json", "b": 134813}, {"n": "yahoo_LUSURC1.json", "b": 120703}, {"n": "yahoo_MINSURI1.json", "b": 135705}, {"n": "yahoo_NEXAPEC1.json", "b": 137328}, {"n": "yahoo_SCCO.json", "b": 146858}, {"n": "yahoo_SCOTIAC1.json", "b": 123635}, {"n": "yahoo_SIDERC1.json", "b": 142262}, {"n": "yahoo_UNACEMC1.json", "b": 144214}, {"n": "yahoo_VOLCABC1.json", "b": 149364}, {"n": "yahoo_tipo_cambio.json", "b": 147365}, {"n": "yahoo_treasury_10a.json", "b": 140235}], "ajeno": false}, {"n": "web", "b": 56509, "d": [], "f": [{"n": "bvl_market_CA.json", "b": 53}, {"n": "bvl_market_CB.json", "b": 2658}, {"n": "bvl_market_CD.json", "b": 9897}, {"n": "bvl_market_CG.json", "b": 1395}, {"n": "bvl_market_CI.json", "b": 6336}, {"n": "bvl_market_CM.json", "b": 11804}, {"n": "bvl_market_CP.json", "b": 3993}, {"n": "bvl_market_CS.json", "b": 602}, {"n": "bvl_market_FI.json", "b": 19190}, {"n": "bvl_sectores.json", "b": 581}], "ajeno": false}], "f": [{"n": "datos_crudos_macro_2024200522B.csv", "b": 62987}, {"n": "datos_crudos_precios_2024200522B.csv", "b": 1047854}, {"n": "datos_crudos_web_2024200522B.csv", "b": 10364}, {"n": "verificacion_composicion_bvl.csv", "b": 478}, {"n": "verificacion_cotejo_bvl.csv", "b": 579}], "ajeno": false}, {"n": "datos_procesados", "b": 2664314, "d": [], "f": [{"n": "datos_procesados_2024200522B.csv", "b": 227365}, {"n": "intermedio_acciones_2024200522B.csv", "b": 2436949}], "ajeno": false}, {"n": "salidas", "b": 3537912, "d": [], "f": [{"n": "figura10_linea_mercado_valores.png", "b": 204691}, {"n": "figura1_evolucion_sectorial.png", "b": 452487}, {"n": "figura2_retornos_diarios.png", "b": 738850}, {"n": "figura3_mineria_vs_mercado.png", "b": 209187}, {"n": "figura4_banca_vs_mercado.png", "b": 220505}, {"n": "figura5_consumo_vs_mercado.png", "b": 235976}, {"n": "figura6_construccion_vs_mercado.png", "b": 202717}, {"n": "figura7_betas.png", "b": 76044}, {"n": "figura8_costo_capital.png", "b": 85067}, {"n": "figura9_frontera_eficiente.png", "b": 1092387}, {"n": "tabla0_composicion_carteras.csv", "b": 846}, {"n": "tabla0_composicion_carteras.tex", "b": 1330}, {"n": "tabla10_ganancia_diversificacion.csv", "b": 279}, {"n": "tabla10_ganancia_diversificacion.tex", "b": 532}, {"n": "tabla1_descriptiva.csv", "b": 514}, {"n": "tabla1_descriptiva.tex", "b": 623}, {"n": "tabla2_adf.csv", "b": 130}, {"n": "tabla2_adf.tex", "b": 362}, {"n": "tabla3_correlaciones.csv", "b": 171}, {"n": "tabla3_correlaciones.tex", "b": 419}, {"n": "tabla4_betas.csv", "b": 673}, {"n": "tabla4_betas.tex", "b": 625}, {"n": "tabla4_salida_completa.txt", "b": 8425}, {"n": "tabla5_costo_capital.csv", "b": 276}, {"n": "tabla5_costo_capital.tex", "b": 544}, {"n": "tabla6_betas_robustez.csv", "b": 678}, {"n": "tabla6_betas_robustez.tex", "b": 649}, {"n": "tabla7_diagnostico.csv", "b": 283}, {"n": "tabla7_diagnostico.tex", "b": 585}, {"n": "tabla8_frontera_carteras.csv", "b": 276}, {"n": "tabla8_frontera_carteras.tex", "b": 616}, {"n": "tabla9_desempeno_ajustado.csv", "b": 384}, {"n": "tabla9_desempeno_ajustado.tex", "b": 781}], "ajeno": false}], "f": [{"n": "README.md", "b": 11247}, {"n": "bitacora_decisiones.md", "b": 4556}, {"n": "diccionario_variables.md", "b": 4893}, {"n": "incidencias_fuente.md", "b": 11242}, {"n": "log_ejecucion.txt", "b": 47688}, {"n": "requirements.txt", "b": 240}], "ajeno": false, "slug": "base", "ruta": "Base de datos y codigo Meglinho Sneyder Rojas Poma"}];
+const ZIPS = {"producto": {"archivos": 33, "bytes": 15734144, "url": "zips/producto.zip"}, "desarrollo": {"archivos": 33, "bytes": 14240212, "url": "zips/desarrollo.zip"}, "base": {"archivos": 93, "bytes": 9411627, "url": "zips/base.zip"}};
+const PRODUCTOS = [["Journal", "El artículo completo, 34 paginas", "productos/journal.pdf", true, 2.7], ["Póster del journal", "El póster de la investigación, 1 pagina", "productos/poster.pdf", true, 1.4], ["Beamer", "La presentación de la exposición, 10 paginas", "productos/beamer.pdf", true, 1.4]];
+const REFS = [{"t": "Abdel-Hafez, E., Taspinar, N., y Eren, B. M. (2026). How uncertainty transmits across Turkish equity sectors. Borsa Istanbul Review, 26(3), Artículo 100806.", "doi": "10.1016/j.bir.2026.100806", "url": null}, {"t": "Altay, E., y Çalgıcı, S. (2019). Liquidity adjusted capital asset pricing model in an emerging market: Liquidity risk in Borsa Istanbul. Borsa Istanbul Review, 19(4), 297-309.", "doi": "10.1016/j.bir.2019.06.002", "url": null}, {"t": "Arbaa, O., y Varon, E. (2019). Turkish currency crisis: Spillover effects on European banks. Borsa Istanbul Review, 19(4), 372-378.", "doi": "10.1016/j.bir.2019.07.003", "url": null}, {"t": "Azimli, A. (2020). Pricing the common stocks in an emerging capital market: Comparison of the factor models. Borsa Istanbul Review, 20(4), 334-346.", "doi": "10.1016/j.bir.2020.05.002", "url": null}, {"t": "Bazhutov, D., Betzer, A., y Stehle, R. (2023). Beta estimation in the European network regulation context: What matters, what doesn’t, and what is indispensable. Financial Markets and Portfolio Management, 37(3), 239-275.", "doi": "10.1007/s11408-023-00428-z", "url": null}, {"t": "Bildik, R. (2023). Trading halts and the advantage of institutional investors: Historical evidence from Borsa Istanbul. Borsa Istanbul Review, 23(S), S6-S18.", "doi": "10.1016/j.bir.2023.12.006", "url": null}, {"t": "Brum-Civelli, C., Fried-Gindel, A., y Garcia-Hiernaux, A. (2024). IFCI-SA: International financial conditions index for South American economies. Research in International Business and Finance, 72(Parte A), Artículo 102507.", "doi": "10.1016/j.ribaf.2024.102507", "url": null}, {"t": "Bugan, M. F., Cevik, E. I., y Dibooglu, S. (2022). Emerging market portfolios and Islamic financial markets: Diversification benefits and safe havens. Borsa Istanbul Review, 22(1), 77-91.", "doi": "10.1016/j.bir.2021.01.007", "url": null}, {"t": "Cakici, N., y Zaremba, A. (2024). What drives stock returns across countries? Insights from machine learning models. International Review of Financial Analysis, 96(Parte A), Artículo 103569.", "doi": "10.1016/j.irfa.2024.103569", "url": null}, {"t": "Çam, S., Uzkaralar, Ö., y Borak, M. (2024). Idiosyncratic risk and market volatility: Threat or opportunity for returns? A study of Borsa Istanbul stocks. Borsa Istanbul Review, 24(4), 698-709.", "doi": "10.1016/j.bir.2024.04.001", "url": null}, {"t": "Carney, R. W., El Ghoul, S., Guedhami, O., y Wang, H. (2024). Geopolitical risk and the cost of capital in emerging economies. Emerging Markets Review, 61, Artículo 101149.", "doi": "10.1016/j.ememar.2024.101149", "url": null}, {"t": "Cepoi, C.-O., Dumitrescu, B.-A., y Pop, I. D. (2025). Price discovery and government intervention during the COVID-19 pandemic: Evidence from European cross-listed firms. Borsa Istanbul Review, 25(6), 1572-1584.", "doi": "10.1016/j.bir.2025.10.012", "url": null}, {"t": "Chen, B., y Zhang, A. (2021). How does corporate social responsibility affect the cost of equity capital through operating risk? Borsa Istanbul Review, 21(S1), S38-S45.", "doi": "10.1016/j.bir.2021.01.005", "url": null}, {"t": "Ersan, O., y Ekinci, C. (2016). Algorithmic and high-frequency trading in Borsa Istanbul. Borsa Istanbul Review, 16(4), 233-248.", "doi": "10.1016/j.bir.2016.09.005", "url": null}, {"t": "Ghallabi, F., Ghorbel, A., y Karim, S. (2025). Decoding systemic risks across commodities and emerging market stock markets. Financial Innovation, 11, Artículo 47.", "doi": "10.1186/s40854-024-00732-1", "url": null}, {"t": "Gökçen, U. (2026). Factor investing in the Turkish equity market. Borsa Istanbul Review, Artículo 100884.", "doi": "10.1016/j.bir.2026.100884", "url": null}, {"t": "Gülay, G. (2022). Volatility, trading activity and maximum lot amounts: Evidence from Borsa Istanbul. Borsa Istanbul Review, 22(3), 409-425.", "doi": "10.1016/j.bir.2022.03.002", "url": null}, {"t": "Gülay, G., y Ersan, Y. (2023). Tick size, liquid stocks and market quality: Evidence from a natural experiment in a unique setting. Borsa Istanbul Review, 23(5), 1037-1057.", "doi": "10.1016/j.bir.2023.07.003", "url": null}, {"t": "Hourani, A., Wang, Y., Demiralay, S., y McGroarty, F. (2023). Industry costs of equity: Evidence from frontier markets. International Review of Financial Analysis, 87, Artículo 102573.", "doi": "10.1016/j.irfa.2023.102573", "url": null}, {"t": "Jensen, M. C. (1968). The performance of mutual funds in the period 1945-1964. The Journal of Finance, 23(2), 389-416.", "doi": null, "url": "https://www.jstor.org/stable/2325404"}, {"t": "Karaca, C., Mensi, W., y Gemici, E. (2025). Inverted U-shaped dynamics of capital structure and firm value: Evidence from an emerging market. Borsa Istanbul Review, 25(5), 939-952.", "doi": "10.1016/j.bir.2025.05.010", "url": null}, {"t": "Markowitz, H. (1952). Portfolio selection. The Journal of Finance, 7(1), 77-91.", "doi": null, "url": "https://www.jstor.org/stable/2975974"}, {"t": "Özdemir, M., y Taş, O. (2025). Investor attention and its impact on portfolio volatility and sectoral risk spillovers in Borsa Istanbul. Borsa Istanbul Review, 25(1), 107-126.", "doi": "10.1016/j.bir.2024.12.014", "url": null}, {"t": "Ozsoz, E., Rengifo, E. W., y Akinkunmi, M. A. (2014). What determines return risks for bank equities in Turkey? Borsa Istanbul Review, 14(1), 23-31.", "doi": "10.1016/j.bir.2013.12.002", "url": null}, {"t": "Sharpe, W. F. (1966). Mutual fund performance. The Journal of Business, 39(1), 119-138.", "doi": "10.1086/294846", "url": null}, {"t": "Su, E., y Tokmakcioglu, K. (2021). A comparison of bid-ask spread proxies and determinants of bond bid-ask spread. Borsa Istanbul Review, 21(3), 227-238.", "doi": "10.1016/j.bir.2020.10.005", "url": null}, {"t": "Tomtosov, A. (2024). Overlapping portfolio holdings and unique sources of emerging market risk. Borsa Istanbul Review, 24(1), 201-217.", "doi": "10.1016/j.bir.2023.12.003", "url": null}, {"t": "Treynor, J. L. (1965). How to rate management of investment funds. Harvard Business Review, 43(1), 63-75.", "doi": null, "url": null}, {"t": "Usman, M. (2023). Bank contribution to financial sector systemic risk and expected returns: Evidence from large U.S. banks. Borsa Istanbul Review, 23(1), 203-216.", "doi": "10.1016/j.bir.2022.10.002", "url": null}, {"t": "Yaman, S., y Tuncel, M. B. (2025). The benefits of sectoral diversification for investors with different risk perceptions. Borsa Istanbul Review, 25(3), 597-616.", "doi": "10.1016/j.bir.2025.02.008", "url": null}, {"t": "Yildiz, M. E., y Erzurumlu, Y. O. (2018). Testing postmodern portfolio theory based on global and local single factor market model: Borsa Istanbul case. Borsa Istanbul Review, 18(4), 259-268.", "doi": "10.1016/j.bir.2018.03.001", "url": null}, {"t": "Yıldırım, D., y Çelik, A. K. (2021). Testing the pecking order theory of capital structure: Evidence from Turkey using panel quantile regression approach. Borsa Istanbul Review, 21(4), 317-331.", "doi": "10.1016/j.bir.2020.11.002", "url": null}];
+const TITULOS = {"composicion": {"t": "0. Composición de las carteras", "a": "tabla0_composicion_carteras.csv"}, "descriptiva": {"t": "1. Descriptiva de los retornos", "a": "tabla1_descriptiva.csv"}, "adf": {"t": "2. Prueba de raíz unitaria", "a": "tabla2_adf.csv"}, "correlaciones": {"t": "3. Correlaciones entre sectores", "a": "tabla3_correlaciones.csv"}, "betas": {"t": "4. Betas sectoriales", "a": "tabla4_betas.csv"}, "costo": {"t": "5. Costo de capital", "a": "tabla5_costo_capital.csv"}, "robustez": {"t": "6. Betas, prueba de robustez", "a": "tabla6_betas_robustez.csv"}, "diagnostico": {"t": "7. Diagnóstico de los residuos", "a": "tabla7_diagnostico.csv"}, "frontera": {"t": "8. Carteras de la frontera", "a": "tabla8_frontera_carteras.csv"}, "desempeno": {"t": "9. Desempeño ajustado por riesgo", "a": "tabla9_desempeno_ajustado.csv"}, "diversificacion": {"t": "10. Ganancia de diversificar", "a": "tabla10_ganancia_diversificacion.csv"}};
 
-(function () {
-  "use strict";
+/* ===================== utilidades ===================== */
+const $ = s => document.querySelector(s);
+const SEC = ["mineria","banca","construccion","consumo"];
+const NOM = {mineria:"Mineria", banca:"Banca", construccion:"Construccion", consumo:"Consumo"};
+const COL = {mineria:"#e8a33d", banca:"#4ea1e8", construccion:"#9b7fe0", consumo:"#4fc9a0"};
 
-  var ORDEN = ["Mineria", "Banca", "Construccion", "Consumo"];
-  var ETQ = { Mineria: "Minería", Banca: "Banca", Construccion: "Construcción", Consumo: "Consumo" };
-  var COL = {
-    Mineria: "#5b9bd5", Banca: "#ffa94d", Construccion: "#f06565", Consumo: "#2ec4a0"
-  };
-  var ocultos = {};
+/* Las tablas 8 y 9 escriben "Mineria" y "Construccion" con tilde y las demas sin ella.
+   Todo lo que cruza tablas pasa por aqui para que las tildes no partan las series. */
+const clave = t => String(t ?? "").normalize("NFD").replace(/[̀-ͯ]/g,"")
+                   .toLowerCase().trim();
+const num = v => {
+  const n = parseFloat(String(v ?? "").replace(",", "."));
+  return Number.isFinite(n) ? n : null;
+};
+/* Formato a mano, con coma decimal. No se usa toLocaleString porque un navegador
+   sin los datos de idioma instalados cae al punto decimal del ingles. */
+const fmt = (v, d = 2) => {
+  if (v == null || !Number.isFinite(v)) return "s. d.";
+  const [ent, dec] = Math.abs(v).toFixed(d).split(".");
+  return (v < 0 ? "-" : "") + ent.replace(/\B(?=(\d{3})+(?!\d))/g, " ") +
+         (dec ? "," + dec : "");
+};
+const pesa = b => b >= 1048576 ? fmt(b/1048576, 1)+" MB"
+               : b >= 1024 ? fmt(b/1024, 0)+" KB" : b+" B";
+const ext = n => { const p = n.lastIndexOf("."); return p > 0 ? n.slice(p+1) : "&mdash;"; };
+const esc = t => String(t).replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-  // Las tablas no escriben el sector igual: tabla9 lleva tilde y las demas no.
-  // Esta funcion devuelve siempre la misma clave, de modo que color, etiqueta y
-  // orden coinciden venga de donde venga la fila.
-  function clave(s) {
-    if (!s) return "";
-    var x = String(s).normalize ? String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                                : String(s);
-    return x.charAt(0).toUpperCase() + x.slice(1).toLowerCase();
+/* Busca una fila por el nombre del sector, sin importar tildes ni columna. */
+function fila(tabla, sector, col) {
+  const k = clave(sector);
+  return (DATOS[tabla] || []).find(f => clave(f[col ?? Object.keys(f)[0]]) === k);
+}
+
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(t, at = {}, padre) {
+  const n = document.createElementNS(SVGNS, t);
+  for (const k in at) n.setAttribute(k, at[k]);
+  if (padre) padre.appendChild(n);
+  return n;
+}
+function lienzo(destino, an, al) {
+  const d = typeof destino === "string" ? $(destino) : destino;
+  d.innerHTML = "";
+  const s = el("svg", {viewBox:`0 0 ${an} ${al}`, role:"img"}, d);
+  return s;
+}
+
+/* consejo flotante */
+const tip = $("#tip");
+function conTip(nodo, html) {
+  nodo.addEventListener("mousemove", e => {
+    tip.innerHTML = html;
+    tip.style.opacity = 1;
+    const r = tip.getBoundingClientRect();
+    let x = e.clientX + 14, y = e.clientY - r.height - 10;
+    if (x + r.width > innerWidth - 10) x = e.clientX - r.width - 14;
+    if (y < 10) y = e.clientY + 18;
+    tip.style.left = x + "px";
+    tip.style.top = y + "px";
+  });
+  nodo.addEventListener("mouseleave", () => tip.style.opacity = 0);
+}
+
+/* ===================== datos derivados de las tablas ===================== */
+const RF    = num(fila("costo","mineria","Sector")?.["Rf (%)"]);
+const PRIMA = num(fila("costo","mineria","Sector")?.["Prima de mercado (%)"]);
+/* La prima de referencia no esta en ninguna tabla como columna propia, de modo que se
+   despeja de la columna "Ke con prima de referencia". La tabla guarda beta y Ke con
+   cuatro decimales, y esa perdida de precision deja la division en 7,5004 en lugar de
+   7,5, de modo que el resultado se redondea a dos decimales. El valor declarado en
+   04_analisis.py linea 196 es PRIMA_REFERENCIA = 7.5 */
+const PRIMA_REF = (() => {
+  const f = fila("costo","mineria","Sector");
+  const b = num(f?.Beta), ke = num(f?.["Ke con prima de referencia (%)"]);
+  return (b && ke != null && RF != null) ? Math.round((ke - RF) / b * 100) / 100 : null;
+})();
+
+const BETA = {}, KE = {}, IC = {}, R2 = {}, EE = {};
+SEC.forEach(s => {
+  const f = fila("betas", s, "Sector") || {};
+  const g = fila("costo", s, "Sector") || {};
+  BETA[s] = num(f.Beta);
+  EE[s]   = num(f["Error estandar"]);
+  IC[s]   = [num(f["IC 95% inferior"]), num(f["IC 95% superior"])];
+  R2[s]   = num(f.R2);
+  KE[s]   = num(g["Costo de capital Ke (%)"]);
+});
+
+/* ===================== tarjetas ===================== */
+(function tarjetas() {
+  $("#tarjetas").innerHTML = SEC.map(s => {
+    const d = fila("desempeno", s, "Sector") || {};
+    return `<div class="tarjeta" style="--c:${COL[s]}">
+      <h4>${NOM[s]}</h4>
+      <div class="cifra">${fmt(KE[s])} %</div>
+      <div class="pie">costo de capital</div>
+      <div class="pie" style="margin-top:9px">
+        beta ${fmt(BETA[s], 4)} &nbsp;&middot;&nbsp; R&sup2; ${fmt(R2[s], 3)}<br>
+        retorno ${fmt(num(d["Retorno anual %"]))} % &nbsp;&middot;&nbsp;
+        riesgo ${fmt(num(d["Volatilidad anual %"]))} %
+      </div>
+    </div>`;
+  }).join("");
+})();
+
+/* ===================== figura de betas ===================== */
+(function figBetas() {
+  const an = 760, al = 250, iz = 108, de = 56, ar = 18, ab = 40;
+  const s = lienzo("#fig-betas", an, al);
+  const lo = Math.min(0, ...SEC.map(k => IC[k][0])) - .08;
+  const hi = Math.max(...SEC.map(k => IC[k][1])) + .12;
+  const X = v => iz + (v - lo) / (hi - lo) * (an - iz - de);
+  const paso = (al - ar - ab) / SEC.length;
+
+  for (let t = Math.ceil(lo*5)/5; t <= hi; t += .2) {
+    const x = X(t);
+    el("line", {x1:x, y1:ar, x2:x, y2:al-ab, stroke:"#2a323d", "stroke-width":1}, s);
+    el("text", {x, y:al-ab+17, fill:"#6e7781", "font-size":11, "text-anchor":"middle"}, s)
+      .textContent = fmt(t, 1);
   }
-  function color(s) { return COL[clave(s)] || "#8396ab"; }
-  function nombre(s) { return ETQ[clave(s)] || s; }
+  const x1 = X(1);
+  el("line", {x1, y1:ar, x2:x1, y2:al-ab, stroke:"#9aa4b2", "stroke-width":1.5,
+              "stroke-dasharray":"5 4"}, s);
+  el("text", {x:x1, y:ar-5, fill:"#9aa4b2", "font-size":11, "text-anchor":"middle"}, s)
+    .textContent = "beta del mercado = 1,0";
 
-  function num(v) { var x = parseFloat(v); return isFinite(x) ? x : NaN; }
-  function fmt(v, d) {
-    return isFinite(v) ? v.toFixed(d === undefined ? 2 : d).replace(".", ",") : "—";
-  }
-  function pct(v, d) { return fmt(v, d) + " %"; }
-  function el(id) { return document.getElementById(id); }
+  SEC.forEach((k, i) => {
+    const y = ar + paso*i + paso/2;
+    const g = el("g", {}, s);
+    el("line", {x1:X(IC[k][0]), y1:y, x2:X(IC[k][1]), y2:y,
+                stroke:COL[k], "stroke-width":2.5, opacity:.42}, g);
+    [IC[k][0], IC[k][1]].forEach(v =>
+      el("line", {x1:X(v), y1:y-6, x2:X(v), y2:y+6, stroke:COL[k], "stroke-width":2.5}, g));
+    el("circle", {cx:X(BETA[k]), cy:y, r:6, fill:COL[k], stroke:"#0d1117",
+                  "stroke-width":2}, g);
+    el("text", {x:iz-12, y:y+4, fill:"#e6edf3", "font-size":13, "text-anchor":"end"}, g)
+      .textContent = NOM[k];
+    el("text", {x:X(IC[k][1])+11, y:y+4, fill:COL[k], "font-size":12,
+                "font-family":"ui-monospace,Menlo,monospace"}, g)
+      .textContent = fmt(BETA[k], 3);
+    conTip(g, `<b>${NOM[k]}</b><br>beta ${fmt(BETA[k],4)}<br>` +
+      `error estandar ${fmt(EE[k],4)}<br>` +
+      `IC 95% ${fmt(IC[k][0],4)} a ${fmt(IC[k][1],4)}<br>` +
+      `R&sup2; ${fmt(R2[k],4)}<br>Ke ${fmt(KE[k])} %`);
+  });
+})();
 
-  function fila(tabla, campo, valor) {
-    var a = DATOS[tabla] || [];
-    for (var i = 0; i < a.length; i++) if (a[i][campo] === valor) return a[i];
-    return null;
-  }
-  function porOrden(tabla) {
-    return (DATOS[tabla] || []).slice().sort(function (a, b) {
-      return ORDEN.indexOf(clave(a.Sector)) - ORDEN.indexOf(clave(b.Sector));
-    });
-  }
-  function visibles(rows) {
-    return rows.filter(function (r) { return !ocultos[clave(r.Sector)]; });
-  }
+/* ===================== hallazgo ===================== */
+(function hallazgo() {
+  const d = s => fila("desempeno", s, "Sector") || {};
+  const rm = num(d("mineria")["Retorno anual %"]), rb = num(d("banca")["Retorno anual %"]);
+  const bm = BETA.mineria, bb = BETA.banca;
+  $("#hallazgo").innerHTML =
+    `<b>Lo que mas llama la atencion.</b> La banca rindio ${fmt(rb)} por ciento al anio y la
+     mineria ${fmt(rm)} por ciento, una diferencia de apenas
+     ${fmt(Math.abs(rm-rb))} puntos, pero la beta de la banca
+     (${fmt(bb,4)}) es ${fmt((1-bb/bm)*100,0)} por ciento menor que la de la mineria
+     (${fmt(bm,4)}). Casi el mismo retorno con bastante menos riesgo sistematico, y por eso
+     la banca pesa ${fmt(num((DATOS.frontera[0]||{})["Banca %"]),1)} por ciento en la cartera
+     tangente mientras la mineria se queda en
+     ${fmt(num((DATOS.frontera[0]||{})["Minería %"] ??
+                (DATOS.frontera[0]||{})["Mineria %"]),1)} por ciento.`;
+})();
 
-  // ---------- utilidades de dibujo ----------
-  var NS = "http://www.w3.org/2000/svg";
-  function svgEl(t, at) {
-    var e = document.createElementNS(NS, t);
-    for (var k in at) if (at[k] !== null && at[k] !== undefined) e.setAttribute(k, at[k]);
-    return e;
-  }
-  function lienzo(host, h, label) {
-    host.textContent = "";
-    var w = Math.max(280, host.clientWidth || 320);
-    var s = svgEl("svg", {
-      viewBox: "0 0 " + w + " " + h, width: "100%", height: h,
-      role: "img", "aria-label": label
-    });
-    host.appendChild(s);
-    return { s: s, w: w, h: h };
-  }
-  function texto(p, x, y, txt, op) {
-    op = op || {};
-    var t = svgEl("text", {
-      x: x, y: y, fill: op.fill || "#8396ab",
-      "font-size": op.size || 11, "text-anchor": op.anchor || "start",
-      "font-weight": op.weight || null
-    });
-    if (op.mono) t.setAttribute("style", "font-variant-numeric:tabular-nums");
-    t.textContent = txt;
-    p.appendChild(t);
-    return t;
-  }
-  function tooltip(host) {
-    var d = document.createElement("div");
-    d.className = "tip";
-    host.style.position = "relative";
-    host.appendChild(d);
-    return {
-      ver: function (x, y, txt) {
-        d.textContent = txt;
-        d.style.opacity = 1;
-        var bw = d.offsetWidth, bh = d.offsetHeight, W = host.clientWidth;
-        d.style.left = Math.max(2, Math.min(x - bw / 2, W - bw - 2)) + "px";
-        d.style.top = Math.max(2, y - bh - 12) + "px";
-      },
-      ir: function () { d.style.opacity = 0; }
-    };
-  }
-  function zonaHover(p, at, texto_, tip, host) {
-    var z = svgEl("rect", at);
-    z.setAttribute("fill", "transparent");
-    z.style.cursor = "crosshair";
-    z.addEventListener("pointermove", function (ev) {
-      var r = host.getBoundingClientRect();
-      tip.ver(ev.clientX - r.left, ev.clientY - r.top, texto_);
-    });
-    z.addEventListener("pointerleave", tip.ir);
-    p.appendChild(z);
-  }
+/* ===================== simulador del CAPM ===================== */
+(function capm() {
+  const r = $("#prima");
+  /* El deslizador se mueve de decima en decima, pero la prima estimada tiene cuatro
+     decimales. Se guarda aparte para que al pulsar "Prima estimada" el Ke salga
+     identico al de la tabla 5 y no redondeado al paso del deslizador. */
+  let prima = PRIMA;
+  r.value = PRIMA;
+  const an = 760, al = 285, iz = 108, de = 60, ar = 24, ab = 42;
 
-  // ---------- portada ----------
-  function portada() {
-    var b = porOrden("betas");
-    var c = DATOS.costo[0] || {};
-    var min = fila("betas", "Sector", "Consumo"), max = fila("betas", "Sector", "Mineria");
+  function pinta() {
+    const p = prima;
+    $("#v-prima").textContent = fmt(p, p === Math.round(p*10)/10 ? 2 : 4) + " %";
+    const ke = {}; SEC.forEach(k => ke[k] = RF + BETA[k]*p);
+    const hi = Math.max(12, ...Object.values(ke)) * 1.14;
+    const s = lienzo("#fig-capm", an, al);
+    const X = v => iz + v/hi * (an - iz - de);
+    const paso = (al - ar - ab) / SEC.length;
 
-    el("h-dias").textContent = b.length ? (+b[0].N).toLocaleString("es-PE") : "—";
-    el("k-obs").textContent = b.length ? (+b[0].N).toLocaleString("es-PE") : "—";
-    el("h-bmax").textContent = max ? fmt(num(max.Beta), 3) : "—";
-    el("h-bmin").textContent = min ? fmt(num(min.Beta), 3) : "—";
-
-    var kes = DATOS.costo.map(function (r) { return num(r["Costo de capital Ke (%)"]); })
-      .filter(isFinite);
-    el("k-ke").textContent = kes.length
-      ? fmt(Math.min.apply(null, kes), 1) + " a " + pct(Math.max.apply(null, kes), 1) : "—";
-    el("k-prima").textContent = pct(num(c["Prima de mercado (%)"]), 2);
-
-    var mej = fila("diversificacion", "Indicador", "Mejora porcentual del Sharpe");
-    el("k-sharpe").textContent = mej ? "+" + pct(num(mej.Valor), 1) : "—";
-
-    var tan = (DATOS.frontera || []).filter(function (r) {
-      return r.Cartera.indexOf("Maximo") === 0;
-    })[0];
-    el("h-const").textContent = tan ? fmt(num(tan["Construcción %"]), 1) : "—";
-  }
-
-  // ---------- grafico de betas ----------
-  function dibujarBetas() {
-    var host = el("c-betas");
-    var rows = visibles(porOrden("betas"));
-    if (!rows.length) { host.textContent = ""; return; }
-    var h = rows.length * 46 + 44;
-    var L = lienzo(host, h, "Beta de cada sector con su intervalo de confianza al 95 por ciento");
-    var m = { l: 94, r: 54, t: 12, b: 30 };
-    var maxv = Math.max.apply(null, rows.map(function (r) { return num(r["IC 95% superior"]); }));
-    var X = function (v) { return m.l + (v / (maxv * 1.08)) * (L.w - m.l - m.r); };
-    var bw = (h - m.t - m.b) / rows.length;
-    var tip = tooltip(host);
-
-    for (var g = 0; g <= 2; g += 0.5) {
-      if (g > maxv * 1.08) break;
-      L.s.appendChild(svgEl("line", {
-        x1: X(g), x2: X(g), y1: m.t, y2: h - m.b,
-        stroke: "#1e2b3a", "stroke-width": 1
-      }));
-      texto(L.s, X(g), h - m.b + 16, fmt(g, 1), { anchor: "middle" });
+    const pt = hi > 40 ? 10 : 5;
+    for (let t = 0; t <= hi; t += pt) {
+      const x = X(t);
+      el("line", {x1:x, y1:ar, x2:x, y2:al-ab, stroke:"#2a323d"}, s);
+      el("text", {x, y:al-ab+17, fill:"#6e7781", "font-size":11, "text-anchor":"middle"}, s)
+        .textContent = fmt(t, 0);
     }
-    L.s.appendChild(svgEl("line", {
-      x1: X(1), x2: X(1), y1: m.t, y2: h - m.b,
-      stroke: "#8396ab", "stroke-width": 1, "stroke-dasharray": "5 4", opacity: .8
-    }));
-    texto(L.s, X(1) + 6, m.t + 11, "mercado = 1", { size: 10 });
+    const xr = X(RF);
+    el("line", {x1:xr, y1:ar, x2:xr, y2:al-ab, stroke:"#9aa4b2", "stroke-width":1.5,
+                "stroke-dasharray":"5 4"}, s);
+    el("text", {x:xr-8, y:ar-7, fill:"#9aa4b2", "font-size":11, "text-anchor":"end"}, s)
+      .textContent = "Rf " + fmt(RF) + " %";
 
-    rows.forEach(function (r, i) {
-      var cy = m.t + i * bw + bw / 2;
-      var b = num(r.Beta), lo = num(r["IC 95% inferior"]), hi = num(r["IC 95% superior"]);
-      var c = color(r.Sector);
-      texto(L.s, m.l - 12, cy + 4, nombre(r.Sector), { anchor: "end", fill: "#e9eff7", size: 12 });
-      L.s.appendChild(svgEl("line", {
-        x1: X(lo), x2: X(hi), y1: cy, y2: cy, stroke: c, "stroke-width": 7,
-        "stroke-linecap": "round", opacity: .34
-      }));
-      L.s.appendChild(svgEl("circle", {
-        cx: X(b), cy: cy, r: 7.5, fill: c, stroke: "#080c12", "stroke-width": 2.5
-      }));
-      texto(L.s, X(hi) + 10, cy + 4, fmt(b, 3), { fill: "#e9eff7", size: 12, mono: true });
-      zonaHover(L.s, { x: m.l, y: cy - bw / 2, width: L.w - m.l - m.r, height: bw },
-        nombre(r.Sector) + "\nBeta " + fmt(b, 4) +
-        "\nIC 95 %: " + fmt(lo, 3) + " a " + fmt(hi, 3) +
-        "\nR² " + fmt(num(r.R2), 3) + "\np " + (num(r["p-valor"]) < 0.001 ? "< 0,001" : fmt(num(r["p-valor"]), 3)),
-        tip, host);
+    SEC.forEach((k, i) => {
+      const y = ar + paso*i + 9, h = paso - 20;
+      const g = el("g", {}, s);
+      el("rect", {x:iz, y, width:Math.max(1, X(ke[k])-iz), height:h, rx:4, fill:COL[k],
+                  opacity:.82}, g);
+      el("text", {x:iz-12, y:y+h/2+4, fill:"#e6edf3", "font-size":13, "text-anchor":"end"}, g)
+        .textContent = NOM[k];
+      el("text", {x:X(ke[k])+10, y:y+h/2+4, fill:COL[k], "font-size":12.5,
+                  "font-family":"ui-monospace,Menlo,monospace"}, g)
+        .textContent = fmt(ke[k]) + " %";
+      conTip(g, `<b>${NOM[k]}</b><br>Ke = ${fmt(RF)} + ${fmt(BETA[k],4)} &times; ${fmt(p)}` +
+        `<br>Ke = <b>${fmt(ke[k])} %</b>`);
     });
+    el("text", {x:(an+iz-de)/2, y:al-6, fill:"#6e7781", "font-size":11,
+                "text-anchor":"middle"}, s)
+      .textContent = "costo de capital Ke, por ciento anual";
+
+    const d = ke.mineria - ke.consumo;
+    const igual = Math.abs(p - PRIMA) < 1e-9;
+    $("#nota-capm").innerHTML =
+      `Con una prima de ${fmt(p, igual ? 4 : 2)} por ciento, a la mineria se le exige
+       ${fmt(d)} puntos mas que al consumo. La prima estimada del periodo es
+       ${fmt(PRIMA, 4)} por ciento` +
+      (PRIMA_REF == null ? "" : ` y la de referencia que usa el articulo para contrastar es
+       ${fmt(PRIMA_REF)} por ciento`) + `. ` +
+      (igual ? `Con esta prima el Ke de la mineria sale ${fmt(ke.mineria, 4)} por ciento y la
+                tabla 5 dice ${fmt(KE.mineria, 4)} por ciento. La diferencia de
+                ${fmt(Math.abs(ke.mineria - KE.mineria), 4)} puntos es el redondeo a cuatro
+                decimales con que el CSV guarda la prima; el codigo de Python la multiplica sin
+                redondear.`
+             : `Los Ke de la tabla 5 corresponden a la prima estimada; esta es otra, de modo
+                que las cifras de arriba no son las del articulo.`);
   }
-
-  function leyenda() {
-    var cont = el("leg-betas");
-    cont.textContent = "";
-    ORDEN.forEach(function (s) {
-      var b = document.createElement("button");
-      b.className = "chip" + (ocultos[s] ? " off" : "");
-      b.type = "button";
-      b.setAttribute("aria-pressed", ocultos[s] ? "false" : "true");
-      var d = document.createElement("i");
-      d.className = "dot";
-      d.style.background = COL[s];
-      b.appendChild(d);
-      b.appendChild(document.createTextNode(ETQ[s]));
-      b.addEventListener("click", function () {
-        ocultos[s] = !ocultos[s];
-        if (ORDEN.every(function (x) { return ocultos[x]; })) ocultos[s] = false;
-        leyenda(); dibujarBetas(); dibujarKe();
-      });
-      cont.appendChild(b);
-    });
-  }
-
-  // ---------- simulador del costo de capital ----------
-  var primaReal = 15.4;
-  function dibujarKe() {
-    var host = el("c-ke");
-    var rows = visibles(porOrden("costo"));
-    if (!rows.length) { host.textContent = ""; return; }
-    var prima = parseFloat(el("prima").value);
-    var rf = num((DATOS.costo[0] || {})["Rf (%)"]);
-    var h = 300;
-    var L = lienzo(host, h, "Costo de capital de cada sector segun la prima de mercado elegida");
-    var m = { l: 46, r: 16, t: 24, b: 48 };
-    var kes = rows.map(function (r) { return rf + num(r.Beta) * prima; });
-    var top = Math.max(Math.max.apply(null, kes) * 1.17, 10);
-    var Y = function (v) { return h - m.b - (v / top) * (h - m.b - m.t); };
-    var bw = (L.w - m.l - m.r) / rows.length;
-    var tip = tooltip(host);
-
-    var paso = top > 30 ? 10 : 5;
-    for (var g = 0; g <= top; g += paso) {
-      L.s.appendChild(svgEl("line", {
-        x1: m.l, x2: L.w - m.r, y1: Y(g), y2: Y(g), stroke: "#1e2b3a", "stroke-width": 1
-      }));
-      texto(L.s, m.l - 8, Y(g) + 4, g + "%", { anchor: "end", size: 10 });
-    }
-    L.s.appendChild(svgEl("line", {
-      x1: m.l, x2: L.w - m.r, y1: Y(rf), y2: Y(rf),
-      stroke: "#8396ab", "stroke-dasharray": "4 4", opacity: .75
-    }));
-    texto(L.s, m.l + 6, Y(rf) - 7, "Rf " + fmt(rf, 2) + " %", { size: 10 });
-
-    rows.forEach(function (r, i) {
-      var ke = rf + num(r.Beta) * prima;
-      var x = m.l + i * bw + bw * 0.2, an = bw * 0.6;
-      var c = color(r.Sector);
-      var alto = Math.max(0, h - m.b - Y(ke));
-      var b = svgEl("rect", { x: x, y: Y(ke), width: an, height: alto, rx: 4, fill: c });
-      b.setAttribute("style", "transition:y .18s,height .18s");
-      L.s.appendChild(b);
-      texto(L.s, x + an / 2, Y(ke) - 9, pct(ke, 1),
-        { anchor: "middle", fill: "#e9eff7", size: 12.5, mono: true, weight: 600 });
-      texto(L.s, x + an / 2, h - m.b + 18, nombre(r.Sector),
-        { anchor: "middle", size: 11 });
-      texto(L.s, x + an / 2, h - m.b + 33, "β " + fmt(num(r.Beta), 3),
-        { anchor: "middle", size: 10, mono: true });
-      zonaHover(L.s, { x: m.l + i * bw, y: m.t, width: bw, height: h - m.b - m.t },
-        nombre(r.Sector) + "\nKe " + pct(ke, 2) +
-        "\nβ " + fmt(num(r.Beta), 4) + "\nRf " + pct(rf, 3) + "\nPrima " + pct(prima, 1),
-        tip, host);
-    });
-  }
-
-  // ---------- frontera ----------
-  function dibujarFrontera() {
-    var host = el("c-front");
-    var sec = porOrden("desempeno").map(function (r) {
-      return {
-        n: nombre(r.Sector), c: color(r.Sector),
-        v: num(r["Volatilidad anual %"]), r: num(r["Retorno anual %"]), s: num(r.Sharpe), tipo: "s"
-      };
-    });
-    var car = (DATOS.frontera || []).map(function (r) {
-      return {
-        n: r.Cartera, c: "#7c5cff", v: num(r["Volatilidad anual %"]),
-        r: num(r["Retorno anual %"]), s: num(r.Sharpe), tipo: "c"
-      };
-    });
-    var todo = sec.concat(car).filter(function (p) { return isFinite(p.v) && isFinite(p.r); });
-    if (!todo.length) { host.textContent = ""; return; }
-
-    var h = 300;
-    var L = lienzo(host, h, "Retorno frente a volatilidad de los sectores y de las carteras");
-    var m = { l: 46, r: 18, t: 20, b: 48 };
-    var vs = todo.map(function (p) { return p.v; }), rs = todo.map(function (p) { return p.r; });
-    var v0 = Math.min.apply(null, vs) * 0.88, v1 = Math.max.apply(null, vs) * 1.07;
-    var r0 = Math.min.apply(null, rs) * 0.82, r1 = Math.max.apply(null, rs) * 1.1;
-    var X = function (v) { return m.l + ((v - v0) / (v1 - v0)) * (L.w - m.l - m.r); };
-    var Y = function (v) { return h - m.b - ((v - r0) / (r1 - r0)) * (h - m.b - m.t); };
-    var tip = tooltip(host);
-
-    for (var i = 0; i <= 4; i++) {
-      var yv = r0 + (r1 - r0) * i / 4, xv = v0 + (v1 - v0) * i / 4;
-      L.s.appendChild(svgEl("line", { x1: m.l, x2: L.w - m.r, y1: Y(yv), y2: Y(yv), stroke: "#1e2b3a" }));
-      texto(L.s, m.l - 8, Y(yv) + 4, fmt(yv, 0) + "%", { anchor: "end", size: 10 });
-      texto(L.s, X(xv), h - m.b + 17, fmt(xv, 0) + "%", { anchor: "middle", size: 10 });
-    }
-    texto(L.s, (m.l + L.w - m.r) / 2, h - 8, "Volatilidad anual", { anchor: "middle", size: 11 });
-
-    car.forEach(function (p) {
-      var g = svgEl("path", {
-        d: "M0,-11 L3,-3.4 L11,-3.4 L4.6,1.3 L6.9,9 L0,4.3 L-6.9,9 L-4.6,1.3 L-11,-3.4 L-3,-3.4 Z",
-        transform: "translate(" + X(p.v) + "," + Y(p.r) + ")",
-        fill: "#7c5cff", stroke: "#080c12", "stroke-width": 1.5
-      });
-      L.s.appendChild(g);
-    });
-    sec.forEach(function (p) {
-      L.s.appendChild(svgEl("circle", {
-        cx: X(p.v), cy: Y(p.r), r: 9, fill: p.c, stroke: "#080c12", "stroke-width": 2.5
-      }));
-      texto(L.s, X(p.v), Y(p.r) - 17, p.n, { anchor: "middle", size: 10.5 });
-    });
-    todo.forEach(function (p) {
-      var z = svgEl("circle", { cx: X(p.v), cy: Y(p.r), r: 16, fill: "transparent" });
-      z.style.cursor = "crosshair";
-      z.addEventListener("pointermove", function (ev) {
-        var rc = host.getBoundingClientRect();
-        tip.ver(ev.clientX - rc.left, ev.clientY - rc.top,
-          p.n + "\nRetorno " + pct(p.r, 2) + "\nVolatilidad " + pct(p.v, 2) +
-          "\nSharpe " + fmt(p.s, 4));
-      });
-      z.addEventListener("pointerleave", tip.ir);
-      L.s.appendChild(z);
-    });
-  }
-
-  // ---------- correlaciones ----------
-  function dibujarCorr() {
-    var host = el("c-corr");
-    var rows = DATOS.correlaciones || [];
-    if (!rows.length) { host.textContent = ""; return; }
-    var h = 300;
-    var L = lienzo(host, h, "Matriz de correlaciones entre los retornos de los cuatro sectores");
-    var m = { l: 56, r: 14, t: 32, b: 14 };
-    var corto = { Mineria: "Min.", Banca: "Ban.", Construccion: "Con.", Consumo: "Cns." };
-    var cw = (L.w - m.l - m.r) / 4, ch = (h - m.t - m.b) / 4;
-    var tip = tooltip(host);
-
-    ORDEN.forEach(function (s, j) {
-      texto(L.s, m.l + j * cw + cw / 2, m.t - 11, corto[s], { anchor: "middle", size: 11 });
-      texto(L.s, m.l - 10, m.t + j * ch + ch / 2 + 4, corto[s], { anchor: "end", size: 11 });
-    });
-
-    rows.forEach(function (r) {
-      var i = ORDEN.indexOf(clave(r.Sector));
-      if (i < 0) return;
-      ORDEN.forEach(function (c, j) {
-        var v = num(r[c]);
-        if (!isFinite(v)) return;
-        var mismo = r.Sector === c;
-        var op = mismo ? 0.12 : Math.max(0.1, Math.min(0.95, v / 0.6));
-        L.s.appendChild(svgEl("rect", {
-          x: m.l + j * cw + 2, y: m.t + i * ch + 2,
-          width: cw - 4, height: ch - 4, rx: 4,
-          fill: "#4da3ff", opacity: op
-        }));
-        texto(L.s, m.l + j * cw + cw / 2, m.t + i * ch + ch / 2 + 4,
-          mismo ? "—" : fmt(v, 3).replace("0,", ","),
-          { anchor: "middle", size: 12, mono: true, fill: mismo ? "#8396ab" : (v > 0.42 ? "#06121f" : "#e9eff7") });
-        zonaHover(L.s, { x: m.l + j * cw, y: m.t + i * ch, width: cw, height: ch },
-          nombre(r.Sector) + " con " + nombre(c) + "\n" + fmt(v, 4), tip, host);
-      });
-    });
-  }
-
-  // ---------- tablas ----------
-  function tablaOrdenable(datos, campos, cabecera, cuerpo, formato) {
-    var estado = { campo: null, asc: false };
-
-    function pinta() {
-      var rows = datos.slice();
-      if (estado.campo) {
-        rows.sort(function (a, b) {
-          var x = num(a[estado.campo]), y = num(b[estado.campo]);
-          if (isNaN(x) && isNaN(y)) {
-            return String(a[estado.campo]).localeCompare(String(b[estado.campo])) * (estado.asc ? 1 : -1);
-          }
-          if (isNaN(x)) return 1;
-          if (isNaN(y)) return -1;
-          return (x - y) * (estado.asc ? 1 : -1);
-        });
-      }
-      cuerpo.textContent = "";
-      rows.forEach(function (r) {
-        var tr = document.createElement("tr");
-        campos.forEach(function (c, i) {
-          var cel = document.createElement(i === 0 ? "th" : "td");
-          if (i === 0) {
-            cel.scope = "row";
-            cel.style.cssText = "font-weight:500;color:var(--fg);text-transform:none;letter-spacing:0;font-size:.85rem;cursor:default";
-            if (COL[clave(r[c])]) {
-              var d = document.createElement("i");
-              d.className = "dot";
-              d.style.cssText = "background:" + color(r[c]) + ";margin-right:8px;display:inline-block";
-              cel.appendChild(d);
-            }
-            cel.appendChild(document.createTextNode(nombre(r[c])));
-          } else {
-            var txt = formato ? formato(c, r[c], cel) : r[c];
-            cel.textContent = txt;
-          }
-          tr.appendChild(cel);
-        });
-        cuerpo.appendChild(tr);
-      });
-    }
-
-    cabecera.textContent = "";
-    campos.forEach(function (c) {
-      var th = document.createElement("th");
-      th.textContent = c;
-      th.setAttribute("scope", "col");
-      th.addEventListener("click", function () {
-        estado.asc = estado.campo === c ? !estado.asc : false;
-        estado.campo = c;
-        Array.prototype.forEach.call(cabecera.children, function (x) {
-          x.className = "";
-        });
-        th.className = estado.asc ? "asc" : "desc";
-        pinta();
-      });
-      cabecera.appendChild(th);
-    });
-    pinta();
-  }
-
-  function tablas() {
-    var campos = ["Sector", "Beta", "Retorno anual %", "Volatilidad anual %",
-      "Ke del CAPM %", "Sharpe", "Treynor %", "Alfa de Jensen anual %", "p del alfa"];
-    var dec = { Beta: 4, Sharpe: 4, "p del alfa": 3 };
-    tablaOrdenable(porOrden("desempeno"), campos, el("t-head"), el("t-body"),
-      function (campo, valor, celda) {
-        var v = num(valor);
-        if (!isFinite(v)) return valor;
-        if (campo === "Alfa de Jensen anual %") {
-          celda.className = v > 0 ? "pos" : "neg";
-        }
-        return fmt(v, dec[campo] === undefined ? 2 : dec[campo]);
-      });
-
-    var cc = ["Nemonico", "Empresa", "Sector BVL", "Cartera asignada", "Reasignada", "Moneda"];
-    var comp = (DATOS.composicion || []).slice().sort(function (a, b) {
-      var d = ORDEN.indexOf(clave(a["Cartera asignada"])) - ORDEN.indexOf(clave(b["Cartera asignada"]));
-      return d || a.Nemonico.localeCompare(b.Nemonico);
-    });
-    tablaOrdenable(comp, cc, el("tc-head"), el("tc-body"), function (campo, valor, celda) {
-      if (campo === "Reasignada") celda.className = valor === "si" ? "pos" : "";
-      if (campo === "Cartera asignada") return nombre(valor);
-      return valor;
-    });
-  }
-
-  // ---------- descargas ----------
-  function descargas() {
-    var p = el("dl-prod");
-    p.textContent = "";
-    PRODUCTOS.forEach(function (x) {
-      var a = document.createElement("a");
-      a.href = x[2];
-      a.setAttribute("download", "");
-      var i = document.createElement("span");
-      i.className = "ico";
-      i.textContent = "PDF";
-      var c = document.createElement("span");
-      var t = document.createElement("span");
-      t.className = "t";
-      t.textContent = x[0];
-      var d = document.createElement("span");
-      d.className = "d";
-      d.textContent = x[1];
-      c.appendChild(t);
-      c.appendChild(document.createElement("br"));
-      c.appendChild(d);
-      a.appendChild(i);
-      a.appendChild(c);
-      p.appendChild(a);
-    });
-
-    var NOM = {
-      composicion: ["Composición de las carteras", "tabla0_composicion_carteras.csv"],
-      descriptiva: ["Descriptiva de los retornos", "tabla1_descriptiva.csv"],
-      correlaciones: ["Correlaciones entre sectores", "tabla3_correlaciones.csv"],
-      betas: ["Betas sectoriales", "tabla4_betas.csv"],
-      costo: ["Costo de capital", "tabla5_costo_capital.csv"],
-      frontera: ["Carteras de la frontera", "tabla8_frontera_carteras.csv"],
-      desempeno: ["Desempeño ajustado", "tabla9_desempeno_ajustado.csv"],
-      diversificacion: ["Ganancia de diversificar", "tabla10_ganancia_diversificacion.csv"]
-    };
-    var cont = el("dl-datos");
-    cont.textContent = "";
-    Object.keys(NOM).forEach(function (k) {
-      var a = document.createElement("a");
-      a.href = "datos/" + NOM[k][1];
-      a.setAttribute("download", "");
-      var i = document.createElement("span");
-      i.className = "ico";
-      i.textContent = "CSV";
-      var c = document.createElement("span");
-      var t = document.createElement("span");
-      t.className = "t";
-      t.textContent = NOM[k][0];
-      var d = document.createElement("span");
-      d.className = "d";
-      d.textContent = (DATOS[k] || []).length + " filas";
-      c.appendChild(t);
-      c.appendChild(document.createElement("br"));
-      c.appendChild(d);
-      a.appendChild(i);
-      a.appendChild(c);
-      cont.appendChild(a);
-    });
-  }
-
-  // ---------- navegacion ----------
-  function navegacion() {
-    var links = Array.prototype.slice.call(document.querySelectorAll(".nav a"));
-    var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
-    function marca() {
-      var y = window.scrollY + 90, act = -1;
-      secs.forEach(function (s, i) { if (s && s.offsetTop <= y) act = i; });
-      links.forEach(function (a, i) { a.className = i === act ? "on" : ""; });
-    }
-    window.addEventListener("scroll", marca, { passive: true });
-    marca();
-  }
-
-  // ---------- arranque ----------
-  function dibujarTodo() {
-    dibujarBetas(); dibujarKe(); dibujarFrontera(); dibujarCorr();
-  }
-
-  function iniciar() {
-    primaReal = num((DATOS.costo[0] || {})["Prima de mercado (%)"]);
-    if (!isFinite(primaReal)) primaReal = 15.4;
-    var r = el("prima");
-    r.value = primaReal;
-    el("prima-val").textContent = pct(primaReal, 1);
-
-    portada();
-    leyenda();
-    tablas();
-    descargas();
-    dibujarTodo();
-    navegacion();
-
-    r.addEventListener("input", function () {
-      el("prima-val").textContent = pct(parseFloat(r.value), 1);
-      dibujarKe();
-    });
-    el("prima-reset").addEventListener("click", function () {
-      r.value = primaReal;
-      el("prima-val").textContent = pct(primaReal, 1);
-      dibujarKe();
-    });
-
-    var t;
-    window.addEventListener("resize", function () {
-      clearTimeout(t);
-      t = setTimeout(dibujarTodo, 140);
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", iniciar);
+  r.addEventListener("input", () => { prima = parseFloat(r.value); pinta(); });
+  $("#btn-prima-est").textContent = "Prima estimada " + fmt(PRIMA, 4) + " %";
+  $("#btn-prima-est").onclick = () => { prima = PRIMA; r.value = PRIMA; pinta(); };
+  if (PRIMA_REF == null) {
+    $("#btn-prima-ref").remove();
   } else {
-    iniciar();
+    $("#btn-prima-ref").textContent = "Prima de referencia " + fmt(PRIMA_REF) + " %";
+    $("#btn-prima-ref").onclick = () => { prima = PRIMA_REF; r.value = PRIMA_REF; pinta(); };
   }
+  pinta();
+})();
+
+/* ===================== panel diario ===================== */
+(function panel() {
+  const F = DER.fechas, I = DER.indice;
+  const apagados = new Set();
+  let i0 = 0, i1 = F.length - 1;
+
+  $("#leyenda-panel").innerHTML = SEC.map(s =>
+    `<span class="chip" data-sec="${s}"><span class="punto" style="background:${COL[s]}"></span>
+     ${NOM[s]}</span>`).join("");
+  $("#leyenda-panel").querySelectorAll(".chip").forEach(c =>
+    c.onclick = () => {
+      const s = c.dataset.sec;
+      apagados.has(s) ? apagados.delete(s) : apagados.add(s);
+      c.classList.toggle("off");
+      pinta();
+    });
+
+  $("#desde").min = $("#hasta").min = F[0];
+  $("#desde").max = $("#hasta").max = F[F.length-1];
+
+  function pinta() {
+    const an = 760, al = 330, iz = 58, de = 68, ar = 20, ab = 42;
+    const s = lienzo("#fig-panel", an, al);
+    const vivos = SEC.filter(k => !apagados.has(k));
+    if (!vivos.length || i1 <= i0) {
+      el("text", {x:an/2, y:al/2, fill:"#6e7781", "font-size":13, "text-anchor":"middle"}, s)
+        .textContent = !vivos.length ? "Enciende al menos un sector"
+                                     : "El tramo elegido no tiene dias";
+      return;
+    }
+    const base = {}; vivos.forEach(k => base[k] = I[k][i0]);
+    let lo = Infinity, hi = -Infinity;
+    vivos.forEach(k => { for (let i = i0; i <= i1; i++) {
+      const v = I[k][i] / base[k] * 100;
+      if (v < lo) lo = v; if (v > hi) hi = v;
+    }});
+    const m = (hi - lo) * .09 || 5; lo -= m; hi += m;
+    const X = i => iz + (i - i0) / (i1 - i0) * (an - iz - de);
+    const Y = v => al - ab - (v - lo) / (hi - lo) * (al - ar - ab);
+
+    const salto = Math.pow(10, Math.floor(Math.log10(hi - lo))) *
+                  ((hi - lo) / Math.pow(10, Math.floor(Math.log10(hi - lo))) > 5 ? 2 : 1);
+    for (let t = Math.ceil(lo/salto)*salto; t <= hi; t += salto) {
+      el("line", {x1:iz, y1:Y(t), x2:an-de, y2:Y(t), stroke:"#2a323d"}, s);
+      el("text", {x:iz-9, y:Y(t)+4, fill:"#6e7781", "font-size":11, "text-anchor":"end"}, s)
+        .textContent = fmt(t, 0);
+    }
+    el("line", {x1:iz, y1:Y(100), x2:an-de, y2:Y(100), stroke:"#9aa4b2",
+                "stroke-dasharray":"4 4"}, s);
+
+    const n = 5;
+    for (let j = 0; j < n; j++) {
+      const i = Math.round(i0 + (i1-i0)*j/(n-1));
+      el("text", {x:X(i), y:al-ab+18, fill:"#6e7781", "font-size":11,
+                  "text-anchor": j===0 ? "start" : j===n-1 ? "end" : "middle"}, s)
+        .textContent = F[i].slice(0, 7);
+    }
+
+    vivos.forEach(k => {
+      let d = "";
+      for (let i = i0; i <= i1; i++)
+        d += (i === i0 ? "M" : "L") + X(i).toFixed(1) + " " +
+             Y(I[k][i]/base[k]*100).toFixed(1) + " ";
+      el("path", {d, fill:"none", stroke:COL[k], "stroke-width":1.9,
+                  "stroke-linejoin":"round"}, s);
+      const fin = I[k][i1]/base[k]*100;
+      el("text", {x:an-de+9, y:Y(fin)+4, fill:COL[k], "font-size":12,
+                  "font-family":"ui-monospace,Menlo,monospace"}, s)
+        .textContent = fmt(fin, 0);
+    });
+    el("text", {x:14, y:ar+6, fill:"#6e7781", "font-size":11}, s)
+      .textContent = "indice";
+
+    /* lectura al pasar el cursor */
+    const capa = el("rect", {x:iz, y:ar, width:an-iz-de, height:al-ar-ab,
+                             fill:"transparent"}, s);
+    const guia = el("line", {x1:0, y1:ar, x2:0, y2:al-ab, stroke:"#9aa4b2",
+                             "stroke-width":1, opacity:0}, s);
+    capa.addEventListener("mousemove", e => {
+      const caja = s.getBoundingClientRect();
+      const px = (e.clientX - caja.left) / caja.width * an;
+      const i = Math.max(i0, Math.min(i1,
+        Math.round(i0 + (px - iz)/(an-iz-de)*(i1-i0))));
+      guia.setAttribute("x1", X(i)); guia.setAttribute("x2", X(i));
+      guia.setAttribute("opacity", .55);
+      tip.innerHTML = `<b>${F[i]}</b><br>` + vivos.map(k =>
+        `<span style="color:${COL[k]}">&#9679;</span> ${NOM[k]} ` +
+        fmt(I[k][i]/base[k]*100, 1)).join("<br>");
+      tip.style.opacity = 1;
+      const r = tip.getBoundingClientRect();
+      let x = e.clientX + 16;
+      if (x + r.width > innerWidth - 10) x = e.clientX - r.width - 16;
+      tip.style.left = x + "px";
+      tip.style.top = Math.max(10, e.clientY - r.height/2) + "px";
+    });
+    capa.addEventListener("mouseleave", () => {
+      tip.style.opacity = 0; guia.setAttribute("opacity", 0);
+    });
+
+    $("#desde").value = F[i0]; $("#hasta").value = F[i1];
+    const anios = (new Date(F[i1]) - new Date(F[i0])) / 31557600000;
+    $("#nota-panel").innerHTML =
+      `${i1-i0+1} sesiones, del ${F[i0]} al ${F[i1]}. ` + vivos.map(k => {
+        const t = I[k][i1]/base[k]*100 - 100;
+        return `${NOM[k]} ${t >= 0 ? "+" : ""}${fmt(t,1)} por ciento` +
+               (anios > 1.2 ? ` (${fmt((Math.pow(1+t/100, 1/anios)-1)*100,1)} % al anio)` : "");
+      }).join(", ") + ". Cada curva arranca en 100 el primer dia del tramo.";
+  }
+
+  document.querySelectorAll("[data-rango]").forEach(b => b.onclick = () => {
+    document.querySelectorAll("[data-rango]").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    const d = {todo:1e9, "3a":756, "1a":252, "6m":126}[b.dataset.rango];
+    i1 = F.length - 1; i0 = Math.max(0, i1 - d);
+    pinta();
+  });
+  function porFecha() {
+    const a = $("#desde").value, b = $("#hasta").value;
+    let na = F.findIndex(f => f >= a);
+    let nb = F.length - 1; while (nb > 0 && F[nb] > b) nb--;
+    if (na < 0) na = 0;
+    if (nb > na) { i0 = na; i1 = nb;
+      document.querySelectorAll("[data-rango]").forEach(x => x.classList.remove("on"));
+      pinta(); }
+  }
+  $("#desde").onchange = $("#hasta").onchange = porFecha;
+  pinta();
+  addEventListener("resize", () => { clearTimeout(window._rp);
+    window._rp = setTimeout(pinta, 180); });
+})();
+
+/* ===================== cartera y frontera ===================== */
+(function cartera() {
+  const mu = DER.mu, cov = DER.cov;
+  const evalua = w => {
+    let r = 0, v = 0;
+    SEC.forEach((a, i) => { r += w[i]*mu[a];
+      SEC.forEach((b, j) => v += w[i]*w[j]*cov[a+"|"+b]); });
+    const s = Math.sqrt(Math.max(v, 0));
+    return {r, s, sharpe: s > 0 ? (r - RF)/s : null};
+  };
+
+  /* La nube: generador con semilla fija, de modo que sale igual en cada visita.
+     Se usa mulberry32 y no un congruencial clasico porque JavaScript guarda los
+     numeros en coma flotante de 53 bits: el producto de un congruencial de 31 bits
+     pasa de ese limite, pierde los bits bajos y la serie degenera en unos pocos
+     valores repetidos. Math.imul multiplica en 32 bits enteros y evita eso. */
+  const nube = (() => {
+    let a = 522 >>> 0;
+    const az = () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    /* Pesos de una Dirichlet(1,1,1,1): cuatro exponenciales normalizadas. */
+    const expo = () => -Math.log(1 - az() * 0.9999999);
+    const p = [];
+    for (let n = 0; n < 20000; n++) {
+      const g = SEC.map(expo), t = g[0]+g[1]+g[2]+g[3];
+      const w = [g[0]/t, g[1]/t, g[2]/t, g[3]/t], e = evalua(w);
+      p.push([e.s, e.r, e.sharpe]);
+    }
+    return p;
+  })();
+
+  const PRE = {
+    igual:   [25, 25, 25, 25],
+    cero:    [0, 0, 0, 0],
+    tangente: null, minvar: null
+  };
+  (DATOS.frontera || []).forEach(f => {
+    const w = [num(f["Minería %"] ?? f["Mineria %"]), num(f["Banca %"]),
+               num(f["Construcción %"] ?? f["Construccion %"]), num(f["Consumo %"])];
+    if (/tangente|sharpe/i.test(f.Cartera)) PRE.tangente = w;
+    if (/minima varianza|mínima varianza/i.test(f.Cartera)) PRE.minvar = w;
+  });
+
+  $("#pesos").innerHTML = SEC.map((s, i) =>
+    `<div class="campo">
+       <label>${NOM[s]}: <span class="valor" id="p-${s}">25,0 %</span></label>
+       <input type="range" id="w-${s}" min="0" max="100" step="0.1" value="25"
+              style="accent-color:${COL[s]}">
+     </div>`).join("");
+
+  const mandos = SEC.map(s => $("#w-"+s));
+
+  function pinta() {
+    const bruto = mandos.map(m => parseFloat(m.value));
+    const suma = bruto.reduce((a,b) => a+b, 0);
+    const w = suma > 0 ? bruto.map(v => v/suma) : [0,0,0,0];
+    SEC.forEach((s, i) => $("#p-"+s).textContent = fmt(w[i]*100, 1) + " %");
+
+    const e = suma > 0 ? evalua(w) : {r:null, s:null, sharpe:null};
+    const refT = PRE.tangente ? evalua(PRE.tangente.map(v => v/100)) : null;
+
+    $("#resultado-cartera").innerHTML = [
+      ["Retorno anual", e.r, "%", "--acento", 2],
+      ["Riesgo anual", e.s, "%", null, 2],
+      ["Sharpe", e.sharpe, "", null, 4],
+      ["Suma de pesos", suma > 0 ? 100 : 0, "%", null, 1],
+    ].map(([t, v, u, c, d]) =>
+      `<div class="tarjeta" style="--c:${c ? "var("+c+")" : "var(--borde)"}">
+         <h4>${t}</h4>
+         <div class="cifra" style="font-size:25px">${v == null ? "s. d." : fmt(v, d)}${u ? " "+u : ""}</div>
+       </div>`).join("") +
+      (refT && e.sharpe != null
+        ? `<div class="tarjeta" style="--c:${e.sharpe >= refT.sharpe ? "var(--consumo)" : "var(--borde)"}">
+             <h4>Frente a la tangente</h4>
+             <div class="cifra" style="font-size:25px">${fmt(e.sharpe - refT.sharpe, 4)}</div>
+             <div class="pie">de Sharpe, ${e.sharpe >= refT.sharpe ? "mejor" : "peor"}</div>
+           </div>` : "");
+
+    /* el scatter */
+    const an = 760, al = 360, iz = 62, de = 72, ar = 26, ab = 46;
+    const sv = lienzo("#fig-frontera", an, al);
+    /* El dominio abarca la nube y ademas los cuatro sectores por separado, que
+       quedan fuera de ella: una Dirichlet practicamente nunca da el cien por
+       ciento a un solo activo, de modo que la mineria caeria fuera del grafico. */
+    const sueltos = SEC.map(k => {
+      const d = fila("desempeno", k, "Sector") || {};
+      return [num(d["Volatilidad anual %"]), num(d["Retorno anual %"])];
+    }).filter(p => p[0] != null && p[1] != null);
+    const extra = sueltos.concat(
+      [PRE.tangente, PRE.minvar].filter(Boolean).map(w => {
+        const e2 = evalua(w.map(v => v/100)); return [e2.s, e2.r];
+      }));
+    const xs = nube.map(p => p[0]).concat(extra.map(p => p[0]));
+    const ys = nube.map(p => p[1]).concat(extra.map(p => p[1]));
+    const x0 = Math.min(...xs)*.94, x1 = Math.max(...xs)*1.04;
+    const y0 = Math.min(...ys, RF)*.88, y1 = Math.max(...ys)*1.07;
+    const X = v => iz + (v-x0)/(x1-x0)*(an-iz-de);
+    const Y = v => al-ab - (v-y0)/(y1-y0)*(al-ar-ab);
+
+    for (let t = Math.ceil(y0/5)*5; t <= y1; t += 5) {
+      el("line", {x1:iz, y1:Y(t), x2:an-de, y2:Y(t), stroke:"#2a323d"}, sv);
+      el("text", {x:iz-9, y:Y(t)+4, fill:"#6e7781", "font-size":11, "text-anchor":"end"}, sv)
+        .textContent = t;
+    }
+    for (let t = Math.ceil(x0/5)*5; t <= x1; t += 5) {
+      el("line", {x1:X(t), y1:ar, x2:X(t), y2:al-ab, stroke:"#2a323d"}, sv);
+      el("text", {x:X(t), y:al-ab+17, fill:"#6e7781", "font-size":11,
+                  "text-anchor":"middle"}, sv).textContent = t;
+    }
+
+    /* Veinte mil circulos serian veinte mil nodos y el navegador se arrastraria.
+       Se reparten en bandas de Sharpe y cada banda va en un solo trazo, con
+       segmentos de longitud cero y punta redonda, que dibujan un punto cada uno. */
+    const BANDAS = 14;
+    const maxS = Math.max(...nube.map(p => p[2]));
+    const minS = Math.min(...nube.map(p => p[2]));
+    const cubos = Array.from({length:BANDAS}, () => []);
+    nube.forEach(p => {
+      const t = (p[2]-minS)/(maxS-minS || 1);
+      const b = Math.min(BANDAS-1, Math.floor(t*BANDAS));
+      cubos[b].push(`M${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}l0 0`);
+    });
+    cubos.forEach((c, b) => {
+      if (!c.length) return;
+      const t = (b + .5) / BANDAS;
+      el("path", {d:c.join(""), fill:"none", "stroke-linecap":"round",
+        "stroke-width":2.1, opacity:.5,
+        stroke:`hsl(${(214 - t*186).toFixed(0)} ${(58 + t*22).toFixed(0)}% ${(40 + t*18).toFixed(0)}%)`
+      }, sv);
+    });
+
+    /* los cuatro sectores solos */
+    SEC.forEach(k => {
+      const d = fila("desempeno", k, "Sector") || {};
+      const vx = num(d["Volatilidad anual %"]), vy = num(d["Retorno anual %"]);
+      if (vx == null || vy == null) return;
+      const g = el("g", {}, sv);
+      el("circle", {cx:X(vx), cy:Y(vy), r:6, fill:COL[k], stroke:"#0d1117",
+                    "stroke-width":1.8}, g);
+      el("text", {x:X(vx), y:Y(vy)-11, fill:COL[k], "font-size":11,
+                  "text-anchor":"middle"}, g).textContent = NOM[k];
+      conTip(g, `<b>${NOM[k]} solo</b><br>retorno ${fmt(vy)} %<br>riesgo ${fmt(vx)} %` +
+        `<br>Sharpe ${fmt(num(d.Sharpe), 4)}`);
+    });
+
+    /* las dos carteras de la tabla 8 */
+    [["tangente","Tangente","#ffffff"],["minvar","Minima varianza","#9aa4b2"]]
+      .forEach(([k, et, c]) => {
+        if (!PRE[k]) return;
+        const e2 = evalua(PRE[k].map(v => v/100));
+        const g = el("g", {}, sv);
+        el("path", {d:`M${X(e2.s)} ${Y(e2.r)-7}L${X(e2.s)+7} ${Y(e2.r)}L${X(e2.s)} ${Y(e2.r)+7}L${X(e2.s)-7} ${Y(e2.r)}Z`,
+                    fill:c, stroke:"#0d1117", "stroke-width":1.5}, g);
+        el("text", {x:X(e2.s), y:Y(e2.r)-12, fill:c, "font-size":11,
+                    "text-anchor":"middle"}, g).textContent = et;
+        conTip(g, `<b>${et}</b><br>retorno ${fmt(e2.r)} %<br>riesgo ${fmt(e2.s)} %` +
+          `<br>Sharpe ${fmt(e2.sharpe, 4)}<br>` +
+          SEC.map((s,i) => `${NOM[s]} ${fmt(PRE[k][i],1)} %`).join("<br>"));
+      });
+
+    /* la cartera que armo quien mira */
+    if (suma > 0) {
+      const g = el("g", {}, sv);
+      el("circle", {cx:X(e.s), cy:Y(e.r), r:9, fill:"none", stroke:"#58a6ff",
+                    "stroke-width":2.2}, g);
+      el("circle", {cx:X(e.s), cy:Y(e.r), r:3.2, fill:"#58a6ff"}, g);
+      conTip(g, `<b>Tu cartera</b><br>retorno ${fmt(e.r)} %<br>riesgo ${fmt(e.s)} %` +
+        `<br>Sharpe ${fmt(e.sharpe, 4)}`);
+    }
+
+    el("text", {x:(an+iz)/2, y:al-6, fill:"#6e7781", "font-size":11,
+                "text-anchor":"middle"}, sv)
+      .textContent = "riesgo: desviacion estandar anual, por ciento";
+    el("text", {x:15, y:ar+4, fill:"#6e7781", "font-size":11}, sv)
+      .textContent = "retorno";
+
+    $("#nota-frontera").innerHTML =
+      `Veinte mil carteras con pesos no negativos que suman uno. El color va del azul al
+       naranja segun el Sharpe. Los circulos con nombre son los cuatro sectores por separado,
+       los rombos son las dos carteras de la tabla 8 y el circulo hueco azul es la que acabas
+       de armar. La tabla 8 le da a la tangente un Sharpe de
+       ${fmt(num((DATOS.frontera||[]).find(f => /tangente|sharpe/i.test(f.Cartera))?.Sharpe), 4)};
+       tu cartera ${e.sharpe == null ? "no tiene pesos" : "da " + fmt(e.sharpe, 4)}.
+       Los sectores por separado caen fuera de la nube porque ninguna de las veinte mil
+       carteras pone el cien por ciento en uno solo.`;
+  }
+
+  mandos.forEach(m => m.addEventListener("input", pinta));
+  document.querySelectorAll("[data-pre]").forEach(b => b.onclick = () => {
+    const w = PRE[b.dataset.pre];
+    if (!w) return;
+    mandos.forEach((m, i) => m.value = w[i]);
+    pinta();
+  });
+  pinta();
+})();
+
+/* ===================== comparador ===================== */
+(function comparar() {
+  const a = $("#sec-a"), b = $("#sec-b");
+  const op = SEC.map(s => `<option value="${s}">${NOM[s]}</option>`).join("");
+  a.innerHTML = op; b.innerHTML = op;
+  a.value = "mineria"; b.value = "banca";
+
+  const pAlfa = s => num(fila("desempeno", s, "Sector")?.["p del alfa"]);
+
+  /* [etiqueta, de donde sale, decimales, "mas es mejor" (null: no se marca), sufijo]
+
+     El alfa de Jensen y su p-valor no se marcan en verde. Un alfa positivo solo
+     dice algo si es significativo, y aqui ninguno lo es, de modo que pintar de
+     verde el mas alto daria a entender que ese sector le gano al mercado cuando
+     los datos no lo sostienen. Se muestra el valor con la marca "n. s." al lado.
+     El p-valor tampoco se marca: no mide desempeno, mide evidencia, y un p mas
+     bajo serviria igual para un alfa negativo. */
+  const FILAS = [
+    ["Beta",                 s => BETA[s],                                 4, null],
+    ["Error estandar",       s => EE[s],                                   4, false],
+    ["R cuadrado",           s => R2[s],                                   4, true],
+    ["Retorno anual %",      s => num(fila("desempeno",s,"Sector")?.["Retorno anual %"]), 2, true],
+    ["Riesgo anual %",       s => num(fila("desempeno",s,"Sector")?.["Volatilidad anual %"]), 2, false],
+    ["Costo de capital %",   s => KE[s],                                   2, false],
+    ["Sharpe",               s => num(fila("desempeno",s,"Sector")?.Sharpe), 4, true],
+    ["Treynor %",            s => num(fila("desempeno",s,"Sector")?.["Treynor %"]), 2, true],
+    ["Alfa de Jensen %",     s => num(fila("desempeno",s,"Sector")?.["Alfa de Jensen anual %"]), 2, null,
+                             s => pAlfa(s) != null && pAlfa(s) >= .05 ? " n. s." : ""],
+    ["p del alfa",           s => pAlfa(s),                                3, null],
+    ["Retorno menos Ke %",   s => num(fila("desempeno",s,"Sector")?.["Retorno menos Ke %"]), 2, true],
+    ["Durbin-Watson",        s => num(fila("diagnostico",s,"Especificacion")?.["Durbin-Watson"]), 3, null],
+  ];
+
+  function pinta() {
+    const x = a.value, y = b.value;
+    const cor = num((DATOS.correlaciones.find(f => clave(f[Object.keys(f)[0]]) === clave(x))
+                     || {})[NOM[y]]);
+    $("#enfrentados").innerHTML = [x, y].map((s, lado) => {
+      const otro = lado === 0 ? y : x;
+      return `<div class="cara" style="--c:${COL[s]}">
+        <h4>${NOM[s]}</h4><dl>` + FILAS.map(([et, f, d, mas, suf]) => {
+          const v = f(s), o = f(otro);
+          let c = "";
+          if (mas !== null && v != null && o != null && v !== o)
+            c = ((v > o) === mas) ? "gana" : "pierde";
+          return `<dt>${et}</dt><dd class="${c}">${fmt(v, d)}${suf ? suf(s) : ""}</dd>`;
+        }).join("") + `</dl></div>`;
+    }).join("");
+
+    $("#nota-comparar").innerHTML = x === y
+      ? "Elige dos sectores distintos para que la comparacion diga algo."
+      : `La correlacion diaria entre ${NOM[x]} y ${NOM[y]} es
+         ${cor == null ? "s. d." : fmt(cor, 4)}, de modo que
+         ${cor == null ? "" : cor < .35 ? "se mueven bastante por separado y juntarlos baja el riesgo de la cartera"
+           : cor < .6 ? "se mueven en parte juntos y queda algo de ganancia por diversificar"
+           : "se mueven casi a la par y juntarlos ayuda poco"}. En verde queda el sector que
+         sale mejor en cada indicador; para el riesgo, el costo de capital y el error
+         estandar, mejor es menos. La beta y el Durbin-Watson no se marcan porque no son
+         mejores ni peores por ser mas grandes. El alfa de Jensen tampoco: la marca "n. s."
+         dice que su p-valor pasa de 0,05, de modo que no se puede afirmar que ese sector
+         le haya ganado al mercado aunque la cifra salga positiva. ` + (() => {
+           const sig = SEC.filter(k => pAlfa(k) != null && pAlfa(k) < .05);
+           return !sig.length
+             ? "Ninguno de los cuatro sectores tiene un alfa significativo al 5 por ciento."
+             : `Con un alfa significativo al 5 por ciento: ` +
+               sig.map(k => NOM[k]).join(", ") + ".";
+         })();
+  }
+  a.onchange = b.onchange = pinta;
+  pinta();
+})();
+
+/* ===================== las tablas ===================== */
+(function tablas() {
+  const llaves = Object.keys(TITULOS);
+  let activa = llaves[0], orden = null, asc = true;
+
+  $("#pestanas").innerHTML = llaves.map(k =>
+    `<button data-t="${k}">${esc(TITULOS[k].t)}</button>`).join("");
+
+  function pinta() {
+    const filas0 = DATOS[activa] || [];
+    const cols = filas0.length ? Object.keys(filas0[0]) : [];
+    const q = clave($("#buscar").value);
+    let filas = q ? filas0.filter(f =>
+      cols.some(c => clave(f[c]).includes(q))) : filas0.slice();
+
+    if (orden) filas.sort((p, q2) => {
+      const x = num(p[orden]), y = num(q2[orden]);
+      const r = (x != null && y != null) ? x - y
+              : String(p[orden]).localeCompare(String(q2[orden]), "es");
+      return asc ? r : -r;
+    });
+
+    /* Una columna de texto se lee mejor pegada a la izquierda y una de cifras
+       pegada a la derecha, de modo que se mira el contenido para decidir. */
+    const esTexto = {};
+    cols.forEach(c => esTexto[c] =
+      !filas0.some(f => num(f[c]) != null && String(f[c]).trim() !== ""));
+
+    $("#marco-tabla").innerHTML = !filas.length
+      ? `<div class="vacio">Ninguna fila dice "${esc($("#buscar").value)}"</div>`
+      : `<table><thead><tr>` + cols.map(c =>
+          `<th data-c="${esc(c)}" style="text-align:${esTexto[c] ? "left" : "right"}"
+               class="${orden === c ? (asc ? "asc" : "desc") : ""}">${esc(c)}</th>`
+        ).join("") + `</tr></thead><tbody>` + filas.map(f =>
+          `<tr>` + cols.map(c => {
+            const n = num(f[c]);
+            const txt = n != null && String(f[c]).trim() !== ""
+              ? (Math.abs(n) < 1e-4 && n !== 0 ? n.toExponential(3)
+                 : fmt(n, Number.isInteger(n) ? 0 : 4))
+              : esc(f[c] ?? "");
+            return `<td class="${n != null ? "num" : ""}"
+                        style="text-align:${esTexto[c] ? "left" : "right"}">${txt}</td>`;
+          }).join("") + `</tr>`).join("") + `</tbody></table>`;
+
+    $("#marco-tabla").querySelectorAll("th").forEach(t => t.onclick = () => {
+      const c = t.dataset.c;
+      asc = (orden === c) ? !asc : true;
+      orden = c; pinta();
+    });
+
+    $("#conteo").textContent = filas.length === filas0.length
+      ? `${filas0.length} filas, ${cols.length} columnas`
+      : `${filas.length} de ${filas0.length} filas`;
+    $("#baja-csv").href = "datos/" + TITULOS[activa].a;
+    $("#baja-csv").setAttribute("download", TITULOS[activa].a);
+    $("#nota-tabla").textContent =
+      "Los numeros se muestran con cuatro decimales; el CSV y el Excel llevan la precision completa.";
+    $("#pestanas").querySelectorAll("button").forEach(b =>
+      b.classList.toggle("on", b.dataset.t === activa));
+  }
+
+  $("#pestanas").querySelectorAll("button").forEach(b => b.onclick = () => {
+    activa = b.dataset.t; orden = null; asc = true; pinta();
+  });
+  $("#buscar").addEventListener("input", pinta);
+  pinta();
+})();
+
+/* ===================== archivos ===================== */
+(function archivos() {
+  /* los ZIP por carpeta */
+  $("#zips").innerHTML = (ARBOL || []).map(c => {
+    const z = ZIPS[c.slug];
+    if (!z) return "";
+    return `<a class="descarga" href="${z.url}" download>
+      <span class="tipo">ZIP</span>
+      <span class="cuerpo"><b>${esc(c.n)}</b>
+      <small>${z.archivos} archivos, ${pesa(z.bytes)}</small></span></a>`;
+  }).join("") || `<p class="nota">Los ZIP se generan al correr 06_generar_web.py.</p>`;
+
+  /* los productos: el que no se hallo se muestra apagado, no como enlace roto */
+  $("#productos").innerHTML = (PRODUCTOS || []).map(([t, d, r, hay, mb]) =>
+    hay
+      ? `<a class="descarga" href="${r}" download>
+           <span class="tipo">PDF</span>
+           <span class="cuerpo"><b>${esc(t)}</b>
+           <small>${esc(d)}, ${fmt(mb, 1)} MB</small></span></a>`
+      : `<span class="descarga falta">
+           <span class="tipo">PDF</span>
+           <span class="cuerpo"><b>${esc(t)}</b>
+           <small>todavia no esta en la carpeta de productos</small></span></span>`
+  ).join("");
+
+  /* los datos */
+  $("#datos").innerHTML =
+    `<a class="descarga" href="datos/tablas.xlsx" download>
+       <span class="tipo">XLSX</span>
+       <span class="cuerpo"><b>Las once tablas en Excel</b>
+       <small>una hoja por tabla, con filtros</small></span></a>` +
+    Object.keys(TITULOS).map(k =>
+    `<a class="descarga" href="datos/${TITULOS[k].a}" download>
+       <span class="tipo">CSV</span>
+       <span class="cuerpo"><b>${esc(TITULOS[k].t)}</b>
+       <small>${(DATOS[k]||[]).length} filas</small></span></a>`).join("");
+
+  /* el arbol. El resumen cuenta los archivos de toda la rama, no solo los
+     sueltos en ese nivel, porque una carpeta que solo contiene subcarpetas
+     diria "0 archivos" y no es lo que la gente espera leer. */
+  const total = n => (n.f||[]).length + (n.d||[]).reduce((a,h) => a + total(h), 0);
+  function rama(n, abierta) {
+    const hijos = (n.d||[]).map(h => rama(h, false)).join("") +
+      (n.f||[]).map(f =>
+        `<div class="hoja"><span class="ext">${ext(f.n)}</span>
+         <span>${esc(f.n)}</span><span class="peso">${pesa(f.b)}</span></div>`).join("");
+    const nsub = (n.d||[]).length, narch = total(n);
+    return `<details${abierta ? " open" : ""}>
+      <summary><span class="flecha">&#9654;</span>
+        <span>${esc(n.n)}</span>
+        ${n.ajeno ? '<span class="ajeno">de terceros</span>' : ""}
+        <span class="peso">${nsub ? nsub + (nsub === 1 ? " carpeta, " : " carpetas, ") : ""}${
+          narch} ${narch === 1 ? "archivo" : "archivos"} &middot; ${pesa(n.b)}</span>
+      </summary><div class="dentro">${hijos}</div></details>`;
+  }
+  $("#arbol").innerHTML = (ARBOL || []).map(c =>
+    `<div class="carpeta-raiz">${rama(c, false)}</div>`).join("")
+    || `<p class="nota">El arbol se arma al correr 06_generar_web.py junto a las tres carpetas.</p>`;
+
+  /* el aviso del material de terceros */
+  const cuenta = n => (n.f||[]).length + (n.d||[]).reduce((a,h) => a+cuenta(h), 0);
+  const ajenas = [];
+  (function busca(ns) { ns.forEach(n => {
+    if (n.ajeno) ajenas.push([n.n, cuenta(n)]); else busca(n.d||[]);
+  }); })(ARBOL || []);
+  $("#aviso-ajeno").innerHTML = ajenas.length
+    ? `<b>Lo que esta pagina no reparte.</b> ` + ajenas.map(([n, c]) =>
+        `${n} (${c} archivos)`).join(" y ") + `. Los articulos en ingles son de sus
+       editoriales y las traducciones al espanol son obras derivadas de ellos, de modo que el
+       arbol los lista para que se vea el trabajo hecho pero los ZIP no los incluyen. Cada uno
+       se consulta por su DOI en las referencias del articulo.`
+    : `<b>Nota.</b> El arbol de arriba se armo sin las carpetas de articulos de terceros.`;
+
+  const tot = (ARBOL||[]).reduce((a,c) => a + cuenta(c), 0);
+  const bytes = (ARBOL||[]).reduce((a,c) => a + c.b, 0);
+  $("#pie-datos").innerHTML =
+    `${(DER.fechas||[]).length} sesiones diarias por sector, del ${(DER.fechas||[])[0]} al
+     ${(DER.fechas||[]).slice(-1)[0]}. ${Object.keys(TITULOS).length} tablas y ${tot} archivos
+     en ${(ARBOL||[]).length} carpetas, ${pesa(bytes)} en total. Pagina estatica, sin
+     dependencias externas: todo lo que ves se dibuja en tu navegador con los datos
+     incrustados en este mismo archivo.`;
+})();
+
+/* ===================== bibliografia ===================== */
+(function bibliografia() {
+  const sec = $("#bibliografia");
+  /* Se mira con typeof y no con window.REFS: una variable declarada con const
+     no queda como propiedad de window, de modo que window.REFS seria siempre
+     indefinida y la seccion se borraria aunque los datos esten. */
+  if (typeof REFS === "undefined" || !REFS.length) {
+    sec.remove();
+    const enlace = document.querySelector('.menu a[href="#bibliografia"]');
+    if (enlace) enlace.remove();
+    return;
+  }
+  const con = REFS.filter(r => r.doi).length;
+
+  const otros = REFS.filter(r => !r.doi && r.url).length;
+  $("#sub-bib").innerHTML =
+    `Las ${REFS.length} referencias del articulo, leidas de su propia bibliografia.
+     ${con} llevan DOI` + (otros ? ` y ${otros} un enlace estable del archivo de la
+     revista` : "") + `. Cada enlace lleva a la pagina oficial del articulo en su
+     editorial, con su resumen y sus datos de publicacion; no descarga el PDF, de modo
+     que quien entre vera lo que la editorial permite ver segun su propia licencia.
+     Los articulos en ingles de la carpeta de productos son estos mismos: pertenecen a
+     sus editoriales, y por eso esta pagina enlaza al original en lugar de repartir
+     el archivo.`;
+
+  function pinta() {
+    const q = clave($("#buscar-ref").value);
+    const vis = q ? REFS.filter(r => clave(r.t + " " + (r.doi || "")).includes(q)) : REFS;
+    $("#refs").innerHTML = vis.length
+      ? vis.map(r => `<li>${esc(r.t)}` + (
+            r.doi ? ` <a class="doi" href="https://doi.org/${encodeURI(r.doi)}"
+                        target="_blank" rel="noopener noreferrer"
+                        title="Abre la pagina oficial del articulo en su editorial"
+                     >doi.org/${esc(r.doi)}</a>`
+          : r.url ? ` <a class="doi" href="${esc(r.url)}"
+                        target="_blank" rel="noopener noreferrer"
+                        title="Abre la pagina oficial del articulo"
+                     >${esc(r.url.replace(/^https?:\/\/(www\.)?/, ""))}</a>`
+          : ` <span class="sin">sin enlace</span>`) + `</li>`).join("")
+      : `<li style="padding-left:16px;color:var(--tenue)">Ninguna referencia dice
+         "${esc($("#buscar-ref").value)}"</li>`;
+    $("#conteo-ref").textContent = vis.length === REFS.length
+      ? `${REFS.length} referencias` : `${vis.length} de ${REFS.length}`;
+  }
+  $("#buscar-ref").addEventListener("input", pinta);
+  pinta();
+})();
+
+/* ===================== la portada ===================== */
+(function umbral() {
+  const caja = $("#umbral"), lienzoEsfera = $("#esfera");
+  const ctx = lienzoEsfera.getContext("2d");
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Cada punto es una sesion de la muestra y su color dice que sector rindio
+     mas ese dia. El ganador diario viene calculado desde el panel, una letra
+     por sesion, y no se deduce aqui del indice: ese llega redondeado a dos
+     decimales y en las sesiones de casi empate el redondeo cambia el ganador. */
+  const puntos = [];
+  const cuenta = {}; SEC.forEach(s => cuenta[s] = 0);
+  for (const ch of (DER.gana || "")) {
+    const s = (DER.letra || {})[ch];
+    if (s) { puntos.push(s); cuenta[s]++; }
+  }
+
+  /* Reparto en espiral de Fibonacci: deja los puntos a distancia pareja sobre
+     la esfera, sin los amontonamientos que da una malla de meridianos. */
+  const N = puntos.length;
+  const oro = Math.PI * (3 - Math.sqrt(5));
+  const base = [];
+  for (let i = 0; i < N; i++) {
+    const y = 1 - (i / Math.max(1, N - 1)) * 2;
+    const rad = Math.sqrt(Math.max(0, 1 - y*y));
+    const th = oro * i;
+    base.push([Math.cos(th)*rad, y, Math.sin(th)*rad, COL[puntos[i]]]);
+  }
+
+  let an = 0, al = 0, dpr = 1;
+  function medir() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    an = caja.clientWidth; al = caja.clientHeight;
+    lienzoEsfera.width = an * dpr; lienzoEsfera.height = al * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  const INCL = -0.34;                       /* inclinacion del eje, en radianes */
+  const si = Math.sin(INCL), co = Math.cos(INCL);
+  let giro = 0, vivo = true;
+
+  function cuadro() {
+    if (!vivo) return;
+    ctx.clearRect(0, 0, an, al);
+    const ancha = an >= 900;
+    const R = Math.min(ancha ? an * .46 : an, al) * (ancha ? 0.40 : 0.36);
+    const cx = ancha ? an * 0.715 : an / 2, cy = al / 2;
+    const sg = Math.sin(giro), cg = Math.cos(giro);
+
+    /* Un resplandor muy tenue detras sugiere el volumen que un punteado solo
+       no alcanza a dar. */
+    const halo = ctx.createRadialGradient(cx, cy, R*0.1, cx, cy, R*1.5);
+    halo.addColorStop(0, "rgba(88,166,255,.085)");
+    halo.addColorStop(.55, "rgba(88,166,255,.03)");
+    halo.addColorStop(1, "rgba(88,166,255,0)");
+    ctx.fillStyle = halo;
+    ctx.fillRect(cx - R*1.5, cy - R*1.5, R*3, R*3);
+
+    /* Se ordenan por profundidad para que los de atras queden detras. */
+    const vistos = [];
+    for (let i = 0; i < base.length; i++) {
+      const [x0, y0, z0, c] = base[i];
+      const x1 = x0*cg - z0*sg, z1 = x0*sg + z0*cg;      /* giro sobre el eje Y */
+      const y2 = y0*co - z1*si, z2 = y0*si + z1*co;      /* inclinacion */
+      vistos.push([x1, y2, z2, c]);
+    }
+    vistos.sort((a, b) => a[2] - b[2]);
+
+    for (let i = 0; i < vistos.length; i++) {
+      const [x, y, z, c] = vistos[i];
+      const p = 1 / (1 + z * 0.42);                       /* algo de perspectiva */
+      const px = cx + x * R * p, py = cy + y * R * p;
+      /* La sensacion de esfera viene de aqui: los puntos de atras quedan muy
+         pequenos y casi apagados, y los de delante grandes y vivos. Con tamano
+         y opacidad parejos el conjunto se ve como un disco plano. */
+      const t = (z + 1) / 2;                              /* 0 detras, 1 delante */
+      const f = t * t;                                    /* la curva acentua el frente */
+      ctx.globalAlpha = 0.07 + f * 0.86;
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      ctx.arc(px, py, (0.45 + f * 2.15) * p, 0, 6.2832);
+      ctx.fill();
+      if (t > .93) {                                      /* brillo en el borde frontal */
+        ctx.globalAlpha = (t - .93) * 3.4;
+        ctx.beginPath();
+        ctx.arc(px, py, (1.5 + f * 3.4) * p, 0, 6.2832);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    if (!quieto) { giro += 0.0022; requestAnimationFrame(cuadro); }
+  }
+
+  medir(); cuadro();
+  addEventListener("resize", () => { medir(); if (quieto) cuadro(); });
+
+  const orden = SEC.slice().sort((a, b) => cuenta[b] - cuenta[a]);
+  $("#umbral-pie").innerHTML =
+    `Cada punto es una de las <b>${fmt(N, 0)} sesiones</b> con retorno de la muestra, y su
+     color dice que sector rindio mas ese dia: ` +
+    orden.map(s => `<b style="color:${COL[s]}">${NOM[s]}</b> ${cuenta[s]}`).join(" &middot; ");
+
+  function entrar() {
+    caja.classList.add("fuera");
+    setTimeout(() => { vivo = false; caja.remove(); }, 800);
+    document.body.style.overflow = "";
+  }
+  document.body.style.overflow = "hidden";
+  $("#entrar").onclick = entrar;
+  addEventListener("keydown", e => {
+    if (caja.isConnected && (e.key === "Enter" || e.key === "Escape" || e.key === " ")) {
+      e.preventDefault(); entrar();
+    }
+  }, {once:false});
+  /* Quien llega con un ancla en la direccion (#tablas, por ejemplo) ya sabe a
+     que viene, de modo que no se le pone la portada por delante. */
+  if (location.hash && document.querySelector(location.hash)) entrar();
+})();
+
+/* ===================== menu activo ===================== */
+(function menu() {
+  const ids = [...document.querySelectorAll(".menu a")].map(a => a.getAttribute("href"));
+  const obs = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) document.querySelectorAll(".menu a").forEach(a =>
+      a.classList.toggle("activo", a.getAttribute("href") === "#" + e.target.id));
+  }), {rootMargin:"-45% 0px -50% 0px"});
+  ids.forEach(i => { const n = document.querySelector(i); if (n) obs.observe(n); });
 })();
 </script>
 </body>

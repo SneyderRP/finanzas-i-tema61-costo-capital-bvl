@@ -1,0 +1,5 @@
+Especificacion,R2,Durbin-Watson,Jarque-Bera,p-valor JB,Asimetria,Curtosis,N
+Mineria,0.7657,2.051,2104.55,0.0,-0.0298,10.417,918
+Banca,0.5881,2.1139,323.8,0.0,-0.1267,5.898,918
+Consumo,0.4186,1.8779,1969.67,0.0,0.8339,9.979,918
+Construccion,0.3985,2.0331,7640.36,0.0,0.6099,17.08,918

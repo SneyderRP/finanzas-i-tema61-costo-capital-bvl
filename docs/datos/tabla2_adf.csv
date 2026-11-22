@@ -1,0 +1,5 @@
+Variable,p-valor ADF,Orden
+Y_retorno_sector,0.0,I(0)
+X1_retorno_mercado,0.0,I(0)
+X2_treasury_10a,0.0,I(0)
+X3_tipo_cambio,0.0,I(0)
