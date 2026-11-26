@@ -2,909 +2,3480 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Costo de capital por sector en la BVL</title>
-<meta name="description" content="Betas sectoriales y costo de capital en la Bolsa de Valores de Lima, 2021-2026. Meglinho Sneyder Rojas Poma, UNCP.">
+<meta name="description" content="Betas y costo de capital de cuatro sectores de la Bolsa de Valores de Lima: mineria, banca, consumo y construccion. Periodo 2021-2026.">
+<meta name="author" content="Meglinho Sneyder Rojas Poma">
 <style>
 :root{
-  --bg:#080c12; --panel:#111924; --panel2:#0d141d; --line:#1e2b3a;
-  --fg:#e9eff7; --muted:#8396ab; --accent:#4da3ff; --accent2:#7c5cff;
-  --mineria:#5b9bd5; --banca:#ffa94d; --construccion:#f06565; --consumo:#2ec4a0;
-  --ok:#2ec4a0; --warn:#ffa94d;
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --serif:Georgia,"Times New Roman",serif;
-  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
-  color-scheme:dark;
+  --fondo:#0d1117; --panel:#151b23; --panel2:#1b222c; --borde:#2a323d;
+  --texto:#e6edf3; --suave:#9aa4b2; --tenue:#6e7781;
+  --mineria:#e8a33d; --banca:#4ea1e8; --construccion:#9b7fe0; --consumo:#4fc9a0;
+  --acento:#58a6ff; --alerta:#f0883e;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:var(--bg); color:var(--fg); font-family:var(--sans);
-  line-height:1.55; -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-.wrap{
-  max-width:1120px; margin:0 auto;
-  padding-left:max(18px,env(safe-area-inset-left,0px));
-  padding-right:max(18px,env(safe-area-inset-right,0px));
-}
-a{color:var(--accent); text-decoration:none}
-a:hover{text-decoration:underline}
-h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.015em}
-button{font-family:inherit}
-:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
 
-/* ---------- cabecera ---------- */
-.top{
-  position:sticky; top:0; z-index:40; backdrop-filter:blur(12px);
-  background:rgba(8,12,18,.86); border-bottom:1px solid var(--line);
+/* ---------- umbral: la portada que se ve antes de entrar ---------- */
+#umbral{
+  position:fixed;inset:0;z-index:200;background:var(--fondo);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .72s ease,visibility .72s;
 }
-.top .wrap{display:flex; align-items:center; gap:18px; height:54px}
-.brand{font-weight:600; font-size:.9rem; white-space:nowrap}
-.brand span{color:var(--muted); font-weight:400}
-.nav{display:flex; gap:4px; margin-left:auto; overflow-x:auto; scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav a{
-  color:var(--muted); font-size:.82rem; padding:6px 11px; border-radius:7px;
-  white-space:nowrap; transition:color .18s,background .18s;
+#umbral.fuera{opacity:0;visibility:hidden}
+#esfera{
+  position:absolute;inset:0;width:100%;height:100%;
+  /* La esfera se aparta del centro en pantallas anchas para que el texto
+     no quede encima de los puntos y los dos se lean sin estorbarse. */
 }
-.nav a:hover,.nav a.on{color:var(--fg); background:var(--panel); text-decoration:none}
+.umbral-texto{
+  position:relative;z-index:2;text-align:center;padding:0 26px;max-width:720px;
+  animation:sube .9s .25s both ease-out;
+}
+/* En pantalla ancha el texto se va a la izquierda y la esfera queda a la
+   derecha, de modo que ninguno de los dos se lee por encima del otro. El
+   canvas sigue ocupando todo: lo que se desplaza es el centro que dibuja. */
+@media(min-width:900px){
+  /* #umbral es flex en columna, de modo que align-items manda en horizontal y
+     justify-content en vertical, al reves de lo que sugiere el nombre. */
+  #umbral{align-items:flex-start;justify-content:center}
+  .umbral-texto{
+    text-align:left;margin-left:max(42px,7vw);max-width:min(600px,48vw);padding:0;
+  }
+  .umbral-texto h1,.umbral-bajada,.umbral-firma{text-shadow:none}
+  .umbral-pie{text-align:left;padding-left:max(42px,7vw)}
+}
+@keyframes sube{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.umbral-texto h1{
+  font-size:clamp(25px,4.3vw,42px);margin:0 0 20px;line-height:1.2;
+  text-shadow:0 2px 26px rgba(13,17,23,.92);
+}
+.umbral-bajada{
+  color:var(--suave);font-size:16px;margin:0 0 30px;
+  text-shadow:0 2px 20px rgba(13,17,23,.92);
+}
+.umbral-btn{
+  background:rgba(88,166,255,.1);border:1px solid var(--acento);color:var(--acento);
+  border-radius:999px;padding:12px 34px;font:550 15px inherit;cursor:pointer;
+  font-family:inherit;transition:background .16s,transform .16s;
+}
+.umbral-btn:hover{background:rgba(88,166,255,.2);transform:translateY(-1px)}
+.umbral-btn:focus-visible{outline:2px solid var(--acento);outline-offset:3px}
+.umbral-firma{
+  color:var(--tenue);font-size:12.5px;margin:30px 0 0;line-height:1.8;
+  text-shadow:0 2px 16px rgba(13,17,23,.92);
+}
+.umbral-pie{
+  position:absolute;bottom:22px;left:0;right:0;z-index:2;text-align:center;
+  color:var(--tenue);font-size:11.5px;margin:0;padding:0 26px;line-height:1.7;
+}
+.umbral-pie b{color:var(--suave);font-weight:500}
+/* En pantalla estrecha no hay sitio para poner la esfera al lado, de modo que
+   queda detras del texto. Ahi se atenua para que haga de fondo y no compita
+   con las letras. */
+@media(max-width:899px){
+  #esfera{opacity:.4}
+}
+@media(max-width:640px){
+  .umbral-firma{margin-top:22px}
+  .umbral-pie{font-size:10.5px;bottom:14px}
+  .umbral-texto h1{font-size:clamp(22px,6.4vw,30px)}
+  .umbral-bajada{font-size:14.5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .umbral-texto{animation:none}
+  #umbral{transition:none}
+}
+body{
+  margin:0;background:var(--fondo);color:var(--texto);
+  font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--acento);text-decoration:none}
+a:hover{text-decoration:underline}
+.caja{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ---------- menu lateral ---------- */
+/* La navegacion vive a la izquierda y agrupada por temas, de modo que de un
+   vistazo se ve todo lo que hay sin desplegar nada. El contenido ocupa el
+   resto. En pantalla estrecha el lateral pasa a ser una tira horizontal. */
+:root{--lateral:252px}
+.marco-app{display:flex;min-height:100vh}
+.lateral{
+  width:var(--lateral);flex:none;background:#10161e;
+  border-right:1px solid var(--borde);
+  position:fixed;top:0;bottom:0;left:0;overflow-y:auto;z-index:40;
+  display:flex;flex-direction:column;
+}
+.lateral::-webkit-scrollbar{width:7px}
+.lateral::-webkit-scrollbar-thumb{background:#2a323d;border-radius:4px}
+.contenido{margin-left:var(--lateral);flex:1;min-width:0}
+
+.lat-marca{
+  padding:18px 18px 15px;border-bottom:1px solid var(--borde);
+  background:none;border-left:none;border-right:none;border-top:none;
+  color:var(--texto);cursor:pointer;font-family:inherit;text-align:left;width:100%;
+}
+.lat-marca:hover{background:#151c25}
+.lat-marca b{display:block;font-size:13.5px;font-weight:650;line-height:1.35}
+.lat-marca small{display:block;color:var(--tenue);font-size:11.5px;margin-top:3px}
+
+.lat-grupo{padding:16px 0 4px}
+.lat-grupo h5{
+  margin:0 0 7px;padding:0 18px;font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--tenue);font-weight:600;
+}
+.lat-item{
+  display:flex;align-items:center;gap:10px;width:100%;
+  background:none;border:none;border-left:2px solid transparent;
+  color:var(--suave);font:13.5px inherit;font-family:inherit;
+  padding:8px 18px;cursor:pointer;text-align:left;
+}
+.lat-item:hover{background:#151c25;color:var(--texto)}
+.lat-item.on{
+  background:rgba(88,166,255,.08);border-left-color:var(--c,var(--acento));
+  color:var(--texto);font-weight:550;
+}
+.lat-item .pepita{
+  width:7px;height:7px;border-radius:50%;background:var(--c,var(--tenue));
+  flex:none;opacity:.75;
+}
+.lat-item .cuanto{
+  margin-left:auto;font:10.5px var(--mono);color:var(--tenue);flex:none;
+}
+
+/* el filtro global, al pie del lateral */
+.lat-filtro{
+  margin-top:auto;padding:16px 18px 20px;border-top:1px solid var(--borde);
+  background:#0d131a;
+}
+.lat-filtro h5{
+  margin:0 0 11px;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--tenue);font-weight:600;
+}
+.lat-filtro .rango{
+  display:flex;justify-content:space-between;font:11.5px var(--mono);
+  color:var(--acento);margin:0 0 7px;
+}
+.lat-filtro .doble{position:relative;height:22px}
+.lat-filtro input[type=range]{
+  position:absolute;left:0;width:100%;margin:0;pointer-events:none;background:none;
+}
+.lat-filtro input[type=range]::-webkit-slider-thumb{pointer-events:auto}
+.lat-filtro input[type=range]::-moz-range-thumb{pointer-events:auto}
+.lat-filtro .riel{
+  position:absolute;top:9px;left:0;right:0;height:4px;border-radius:3px;
+  background:var(--panel2);
+}
+.lat-filtro .tramo{
+  position:absolute;top:9px;height:4px;border-radius:3px;background:var(--acento);
+  opacity:.75;
+}
+.lat-filtro .pie-filtro{
+  font-size:11px;color:var(--tenue);margin:9px 0 0;line-height:1.5;
+}
+.lat-filtro .btn{width:100%;margin-top:9px;font-size:12px;padding:5px}
+
+@media(max-width:900px){
+  :root{--lateral:0px}
+  .marco-app{display:block}
+  .lateral{
+    position:sticky;top:0;width:auto;height:auto;bottom:auto;
+    border-right:none;border-bottom:1px solid var(--borde);
+    flex-direction:row;align-items:center;gap:4px;overflow-x:auto;overflow-y:hidden;
+    padding:0 8px;
+  }
+  .lateral .lat-grupo{display:flex;align-items:center;padding:0;gap:3px}
+  .lateral .lat-grupo h5{display:none}
+  .lat-marca{
+    border:none;padding:11px 12px;width:auto;flex:none;border-right:1px solid var(--borde);
+  }
+  .lat-marca small{display:none}
+  .lat-item{
+    width:auto;white-space:nowrap;padding:11px 11px;border-left:none;
+    border-bottom:2px solid transparent;
+  }
+  .lat-item.on{border-left:none;border-bottom-color:var(--c,var(--acento));background:none}
+  .lat-item .cuanto,.lat-item .pepita{display:none}
+  .lat-filtro{
+    margin:0;flex:none;border-top:none;border-left:1px solid var(--borde);
+    padding:8px 12px;min-width:210px;background:none;
+  }
+  .lat-filtro h5,.lat-filtro .pie-filtro,.lat-filtro .btn{display:none}
+  .contenido{margin-left:0}
+}
+
+/* ---------- barra (queda para compatibilidad) ---------- */
+.barra{
+  position:sticky;top:0;z-index:50;background:rgba(13,17,23,.93);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--borde);
+}
+.barra .caja{display:flex;align-items:center;gap:26px;height:56px}
+.marca{
+  font-weight:650;font-size:14px;white-space:nowrap;background:none;border:none;
+  color:var(--texto);cursor:pointer;font-family:inherit;padding:0;
+}
+.marca:hover{color:var(--acento)}
+.marca:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:4px}
+.marca span{color:var(--tenue);font-weight:400}
+.menu{display:flex;gap:20px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.menu::-webkit-scrollbar{display:none}
+.menu a{color:var(--suave);font-size:13.5px;white-space:nowrap;padding:4px 0;border-bottom:2px solid transparent}
+.menu a:hover,.menu a.activo{color:var(--texto);border-color:var(--acento);text-decoration:none}
 
 /* ---------- portada ---------- */
-.hero{padding:54px 0 38px; border-bottom:1px solid var(--line); position:relative; overflow:hidden}
-.hero::before{
-  content:""; position:absolute; top:-180px; right:-140px; width:460px; height:460px;
-  background:radial-gradient(circle,rgba(77,163,255,.15),transparent 68%); pointer-events:none;
+.portada{padding:68px 0 54px;border-bottom:1px solid var(--borde)}
+.etiqueta{
+  display:inline-block;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--acento);border:1px solid rgba(88,166,255,.32);border-radius:999px;
+  padding:4px 13px;margin-bottom:20px;
 }
-.eyebrow{font-size:.7rem; letter-spacing:.17em; text-transform:uppercase; color:var(--accent); font-weight:600}
-.hero h1{font-size:clamp(1.7rem,4.6vw,2.9rem); line-height:1.1; margin:.5rem 0 .7rem; max-width:17ch}
-.hero .lead{color:var(--muted); font-size:1rem; max-width:62ch}
-.hero .lead b{color:var(--fg); font-weight:600}
-.autor{margin-top:20px; font-size:.86rem; color:var(--muted)}
-.autor b{color:var(--fg); font-weight:600}
+h1{font-size:clamp(27px,4.6vw,44px);line-height:1.17;margin:0 0 18px;font-weight:650;letter-spacing:-.02em}
+.bajada{font-size:17px;color:var(--suave);max-width:730px;margin:0 0 26px}
+.firma{font-size:13.5px;color:var(--tenue);line-height:1.9}
+.firma b{color:var(--suave);font-weight:550}
 
-.kpis{display:grid; gap:12px; margin-top:30px; grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
-.kpi{
-  background:linear-gradient(158deg,var(--panel),var(--panel2));
-  border:1px solid var(--line); border-radius:13px; padding:17px 19px;
-  position:relative; overflow:hidden; transition:transform .22s,border-color .22s;
+/* ---------- vistas: cada seccion es una pantalla aparte ---------- */
+/* No se usa una pagina larga por la que bajar: solo esta visible la vista
+   activa, y se pasa de una a otra sin arrastrar las demas por delante. */
+.vista{display:none}
+.vista.activa{display:block;animation:entra .3s ease-out}
+@keyframes entra{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:none}
 }
-.kpi::after{content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--accent)}
-.kpi:hover{transform:translateY(-2px); border-color:var(--accent)}
-.kpi .lbl{font-size:.69rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em}
-.kpi .val{font-family:var(--serif); font-size:clamp(1.5rem,3.6vw,2.05rem); margin-top:5px; line-height:1.08; font-variant-numeric:tabular-nums}
-.kpi .sub{font-size:.74rem; color:var(--muted); margin-top:3px}
+@media(prefers-reduced-motion:reduce){.vista.activa{animation:none}}
+
+/* el indice: la pantalla desde la que se entra a cada seccion */
+#indice{padding:42px 0 60px}
+.tarjetas-indice{
+  display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));
+  margin:28px 0 0;
+}
+/* las tres carpetas de la entrega, como titulos del indice */
+.carpeta-indice{margin:30px 0 0}
+.carpeta-indice .tarjetas-indice{margin:12px 0 0}
+.carpeta-tit{
+  display:flex;align-items:center;gap:9px;margin:0;padding:0 0 9px;
+  border-bottom:1px solid var(--borde);
+  font-size:13.5px;font-weight:600;letter-spacing:.055em;text-transform:uppercase;
+  color:var(--suave);
+}
+.carpeta-ico{font-size:14.5px;filter:grayscale(.3)}
+.carpeta-n{
+  margin-left:auto;font:11.5px var(--mono);color:var(--tenue);
+  letter-spacing:0;text-transform:none;
+}
+.puerta{
+  background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+  padding:20px;cursor:pointer;text-align:left;font-family:inherit;color:var(--texto);
+  display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
+  transition:border-color .16s,transform .16s,background .16s;
+}
+.puerta::after{
+  content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--c);
+  opacity:.55;transition:opacity .16s;
+}
+.puerta:hover{border-color:var(--c);transform:translateY(-2px);background:var(--panel2)}
+.puerta:hover::after{opacity:1}
+.puerta:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+.puerta b{font-size:15.5px;font-weight:600}
+.puerta small{color:var(--suave);font-size:12.8px;line-height:1.55}
+.puerta .cuantos{
+  margin-top:auto;padding-top:9px;font:11.5px var(--mono);color:var(--tenue);
+}
+.puerta .num{
+  position:absolute;top:15px;right:16px;font:600 11px var(--mono);
+  color:var(--tenue);opacity:.65;
+}
+
+/* pie de vista: salir y pasar a la siguiente */
+.pasos{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin:36px 0 0;padding:20px 0 0;border-top:1px solid var(--borde);
+}
+.pasos .btn{padding:9px 16px}
+.pasos .hueco{flex:1}
+.migas{
+  display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--tenue);
+  margin:0 0 6px;
+}
+.migas button{
+  background:none;border:none;color:var(--acento);cursor:pointer;
+  font:inherit;font-size:12.5px;padding:0;
+}
+.migas button:hover{text-decoration:underline}
 
 /* ---------- secciones ---------- */
-section{padding:46px 0; border-bottom:1px solid var(--line)}
-section:last-of-type{border-bottom:none}
-h2{font-size:clamp(1.15rem,2.4vw,1.42rem)}
-.snote{color:var(--muted); font-size:.89rem; margin:.5rem 0 20px; max-width:76ch}
-.snote b{color:var(--fg); font-weight:600}
-.card{background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:20px}
-.grid2{display:grid; gap:15px; grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+section{padding:52px 0;border-bottom:1px solid var(--borde)}
+section.vista{border-bottom:none;padding:38px 0 0;min-height:calc(100vh - 56px)}
+h2{font-size:23px;margin:0 0 9px;font-weight:620;letter-spacing:-.01em}
+h3{font-size:15.5px;margin:30px 0 11px;font-weight:600;color:var(--texto)}
+.sub{color:var(--suave);font-size:14.5px;max-width:790px;margin:0 0 26px}
+p{margin:0 0 14px}
 
-.chart{position:relative; width:100%}
-.chart svg{display:block; width:100%; height:auto; overflow:visible}
-.tip{
-  position:absolute; pointer-events:none; opacity:0; z-index:20;
-  background:#050a10; border:1px solid var(--line); border-radius:9px;
-  padding:8px 11px; font-size:.78rem; white-space:pre; line-height:1.45;
-  box-shadow:0 10px 28px rgba(0,0,0,.7); transition:opacity .13s;
+/* ---------- tarjetas ---------- */
+.rejilla{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.tarjeta{
+  background:var(--panel);border:1px solid var(--borde);border-radius:11px;
+  padding:19px;position:relative;overflow:hidden;
 }
-.legend{display:flex; flex-wrap:wrap; gap:7px; margin-top:14px}
-.chip{
-  display:inline-flex; align-items:center; gap:7px; font-size:.78rem; color:var(--muted);
-  background:var(--panel2); border:1px solid var(--line); border-radius:999px;
-  padding:5px 12px; cursor:pointer; transition:.18s;
-}
-.chip:hover{color:var(--fg); border-color:var(--accent)}
-.chip.off{opacity:.38}
-.dot{width:9px; height:9px; border-radius:50%; flex:none}
+.tarjeta::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--c,var(--borde))}
+.tarjeta h4{margin:0 0 3px;font-size:13px;font-weight:600;color:var(--suave);letter-spacing:.02em}
+.cifra{font:600 30px/1.1 var(--mono);letter-spacing:-.02em;margin:7px 0 2px;color:var(--c,var(--texto))}
+.pie{font-size:12px;color:var(--tenue);font-family:var(--mono)}
 
-/* ---------- simulador ---------- */
-.sim{background:linear-gradient(140deg,rgba(77,163,255,.07),transparent); border-color:rgba(77,163,255,.3)}
-.ctrl{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:18px}
-.ctrl label{font-size:.82rem; color:var(--muted); white-space:nowrap}
-.ctrl output{
-  font-family:var(--mono); font-size:1.02rem; color:var(--accent); font-weight:600;
-  min-width:74px; text-align:right; font-variant-numeric:tabular-nums;
+/* ---------- paneles ---------- */
+.lienzo{
+  background:var(--panel);border:1px solid var(--borde);border-radius:12px;
+  padding:22px;margin:18px 0;
 }
+.lienzo.compacto{padding:16px}
+.lienzo{position:relative}
+.baja-fig{
+  position:absolute;top:14px;right:14px;font-size:11.5px;padding:4px 11px;
+  opacity:0;transition:opacity .16s;
+}
+.lienzo:hover .baja-fig,.baja-fig:focus-visible{opacity:1}
+@media(hover:none){.baja-fig{opacity:.75}}
+.titulo-fig{font-size:13.5px;font-weight:600;color:var(--suave);margin:0 0 3px}
+.nota{font-size:12.5px;color:var(--tenue);margin:11px 0 0;line-height:1.6}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- controles ---------- */
+.controles{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:0 0 18px}
+.campo{display:flex;flex-direction:column;gap:5px;min-width:160px}
+.campo label{font-size:12px;color:var(--suave);font-weight:550}
 input[type=range]{
-  -webkit-appearance:none; appearance:none; flex:1; min-width:170px; height:5px;
-  background:var(--line); border-radius:3px; outline:none;
+  -webkit-appearance:none;appearance:none;height:5px;border-radius:3px;
+  background:var(--panel2);outline:none;width:100%;cursor:pointer;
 }
 input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none; width:19px; height:19px; border-radius:50%;
-  background:var(--accent); cursor:grab; border:3px solid var(--bg);
-  box-shadow:0 0 0 1px var(--accent);
+  -webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+  background:var(--acento);cursor:pointer;border:2px solid var(--fondo);
 }
 input[type=range]::-moz-range-thumb{
-  width:19px; height:19px; border-radius:50%; background:var(--accent);
-  cursor:grab; border:3px solid var(--bg); box-shadow:0 0 0 1px var(--accent);
+  width:15px;height:15px;border-radius:50%;background:var(--acento);
+  cursor:pointer;border:2px solid var(--fondo);
 }
+select,input[type=text],input[type=date],input[type=search]{
+  background:var(--panel2);border:1px solid var(--borde);color:var(--texto);
+  border-radius:7px;padding:7px 10px;font-size:13.5px;font-family:inherit;outline:none;
+}
+select:focus,input:focus{border-color:var(--acento)}
 .btn{
-  background:var(--panel2); color:var(--fg); border:1px solid var(--line);
-  border-radius:8px; padding:7px 14px; font-size:.8rem; cursor:pointer; transition:.18s;
+  background:var(--panel2);border:1px solid var(--borde);color:var(--suave);
+  border-radius:7px;padding:6px 13px;font-size:13px;cursor:pointer;font-family:inherit;
+  transition:border-color .12s,color .12s;
 }
-.btn:hover{border-color:var(--accent); color:var(--accent)}
+.btn:hover{color:var(--texto);border-color:var(--tenue)}
+.btn.on{background:rgba(88,166,255,.13);border-color:var(--acento);color:var(--acento)}
+.valor{font:600 14px var(--mono);color:var(--acento)}
+
+/* ---------- reproductor ---------- */
+/* La serie se dibuja avanzando en el tiempo, como un video, porque ver
+   aparecer las curvas dice mas de lo que paso que verlas ya terminadas. */
+.reproductor{
+  display:flex;align-items:center;gap:12px;margin:0 0 16px;
+  background:var(--panel2);border:1px solid var(--borde);border-radius:9px;
+  padding:9px 13px;
+}
+.btn-play{
+  width:34px;height:34px;flex:none;border-radius:50%;cursor:pointer;
+  background:rgba(88,166,255,.14);border:1px solid var(--acento);color:var(--acento);
+  font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;
+  font-family:inherit;transition:background .14s;
+}
+.btn-play:hover{background:rgba(88,166,255,.26)}
+.btn-play.sonando{font-size:14px}
+.reproductor input[type=range]{flex:1;min-width:90px}
+.p-fecha{
+  font:12.5px var(--mono);color:var(--acento);min-width:84px;text-align:right;flex:none;
+}
+#p-vel,.rp-vel{min-width:44px;font-family:var(--mono);font-size:12px;padding:5px 9px}
+.reproductor .p-fecha{min-width:150px}
+@media(max-width:620px){
+  .reproductor{flex-wrap:wrap}
+  .reproductor input[type=range]{order:3;flex-basis:100%}
+}
+
+/* ---------- leyenda ---------- */
+.leyenda{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 0}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;
+  background:var(--panel2);border:1px solid var(--borde);border-radius:999px;
+  padding:4px 12px;cursor:pointer;user-select:none;transition:opacity .14s;
+}
+.chip.off{opacity:.32}
+.punto{width:9px;height:9px;border-radius:50%;flex:none}
 
 /* ---------- tablas ---------- */
-.tw{overflow-x:auto; -webkit-overflow-scrolling:touch}
-table{width:100%; border-collapse:collapse; font-size:.85rem; min-width:560px}
-th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
-th:first-child,td:first-child{text-align:left; position:sticky; left:0; background:var(--panel)}
+.marco{overflow-x:auto;border:1px solid var(--borde);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 13px;text-align:right;border-bottom:1px solid var(--borde);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
 thead th{
-  color:var(--muted); font-weight:600; font-size:.7rem; text-transform:uppercase;
-  letter-spacing:.08em; cursor:pointer; user-select:none; background:var(--panel);
+  background:var(--panel2);color:var(--suave);font-weight:600;font-size:12px;
+  position:sticky;top:0;cursor:pointer;user-select:none;
 }
-thead th:hover{color:var(--fg)}
-thead th::after{content:"\2195"; opacity:.26; margin-left:6px; font-size:.85em}
-thead th.asc::after{content:"\2191"; opacity:1; color:var(--accent)}
-thead th.desc::after{content:"\2193"; opacity:1; color:var(--accent)}
-tbody td{font-variant-numeric:tabular-nums}
-tbody tr{transition:background .15s}
-tbody tr:hover{background:rgba(77,163,255,.06)}
+thead th:hover{color:var(--texto)}
+thead th::after{content:"";opacity:.4;font-size:9px;margin-left:5px}
+thead th.asc::after{content:"\25B2";opacity:.85}
+thead th.desc::after{content:"\25BC";opacity:.85}
 tbody tr:last-child td{border-bottom:none}
-.pos{color:var(--ok)} .neg{color:var(--construccion)}
+tbody tr:hover{background:rgba(88,166,255,.055)}
+td.num{font-family:var(--mono);font-size:12.5px}
+.vacio{padding:26px;text-align:center;color:var(--tenue);font-size:13.5px}
+
+/* ---------- pestanas ---------- */
+.pestanas{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 15px}
+.pestanas button{
+  background:none;border:1px solid var(--borde);color:var(--suave);
+  border-radius:7px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;
+}
+.pestanas button:hover{color:var(--texto)}
+.pestanas button.on{background:var(--panel2);border-color:var(--acento);color:var(--acento)}
+
+/* ---------- arbol ---------- */
+.arbol{font-size:13.5px}
+.arbol details{margin:0}
+.arbol summary{
+  cursor:pointer;padding:7px 10px;border-radius:7px;display:flex;
+  align-items:center;gap:9px;list-style:none;
+}
+.arbol summary::-webkit-details-marker{display:none}
+.arbol summary:hover{background:var(--panel2)}
+.arbol summary .flecha{
+  color:var(--tenue);font-size:10px;transition:transform .14s;flex:none;width:9px;
+}
+.arbol details[open]>summary .flecha{transform:rotate(90deg)}
+.arbol .dentro{margin-left:19px;border-left:1px solid var(--borde);padding-left:9px}
+.arbol .hoja{
+  padding:5px 10px;display:flex;align-items:center;gap:9px;
+  color:var(--suave);border-radius:6px;
+}
+.arbol .hoja:hover{background:rgba(255,255,255,.028)}
+.arbol .peso{margin-left:auto;font:11.5px var(--mono);color:var(--tenue);flex:none}
+.arbol .ext{
+  font:10px var(--mono);text-transform:uppercase;color:var(--tenue);
+  border:1px solid var(--borde);border-radius:4px;padding:1px 5px;flex:none;min-width:38px;
+  text-align:center;
+}
+.arbol .ajeno{
+  font-size:10.5px;color:var(--alerta);border:1px solid rgba(240,136,62,.3);
+  border-radius:4px;padding:1px 6px;flex:none;
+}
+.carpeta-raiz{
+  background:var(--panel);border:1px solid var(--borde);border-radius:10px;
+  padding:9px;margin:0 0 11px;
+}
+
+/* ---------- mapa de carpetas ---------- */
+.mapa-carpetas{display:grid;gap:16px;grid-template-columns:1fr 1fr;align-items:start}
+@media(max-width:900px){.mapa-carpetas{grid-template-columns:1fr}}
+#fig-sunburst path{cursor:pointer;transition:opacity .12s}
+#fig-sunburst path:hover{opacity:.82}
+.detalle-carpeta{
+  background:var(--panel);border:1px solid var(--borde);border-radius:11px;padding:19px;
+  border-top:3px solid var(--c,var(--acento));min-height:200px;
+}
+.detalle-carpeta .ruta{
+  font:11.5px var(--mono);color:var(--tenue);margin:0 0 10px;line-height:1.6;
+  word-break:break-word;
+}
+.detalle-carpeta h4{margin:0 0 4px;font-size:17px;color:var(--c,var(--texto))}
+.detalle-carpeta .cifras{
+  display:flex;gap:18px;flex-wrap:wrap;margin:13px 0;
+  font:12.5px var(--mono);color:var(--suave);
+}
+.detalle-carpeta .cifras b{display:block;color:var(--texto);font-size:17px;font-weight:600}
+.detalle-carpeta ul{
+  list-style:none;padding:0;margin:13px 0 0;font-size:13px;max-height:230px;overflow-y:auto;
+}
+.detalle-carpeta li{
+  display:flex;gap:9px;align-items:center;padding:5px 0;
+  border-bottom:1px solid rgba(42,50,61,.6);
+}
+.detalle-carpeta li:last-child{border-bottom:none}
+.detalle-carpeta li .peso{margin-left:auto;font:11.5px var(--mono);color:var(--tenue)}
+.detalle-carpeta li button{
+  background:none;border:none;color:var(--acento);font:inherit;cursor:pointer;
+  padding:0;text-align:left;
+}
+.detalle-carpeta li button:hover{text-decoration:underline}
 
 /* ---------- descargas ---------- */
-.dl{display:grid; gap:11px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.dl a{
-  display:flex; align-items:center; gap:13px; background:var(--panel);
-  border:1px solid var(--line); border-radius:11px; padding:14px 16px;
-  color:var(--fg); transition:.19s;
+.descargas{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(255px,1fr))}
+.descarga{
+  display:flex;align-items:center;gap:13px;background:var(--panel);
+  border:1px solid var(--borde);border-radius:10px;padding:15px 17px;
+  color:var(--texto);transition:border-color .14s;
 }
-.dl a:hover{border-color:var(--accent); background:var(--panel2); text-decoration:none; transform:translateY(-1px)}
-.dl .ico{
-  width:36px; height:36px; border-radius:9px; background:rgba(77,163,255,.13);
-  display:grid; place-items:center; color:var(--accent); font-size:.65rem;
-  font-weight:700; letter-spacing:.04em; flex:none;
+.descarga:hover{border-color:var(--acento);text-decoration:none}
+.descarga .tipo{
+  font:600 10.5px var(--mono);color:var(--acento);border:1px solid rgba(88,166,255,.3);
+  border-radius:5px;padding:4px 7px;flex:none;min-width:46px;text-align:center;
 }
-.dl .t{font-size:.88rem; font-weight:500}
-.dl .d{font-size:.74rem; color:var(--muted)}
+.descarga .cuerpo{min-width:0}
+.descarga .cuerpo b{display:block;font-size:13.5px;font-weight:580}
+.descarga .cuerpo small{color:var(--tenue);font-size:12px}
+.descarga.falta{opacity:.5;pointer-events:none}
 
-/* ---------- pie ---------- */
-footer{padding:36px 0 56px; color:var(--muted); font-size:.82rem}
-footer p{margin:.5rem 0; max-width:80ch}
-code{font-family:var(--mono); font-size:.92em; color:var(--accent)}
+/* ---------- avisos ---------- */
 .aviso{
-  background:var(--panel2); border-left:3px solid var(--warn);
-  border-radius:0 9px 9px 0; padding:13px 17px; margin:18px 0; font-size:.84rem;
+  background:rgba(240,136,62,.07);border:1px solid rgba(240,136,62,.26);
+  border-left-width:3px;border-radius:9px;padding:15px 18px;margin:18px 0;font-size:13.5px;
 }
-.aviso b{color:var(--fg)}
+.aviso b{color:var(--alerta)}
+.dato{
+  background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.22);
+  border-left-width:3px;border-radius:9px;padding:15px 18px;margin:18px 0;font-size:13.5px;
+}
 
-@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
-@media (max-width:620px){
-  .hero{padding:34px 0 26px}
-  section{padding:34px 0}
-  .brand span{display:none}
+/* ---------- comparador ---------- */
+.enfrentados{display:grid;gap:13px;grid-template-columns:1fr 1fr}
+@media(max-width:620px){.enfrentados{grid-template-columns:1fr}}
+.cara{background:var(--panel);border:1px solid var(--borde);border-radius:11px;padding:18px;border-top:3px solid var(--c)}
+.cara h4{margin:0 0 14px;font-size:16px;color:var(--c)}
+.cara dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:13px}
+.cara dt{color:var(--suave)}
+.cara dd{margin:0;font-family:var(--mono);font-size:13px;text-align:right}
+.cara dd.gana{color:var(--consumo);font-weight:600}
+.cara dd.pierde{color:var(--tenue)}
+
+/* ---------- consejo flotante ---------- */
+#tip{
+  position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;z-index:99;
+  background:#0b0f14;border:1px solid var(--borde);border-radius:8px;padding:8px 11px;
+  font:12.5px/1.55 var(--mono);box-shadow:0 7px 26px rgba(0,0,0,.6);max-width:250px;
+}
+#tip b{font-family:inherit;color:var(--acento)}
+
+/* ---------- el proceso: terminal y flujo ---------- */
+.dos-columnas{display:grid;gap:16px;grid-template-columns:1.15fr 1fr;align-items:start}
+@media(max-width:1000px){.dos-columnas{grid-template-columns:1fr}}
+
+.cabeza-fig{display:flex;align-items:center;gap:10px;margin:0 0 4px}
+.sello{
+  font:10.5px var(--mono);color:var(--consumo);
+  border:1px solid rgba(79,201,160,.32);border-radius:999px;padding:2px 9px;
+  white-space:nowrap;
+}
+.sello.aviso{color:var(--alerta);border-color:rgba(240,136,62,.32)}
+
+.terminal{
+  background:#0a0e13;border:1px solid var(--borde);border-radius:11px;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.term-barra{
+  display:flex;align-items:center;gap:7px;padding:9px 13px;
+  background:#121922;border-bottom:1px solid var(--borde);
+}
+.luz{width:11px;height:11px;border-radius:50%;flex:none}
+.term-nombre{
+  margin-left:7px;font:12px var(--mono);color:var(--suave);
+}
+.term-barra .sello{margin-left:auto}
+.term-cuerpo{
+  height:430px;overflow-y:auto;padding:11px 13px;
+  font:11.5px/1.72 var(--mono);color:#9fb0c3;
+}
+.term-cuerpo::-webkit-scrollbar{width:8px}
+.term-cuerpo::-webkit-scrollbar-thumb{background:#2a323d;border-radius:4px}
+.term-linea{display:flex;gap:9px;white-space:pre-wrap;word-break:break-word}
+.term-linea:hover{background:rgba(255,255,255,.03)}
+.term-linea .ln{color:#4a5563;flex:none;min-width:30px;text-align:right;user-select:none}
+.term-linea .hora{color:#5d6b7d;flex:none}
+.term-linea .txt{flex:1}
+.term-linea .ok{color:var(--consumo)}
+.term-linea .av{color:var(--alerta)}
+.term-linea .hs{color:var(--construccion)}
+.term-linea .nm{color:var(--acento)}
+.term-corte{color:#4a5563;text-align:center;padding:5px 0}
+.term-pie{
+  display:flex;align-items:center;gap:9px;padding:9px 13px;
+  border-top:1px solid var(--borde);background:#121922;flex-wrap:wrap;
+}
+.term-pie input{flex:1;min-width:120px;font-size:12px;padding:5px 9px}
+.cursor-term{
+  display:inline-block;width:7px;height:13px;background:var(--acento);
+  vertical-align:-2px;animation:parpadeo 1.05s steps(2) infinite;
+}
+@keyframes parpadeo{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+
+/* ---------- galeria de figuras ---------- */
+.galeria{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.figura{
+  background:var(--panel);border:1px solid var(--borde);border-radius:11px;
+  overflow:hidden;display:flex;flex-direction:column;
+  transition:border-color .2s,box-shadow .2s,transform .2s;
+}
+/* la que el pase esta mostrando */
+.figura.en-pase{
+  border-color:var(--acento);transform:translateY(-3px);
+  box-shadow:0 0 0 2px rgba(88,166,255,.3), 0 10px 26px rgba(0,0,0,.4);
+}
+.figura .marco-img{
+  background:#fff;cursor:zoom-in;position:relative;line-height:0;
+  border-bottom:1px solid var(--borde);
+}
+.figura img{width:100%;height:auto;display:block}
+.figura .num{
+  position:absolute;top:9px;left:9px;background:rgba(13,17,23,.84);
+  color:var(--acento);font:600 11px var(--mono);padding:3px 9px;border-radius:5px;
+}
+.figura .cuerpo{padding:14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.figura b{font-size:14.5px;font-weight:600}
+.figura small{color:var(--suave);font-size:12.8px;line-height:1.55}
+.figura .abajo{
+  margin-top:auto;padding-top:10px;display:flex;align-items:center;gap:10px;
+  font:11.5px var(--mono);color:var(--tenue);
+}
+.figura .abajo a{margin-left:auto;font-size:12px}
+
+/* visor a pantalla completa */
+#visor{
+  position:fixed;inset:0;z-index:150;background:rgba(5,8,12,.94);
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+  padding:26px;gap:14px;
+}
+#visor.abierto{display:flex}
+#visor img{
+  max-width:100%;max-height:calc(100vh - 150px);background:#fff;border-radius:6px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+#visor .barra-visor{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;
+  color:var(--suave);font-size:13.5px;max-width:860px;text-align:center;
+}
+#visor .cerrar{
+  position:absolute;top:18px;right:22px;background:none;border:none;
+  color:var(--suave);font-size:30px;cursor:pointer;line-height:1;padding:4px 10px;
+}
+#visor .cerrar:hover{color:var(--texto)}
+#visor .paso{
+  background:var(--panel2);border:1px solid var(--borde);color:var(--texto);
+  border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:17px;flex:none;
+}
+#visor .paso:hover{border-color:var(--acento);color:var(--acento)}
+
+/* ---------- bibliografia ---------- */
+.refs{list-style:none;counter-reset:r;padding:0;margin:0;font-size:13.5px}
+.refs li{
+  counter-increment:r;position:relative;padding:13px 16px 13px 50px;
+  border-bottom:1px solid var(--borde);line-height:1.6;
+}
+.refs li:last-child{border-bottom:none}
+.refs li::before{
+  content:counter(r);position:absolute;left:14px;top:13px;
+  font:11.5px var(--mono);color:var(--tenue);
+}
+.refs li:hover{background:rgba(255,255,255,.022)}
+.refs .doi{
+  display:inline-block;margin-left:7px;font:11.5px var(--mono);
+  color:var(--acento);border:1px solid rgba(88,166,255,.26);border-radius:5px;
+  padding:1px 8px;white-space:nowrap;
+}
+.refs .doi:hover{background:rgba(88,166,255,.12);text-decoration:none}
+.refs .sin{
+  display:inline-block;margin-left:7px;font:11px var(--mono);color:var(--tenue);
+}
+
+footer{padding:38px 0 54px;color:var(--tenue);font-size:12.5px;line-height:1.85}
+.metodo{font-size:13.5px;color:var(--suave)}
+.metodo ol{padding-left:20px;margin:0 0 16px}
+.grupo-btn{display:flex;gap:7px;flex-wrap:wrap}
+.metodo li{margin:0 0 9px;transition:opacity .3s,background .3s;border-radius:7px}
+.metodo li.paso-on{
+  background:rgba(88,166,255,.1);box-shadow:-10px 0 0 rgba(88,166,255,.1);
+}
+.formula{
+  font:13.5px var(--mono);background:var(--panel2);border:1px solid var(--borde);
+  border-radius:8px;padding:12px 15px;margin:12px 0;overflow-x:auto;color:var(--texto);
+}
+@media(max-width:640px){
+  .portada{padding:44px 0 36px}
+  section{padding:38px 0}
+  .marca span{display:none}
 }
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="wrap">
-    <div class="brand">Tema 61 <span>&middot; Finanzas I &middot; UNCP</span></div>
-    <nav class="nav" id="nav">
-      <a href="#riesgo">Riesgo</a>
-      <a href="#capital">Costo de capital</a>
-      <a href="#carteras">Carteras</a>
-      <a href="#datos">Datos</a>
-      <a href="#descargas">Descargas</a>
-    </nav>
+<div id="umbral">
+  <canvas id="esfera" aria-hidden="true"></canvas>
+  <div class="umbral-texto">
+    <div class="etiqueta">Tema 61 &middot; Unidad II &middot; Finanzas I</div>
+    <h1>Costo de capital por sector<br>en la Bolsa de Valores de Lima</h1>
+    <p class="umbral-bajada">Minería, banca, consumo y construcción.<br>
+    918 sesiones entre noviembre de 2021 y octubre de 2026.</p>
+    <button class="umbral-btn" id="entrar">Entrar al informe</button>
+    <p class="umbral-firma">
+      Meglinho Sneyder Rojas Poma &middot; código 2024200522B<br>
+      Universidad Nacional del Centro del Perú &middot; Huancayo
+    </p>
   </div>
-</header>
+  <p class="umbral-pie" id="umbral-pie"></p>
+</div>
 
-<div class="wrap">
+<div class="marco-app">
+<nav class="lateral" id="lateral">
+  <button class="lat-marca" id="ir-indice" title="Volver al indice">
+    <b>Costo de capital en la BVL</b>
+    <small>Finanzas I &middot; Tema 61 &middot; Unidad II</small>
+  </button>
+  <div id="lat-grupos"></div>
+  <div class="lat-filtro">
+    <h5>Periodo</h5>
+    <div class="rango"><span id="f-desde"></span><span id="f-hasta"></span></div>
+    <div class="doble">
+      <div class="riel"></div><div class="tramo" id="f-tramo"></div>
+      <input type="range" id="f-ini" min="0" value="0">
+      <input type="range" id="f-fin" min="0">
+    </div>
+    <p class="pie-filtro" id="f-pie"></p>
+    <button class="btn" id="f-todo">Todo el periodo</button>
+  </div>
+</nav>
+<div class="contenido">
 
-  <div class="hero">
-    <div class="eyebrow">Unidad II &middot; 2026-II</div>
-    <h1>Betas sectoriales y costo de capital en la Bolsa de Valores de Lima</h1>
-    <p class="lead">
-      Qué rendimiento le exige el mercado a cada sector de la bolsa peruana, estimado con
-      <b id="h-dias">—</b> días de cotización entre noviembre de 2021 y octubre de 2026.
-      La minería amplifica el mercado con una beta de <b id="h-bmax">—</b>; el consumo lo
-      amortigua con <b id="h-bmin">—</b>.
-    </p>
-    <p class="autor">
-      <b>Meglinho Sneyder Rojas Poma</b> &middot; código 2024200522B &middot;
-      Escuela Profesional de Economía, Universidad Nacional del Centro del Perú
-    </p>
+<section id="indice" class="vista"><div class="caja">
+  <div class="etiqueta">Tema 61 &middot; Unidad II</div>
+  <h1 style="font-size:clamp(23px,3.6vw,34px);margin:0 0 14px">Costo de capital por sector
+  en la Bolsa de Valores de Lima</h1>
+  <p class="bajada" style="font-size:15.5px;margin-bottom:18px">Betas sectoriales estimadas
+  por minimos cuadrados con errores robustos a heterocedasticidad y autocorrelacion, costo de
+  capital por el CAPM y frontera eficiente de Markowitz para cuatro carteras: mineria, banca,
+  consumo y construccion. 918 sesiones diarias entre noviembre de 2021 y octubre de 2026.</p>
+  <p class="firma">
+    <b>Meglinho Sneyder Rojas Poma</b> &middot; codigo 2024200522B<br>
+    Escuela Profesional de Economia, Facultad de Economia<br>
+    Universidad Nacional del Centro del Peru, Huancayo<br>
+    Finanzas I (055D), ciclo V, periodo 2026-II &middot; Dr. Ciro Ivan Machacuay Meza
+  </p>
+  <div class="tarjetas-indice" id="puertas"></div>
+  <p class="nota" style="margin-top:24px">Entra a una seccion para verla sola. Desde dentro se
+  vuelve aqui con el boton Indice o con la tecla Escape, y se pasa a la siguiente con las
+  flechas del teclado.</p>
+</div></section>
 
-    <div class="kpis">
-      <div class="kpi">
-        <div class="lbl">Observaciones</div>
-        <div class="val" id="k-obs">—</div>
-        <div class="sub">días por sector, panel balanceado</div>
+<section id="resultados" class="vista"><div class="caja">
+  <h2>Lo que salio</h2>
+  <p class="sub">El costo de capital de cada sector sale de su beta. Un sector con beta alta se
+  mueve mas que el mercado y por eso a sus accionistas se les exige mas retorno. Las cuatro
+  betas son significativas al 1 por ciento.</p>
+  <div class="rejilla" id="tarjetas"></div>
+
+  <div class="lienzo">
+    <p class="titulo-fig">Beta de cada sector, con su intervalo de confianza al 95 por ciento</p>
+    <div id="repro-betas"></div>
+    <div id="fig-betas"></div>
+    <p class="nota">La linea vertical en 1,0 marca la beta del mercado. Una barra que no la cruza
+    dice que el sector es distinto del mercado con 95 por ciento de confianza. Pasa el cursor
+    sobre cada barra para ver las cifras.</p>
+  </div>
+
+  <div class="dato" id="hallazgo"></div>
+</div></section>
+
+<section id="capm" class="vista"><div class="caja">
+  <h2>Simulador del CAPM</h2>
+  <p class="sub">La prima de mercado es el supuesto que mas pesa en el resultado. Mueve el
+  deslizador y mira como cambia el costo de capital de los cuatro sectores. La tasa libre de
+  riesgo y la beta se quedan quietas porque son datos estimados, no supuestos.</p>
+
+  <div class="lienzo">
+    <div class="controles">
+      <div class="campo" style="min-width:290px">
+        <label>Prima de mercado: <span class="valor" id="v-prima"></span></label>
+        <input type="range" id="prima" min="0" max="25" step="0.1">
       </div>
-      <div class="kpi">
-        <div class="lbl">Costo de capital</div>
-        <div class="val" id="k-ke">—</div>
-        <div class="sub">del consumo a la minería</div>
+      <button class="btn" id="btn-prima-est">Prima estimada</button>
+      <button class="btn" id="btn-prima-ref">Prima de referencia 7,5</button>
+    </div>
+    <div id="repro-capm"></div>
+    <div id="fig-capm"></div>
+    <p class="nota" id="nota-capm"></p>
+  </div>
+  <div class="formula">Ke = Rf + beta &times; prima de mercado</div>
+</div></section>
+
+<section id="panel" class="vista"><div class="caja">
+  <h2>El panel diario</h2>
+  <p class="sub">Cada sector arranca en 100 el primer dia de la muestra. La curva acumula el
+  retorno diario de la cartera del sector, de modo que su altura al final es cuanto valdrian
+  100 soles invertidos al inicio. Elige el tramo que quieras ver.</p>
+
+  <div class="lienzo">
+    <div class="controles">
+      <button class="btn on" data-rango="todo">Todo</button>
+      <button class="btn" data-rango="3a">3 anios</button>
+      <button class="btn" data-rango="1a">1 anio</button>
+      <button class="btn" data-rango="6m">6 meses</button>
+      <div class="campo" style="min-width:140px">
+        <label for="desde">Desde</label>
+        <input type="date" id="desde">
       </div>
-      <div class="kpi">
-        <div class="lbl">Prima de mercado</div>
-        <div class="val" id="k-prima">—</div>
-        <div class="sub">realizada en la ventana</div>
+      <div class="campo" style="min-width:140px">
+        <label for="hasta">Hasta</label>
+        <input type="date" id="hasta">
       </div>
-      <div class="kpi">
-        <div class="lbl">Diversificar suma</div>
-        <div class="val" id="k-sharpe">—</div>
-        <div class="sub">de mejora en el ratio de Sharpe</div>
+    </div>
+
+    <div class="reproductor">
+      <button class="btn-play" id="p-play" aria-label="Reproducir">&#9654;</button>
+      <input type="range" id="p-barra" min="0" max="100" value="100">
+      <span class="p-fecha" id="p-fecha"></span>
+      <button class="btn" id="p-vel">1x</button>
+    </div>
+
+    <div id="fig-panel"></div>
+    <div class="leyenda" id="leyenda-panel"></div>
+    <p class="nota" id="nota-panel"></p>
+  </div>
+</div></section>
+
+<section id="dispersion" class="vista"><div class="caja">
+  <h2>Sector frente al mercado</h2>
+  <p class="sub">Las figuras 3 a 6 del articulo, aqui dibujadas en vivo. Cada punto es una
+  sesion: el retorno del mercado ese dia en el eje horizontal y el del sector en el vertical.
+  La pendiente de la recta es la beta. La regresion se rehace en tu navegador con el panel
+  original, de modo que al mover el periodo del lateral las dos pendientes se recalculan.</p>
+
+  <div class="controles">
+    <div class="campo" style="min-width:auto">
+      <label>Sector</label>
+      <div class="grupo-btn" id="disp-sectores"></div>
+    </div>
+    <div class="campo" style="min-width:auto">
+      <label>Que rectas dibujar</label>
+      <div class="grupo-btn">
+        <button class="btn on" data-recta="ambas">Las dos</button>
+        <button class="btn" data-recta="simple">Solo la simple</button>
+        <button class="btn" data-recta="multiple">Solo la multiple</button>
       </div>
     </div>
   </div>
 
-  <section id="riesgo">
-    <h2>Riesgo sistemático por sector</h2>
-    <p class="snote">
-      La beta mide cuánto se mueve un sector cuando el mercado se mueve uno por ciento.
-      Cada punto es la estimación por mínimos cuadrados con errores de Newey-West; la banda,
-      su intervalo de confianza al 95 %. <b>La banca es el único sector cuyo intervalo
-      contiene el 1</b>, de modo que su riesgo no se distingue del mercado.
-      Pasa el cursor por cada barra para ver el detalle.
-    </p>
-    <div class="card">
-      <div class="chart" id="c-betas"></div>
-      <div class="legend" id="leg-betas"></div>
-    </div>
-  </section>
+  <div class="lienzo">
+    <p class="titulo-fig" id="disp-titulo"></p>
+    <div id="repro-dispersion"></div>
+    <div id="fig-dispersion"></div>
+    <p class="nota" id="nota-dispersion"></p>
+  </div>
 
-  <section id="capital">
-    <h2>Simulador del costo de capital</h2>
-    <p class="snote">
-      El CAPM dice que <code>Ke = Rf + beta × prima</code>. Mueve la prima de mercado y mira
-      cómo cambia lo que cada sector tiene que rendir. La línea punteada marca la
-      <b>prima realizada en la ventana</b>, que es la que usa el artículo.
-    </p>
-    <div class="card sim">
-      <div class="ctrl">
-        <label for="prima">Prima de mercado</label>
-        <input type="range" id="prima" min="2" max="20" step="0.1" value="15.4"
-               aria-label="Prima de mercado en porcentaje">
-        <output id="prima-val">15,4 %</output>
-        <button class="btn" id="prima-reset">Volver a la realizada</button>
+  <div class="rejilla" id="disp-cifras"
+       style="grid-template-columns:repeat(auto-fit,minmax(165px,1fr))"></div>
+
+  <div class="lienzo">
+    <p class="titulo-fig">Retorno diario del sector, sesion a sesion</p>
+    <div id="fig-retornos"></div>
+    <p class="nota">Es la figura 2 del articulo, para el sector elegido arriba. Las barras
+    largas se ven agrupadas y no repartidas al azar: periodos tranquilos seguidos de periodos
+    movidos. Eso es lo que corrigen los errores de Newey y West a cinco rezagos, porque los
+    minimos cuadrados corrientes darian un error estandar demasiado pequeno.</p>
+  </div>
+</div></section>
+
+<section id="cartera" class="vista"><div class="caja">
+  <h2>Arma tu propia cartera</h2>
+  <p class="sub">Reparte 100 por ciento entre los cuatro sectores y mira que retorno y que
+  riesgo te queda. El calculo usa la misma matriz de covarianzas anualizada que produjo la
+  frontera del articulo, de modo que tus numeros son comparables con los de la tabla 8.</p>
+
+  <div class="lienzo">
+    <div class="rejilla" style="grid-template-columns:repeat(auto-fit,minmax(185px,1fr));margin-bottom:22px" id="pesos"></div>
+    <div class="controles" style="margin-bottom:22px">
+      <button class="btn" data-pre="igual">Partes iguales</button>
+      <button class="btn" data-pre="tangente">La tangente</button>
+      <button class="btn" data-pre="minvar">Minima varianza</button>
+      <button class="btn" data-pre="cero">Vaciar</button>
+    </div>
+    <div class="rejilla" id="resultado-cartera" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))"></div>
+    <div id="repro-frontera" style="margin-top:22px"></div>
+    <div id="fig-frontera"></div>
+    <p class="nota" id="nota-frontera"></p>
+  </div>
+</div></section>
+
+<section id="comparar" class="vista"><div class="caja">
+  <h2>Comparar dos sectores</h2>
+  <p class="sub">Elige dos y mira sus cifras enfrentadas. En verde queda el que sale mejor en
+  cada indicador. Para el riesgo y para el costo de capital, mejor es menos.</p>
+
+  <div class="controles">
+    <div class="campo"><label for="sec-a">Sector A</label><select id="sec-a"></select></div>
+    <div class="campo"><label for="sec-b">Sector B</label><select id="sec-b"></select></div>
+  </div>
+  <div id="repro-comparar"></div>
+  <div class="enfrentados" id="enfrentados"></div>
+  <p class="nota" id="nota-comparar"></p>
+</div></section>
+
+<section id="tablas" class="vista"><div class="caja">
+  <h2>Las tablas del articulo</h2>
+  <p class="sub">Las once tablas, como salieron del codigo. Haz clic en una cabecera para
+  ordenar por esa columna, y escribe en el buscador para filtrar filas. Cada tabla se descarga
+  aparte en CSV, y las once juntas van en un libro de Excel.</p>
+
+  <div class="pestanas" id="pestanas"></div>
+  <div class="controles">
+    <div class="campo" style="min-width:230px">
+      <label for="buscar">Filtrar filas</label>
+      <input type="search" id="buscar" placeholder="escribe para filtrar">
+    </div>
+    <span class="pie" id="conteo"></span>
+    <a class="btn" id="baja-csv" download>CSV completo</a>
+    <button class="btn" id="baja-visto">Descargar lo que veo</button>
+    <button class="btn" id="copiar">Copiar</button>
+  </div>
+  <div id="repro-tablas"></div>
+  <div class="marco" id="marco-tabla"></div>
+  <p class="nota" id="nota-tabla"></p>
+</div></section>
+
+<section id="figuras" class="vista"><div class="caja">
+  <h2>Las figuras del artículo</h2>
+  <p class="sub" id="sub-figuras"></p>
+  <div id="repro-figuras"></div>
+  <div class="galeria" id="galeria"></div>
+</div></section>
+
+<section id="proceso" class="vista"><div class="caja">
+  <h2>El proceso</h2>
+  <p class="sub">Dos cosas que normalmente no se enseñan: el registro de lo que hizo el
+  código mientras corría, y cómo se repartieron las dieciséis acciones en las cuatro
+  carteras. La segunda es la decisión más discutible del trabajo, de modo que aquí está
+  a la vista en vez de escondida en una tabla.</p>
+
+  <div class="dos-columnas">
+    <div class="lienzo compacto">
+      <div class="cabeza-fig">
+        <p class="titulo-fig">De la clasificación de la BVL a las carteras</p>
+        <span class="sello" id="sello-flujo"></span>
       </div>
-      <div class="chart" id="c-ke"></div>
-    </div>
-  </section>
-
-  <section id="carteras">
-    <h2>Diversificación entre sectores</h2>
-    <p class="snote">
-      Frontera eficiente de Markowitz sobre las cuatro carteras sectoriales. La construcción
-      pesa <b id="h-const">—</b> % en la cartera de máximo Sharpe pese a tener el segundo peor
-      retorno, porque es el sector con las correlaciones más bajas. Eso es diversificación:
-      lo que vale no es el retorno de un activo, sino que se mueva distinto a los demás.
-    </p>
-    <div class="grid2">
-      <div class="card">
-        <h3 style="font-size:.92rem;margin-bottom:12px">Riesgo frente a retorno</h3>
-        <div class="chart" id="c-front"></div>
+      <div id="fig-flujo"></div>
+      <div class="controles" style="margin:12px 0 0">
+        <button class="btn on" data-flujo="todas">Las 16</button>
+        <button class="btn" data-flujo="movidas">Solo las reasignadas</button>
+        <button class="btn" data-flujo="quietas">Solo las que no se movieron</button>
       </div>
-      <div class="card">
-        <h3 style="font-size:.92rem;margin-bottom:12px">Correlaciones entre sectores</h3>
-        <div class="chart" id="c-corr"></div>
+      <p class="nota" id="nota-flujo"></p>
+    </div>
+
+    <div class="terminal">
+      <div class="term-barra">
+        <span class="luz" style="background:#ff5f57"></span>
+        <span class="luz" style="background:#febc2e"></span>
+        <span class="luz" style="background:#28c840"></span>
+        <span class="term-nombre">log_ejecucion.txt</span>
+        <span class="sello" id="sello-log">Registro real</span>
+      </div>
+      <div class="term-cuerpo" id="term-log"></div>
+      <div class="term-pie">
+        <input type="search" id="buscar-log" placeholder="filtrar el registro">
+        <button class="btn" id="log-play">Reproducir</button>
+        <span class="pie" id="conteo-log"></span>
       </div>
     </div>
-  </section>
+  </div>
+  <p class="nota" id="nota-log"></p>
+</div></section>
 
-  <section id="datos">
-    <h2>Desempeño ajustado por riesgo</h2>
-    <p class="snote">
-      La banca lidera en Sharpe y en Treynor: rindió casi lo mismo que la minería con una beta
-      34 % menor. <b>Ningún alfa de Jensen es significativo al 5 %</b>, de modo que la
-      diferencia se describe pero no prueba que un sector haya batido al mercado.
-      Haz clic en una columna para ordenar.
-    </p>
-    <div class="card tw">
-      <table id="t-desempeno">
-        <thead><tr id="t-head"></tr></thead>
-        <tbody id="t-body"></tbody>
-      </table>
+<section id="archivos" class="vista"><div class="caja">
+  <h2>Los archivos</h2>
+  <p class="sub">Las tres carpetas del trabajo, con sus subcarpetas tal como estan. Abre una
+  carpeta para ver que tiene dentro.</p>
+
+  <h3>Carpetas, para descargar completas</h3>
+  <div class="descargas" id="zips"></div>
+
+  <h3>Los productos</h3>
+  <div class="descargas" id="productos"></div>
+
+  <h3>Los datos</h3>
+  <div class="descargas" id="datos"></div>
+
+  <h3>El mapa de las carpetas</h3>
+  <p class="sub" style="margin-bottom:14px">Cada anillo es un nivel y cada porcion una
+  carpeta, con el tamano proporcional a lo que pesa. Haz clic en una para entrar en ella
+  y en el centro para volver.</p>
+  <div class="mapa-carpetas">
+    <div class="lienzo compacto" style="margin:0">
+      <div class="controles" style="margin:0 0 10px">
+        <button class="btn on" data-medida="archivos">Por numero de archivos</button>
+        <button class="btn" data-medida="peso">Por peso en disco</button>
+      </div>
+      <div id="repro-sunburst"></div>
+      <div id="fig-sunburst"></div>
     </div>
+    <div class="detalle-carpeta" id="detalle-carpeta"></div>
+  </div>
 
-    <h3 style="font-size:1rem;margin:30px 0 10px">Las dieciséis acciones del panel</h3>
-    <p class="snote">
-      La Bolsa de Valores de Lima clasifica por tipo de empresa, no por actividad económica,
-      de modo que diez de las dieciséis se reasignaron con criterio económico. La columna
-      lo declara.
-    </p>
-    <div class="card tw">
-      <table id="t-comp">
-        <thead><tr id="tc-head"></tr></thead>
-        <tbody id="tc-body"></tbody>
-      </table>
+  <h3>El arbol completo</h3>
+  <div class="arbol" id="arbol"></div>
+
+  <div class="aviso" id="aviso-ajeno"></div>
+</div></section>
+
+<section id="bibliografia" class="vista"><div class="caja">
+  <h2>La bibliografía</h2>
+  <p class="sub" id="sub-bib"></p>
+  <div class="controles">
+    <div class="campo" style="min-width:250px">
+      <label for="buscar-ref">Buscar por autor, título o revista</label>
+      <input type="search" id="buscar-ref" placeholder="escribe para filtrar">
     </div>
-  </section>
+    <span class="pie" id="conteo-ref"></span>
+  </div>
+  <ol class="refs" id="refs"></ol>
+</div></section>
 
-  <section id="descargas">
-    <h2>Descargas</h2>
-    <p class="snote">Los productos del trabajo y las tablas que alimentan esta página.</p>
-    <h3 style="font-size:.95rem;margin-bottom:11px">Productos</h3>
-    <div class="dl" id="dl-prod"></div>
-    <h3 style="font-size:.95rem;margin:26px 0 11px">Datos en CSV</h3>
-    <div class="dl" id="dl-datos"></div>
+<section id="metodo" class="vista"><div class="caja">
+  <h2>Como se hizo</h2>
+  <div id="repro-metodo"></div>
+  <div class="metodo">
+    <ol id="pasos-metodo">
+      <li><b>Las carteras.</b> Dieciseis acciones de la BVL repartidas en cuatro carteras
+      sectoriales. <span id="m-reasig">Nueve de las dieciseis</span> quedaron en una cartera
+      distinta de la que les da la
+      clasificacion oficial de la BVL, porque esa clasificacion agrupa por sector de la empresa
+      y aqui hace falta agrupar por el negocio del que sale el flujo. La tabla 0 dice una por
+      una cual se movio y cual no.</li>
+      <li><b>El retorno de cada cartera.</b> Promedio simple de los retornos logaritmicos
+      diarios de sus acciones, en moneda de cotizacion. Nueve de las dieciseis cotizan en
+      dolares, de modo que su retorno no lleva el efecto del tipo de cambio.</li>
+      <li><b>La beta.</b> Minimos cuadrados del retorno del sector contra el retorno del
+      indice general, con errores estandar de Newey y West a cinco rezagos, que corrigen
+      heterocedasticidad y autocorrelacion. Antes se verifico con la prueba de Dickey-Fuller
+      aumentada que las series son estacionarias en niveles, tabla 2.</li>
+      <li><b>El costo de capital.</b> CAPM con la tasa del bono soberano peruano a diez anios
+      como tasa libre de riesgo y la prima de mercado estimada del propio periodo. El
+      simulador de arriba deja cambiar esa prima porque es el supuesto que mas mueve el
+      resultado.</li>
+      <li><b>La frontera.</b> Veinte mil carteras aleatorias con pesos de una Dirichlet para
+      dibujar la nube, mas la cartera tangente y la de minima varianza resueltas sobre la
+      matriz de covarianzas anualizada. El codigo de Python usa doscientas mil carteras con
+      semilla fija; la nube que ves aqui la dibuja tu navegador con veinte mil y la misma
+      semilla, de modo que sale igual en cada visita pero no es pixel a pixel la figura 9 del
+      articulo.</li>
+    </ol>
 
     <div class="aviso">
-      <b>Sobre los artículos de la revisión.</b> Los treinta artículos en inglés son de sus
-      editoriales y las traducciones al español son obras derivadas, de modo que no se
-      republican aquí. Cada uno se consulta por su DOI, que figura en las referencias del
-      artículo.
+      <b>Sobre la fecha de los datos.</b> La muestra se congelo el 30 de octubre de 2026 y no
+      se vuelve a mover. El portal de la BVL solo entrega la sesion del dia en que se le
+      pregunta, sin historico, de modo que una reejecucion posterior trae la sesion de ese otro
+      dia y no la del cierre de la muestra. Por eso el codigo lleva un interruptor que, cuando
+      esta encendido, usa la captura guardada en lugar de pedirla otra vez. El numeral 2.4.5
+      del articulo lo explica, y la carpeta de datos crudos guarda la captura original con su
+      fecha.
     </div>
-  </section>
+  </div>
+</div></section>
 
-  <footer>
-    <p><b>Fuentes.</b> Dos vías de extracción. El backend de la Bolsa de Valores de Lima aporta
-      la clasificación sectorial y la moneda de cotización; la API de Yahoo Finance aporta los
-      precios diarios, el rendimiento del Tesoro de Estados Unidos a diez años y el tipo de
-      cambio. Ventana congelada al 31 de octubre de 2026.</p>
-    <p><b>Reproducibilidad.</b> Cada número de esta página sale de las tablas que generan
-      <code>04_analisis.py</code> y <code>05_markowitz.py</code>, y esta página la escribe
-      <code>06_generar_web.py</code> desde esas mismas tablas. El código completo está en el
-      repositorio.</p>
-    <p style="margin-top:18px">Finanzas I (055D), ciclo V, periodo 2026-II &middot;
-      Dr. Ciro Iván Machacuay Meza &middot; Universidad Nacional del Centro del Perú</p>
-  </footer>
+<footer><div class="caja">
+  <p>Meglinho Sneyder Rojas Poma &middot; codigo 2024200522B &middot; estudiante n.&ordm; 36<br>
+  Finanzas I (055D), ciclo V, periodo 2026-II &middot; Dr. Ciro Ivan Machacuay Meza<br>
+  Escuela Profesional de Economia, Universidad Nacional del Centro del Peru, Huancayo</p>
+  <p id="pie-datos"></p>
+  <p>Los articulos en ingles de la carpeta de productos pertenecen a sus editoriales y las
+  traducciones al espanol son obras derivadas de ellos. El arbol de archivos los lista para
+  que se vea el trabajo hecho, pero esta pagina no los distribuye. Se consultan por su DOI,
+  que figura en las referencias del articulo.</p>
+</div></footer>
+</div></div>
+
+<div id="visor" role="dialog" aria-modal="true" aria-label="Figura ampliada">
+  <button class="cerrar" id="visor-cerrar" aria-label="Cerrar">&times;</button>
+  <img id="visor-img" alt="">
+  <div class="barra-visor">
+    <button class="paso" id="visor-ant" aria-label="Figura anterior">&#8249;</button>
+    <span id="visor-texto"></span>
+    <button class="paso" id="visor-sig" aria-label="Figura siguiente">&#8250;</button>
+  </div>
 </div>
+
+<div id="tip"></div>
 
 <script>
 /*__DATOS__*/
 
-(function () {
-  "use strict";
+/* ===================== utilidades ===================== */
+const $ = s => document.querySelector(s);
 
-  var ORDEN = ["Mineria", "Banca", "Construccion", "Consumo"];
-  var ETQ = { Mineria: "Minería", Banca: "Banca", Construccion: "Construcción", Consumo: "Consumo" };
-  var COL = {
-    Mineria: "#5b9bd5", Banca: "#ffa94d", Construccion: "#f06565", Consumo: "#2ec4a0"
-  };
-  var ocultos = {};
+/* Los graficos no necesitan repintarse al cambiar de vista: cada SVG lleva su
+   viewBox fijo y el CSS lo escala al ancho disponible, de modo que se dibuja
+   bien aunque su seccion estuviera oculta cuando se creo. */
+const SEC = ["mineria","banca","construccion","consumo"];
+const NOM = {mineria:"Mineria", banca:"Banca", construccion:"Construccion", consumo:"Consumo"};
+const COL = {mineria:"#e8a33d", banca:"#4ea1e8", construccion:"#9b7fe0", consumo:"#4fc9a0"};
 
-  // Las tablas no escriben el sector igual: tabla9 lleva tilde y las demas no.
-  // Esta funcion devuelve siempre la misma clave, de modo que color, etiqueta y
-  // orden coinciden venga de donde venga la fila.
-  function clave(s) {
-    if (!s) return "";
-    var x = String(s).normalize ? String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                                : String(s);
-    return x.charAt(0).toUpperCase() + x.slice(1).toLowerCase();
-  }
-  function color(s) { return COL[clave(s)] || "#8396ab"; }
-  function nombre(s) { return ETQ[clave(s)] || s; }
+/* Las tablas 8 y 9 escriben "Mineria" y "Construccion" con tilde y las demas sin ella.
+   Todo lo que cruza tablas pasa por aqui para que las tildes no partan las series. */
+const clave = t => String(t ?? "").normalize("NFD").replace(/[̀-ͯ]/g,"")
+                   .toLowerCase().trim();
+const num = v => {
+  const n = parseFloat(String(v ?? "").replace(",", "."));
+  return Number.isFinite(n) ? n : null;
+};
+/* Formato a mano, con coma decimal. No se usa toLocaleString porque un navegador
+   sin los datos de idioma instalados cae al punto decimal del ingles. */
+const fmt = (v, d = 2) => {
+  if (v == null || !Number.isFinite(v)) return "s. d.";
+  const [ent, dec] = Math.abs(v).toFixed(d).split(".");
+  return (v < 0 ? "-" : "") + ent.replace(/\B(?=(\d{3})+(?!\d))/g, " ") +
+         (dec ? "," + dec : "");
+};
+const pesa = b => b >= 1048576 ? fmt(b/1048576, 1)+" MB"
+               : b >= 1024 ? fmt(b/1024, 0)+" KB" : b+" B";
+const ext = n => { const p = n.lastIndexOf("."); return p > 0 ? n.slice(p+1) : "&mdash;"; };
+const esc = t => String(t).replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-  function num(v) { var x = parseFloat(v); return isFinite(x) ? x : NaN; }
-  function fmt(v, d) {
-    return isFinite(v) ? v.toFixed(d === undefined ? 2 : d).replace(".", ",") : "—";
-  }
-  function pct(v, d) { return fmt(v, d) + " %"; }
-  function el(id) { return document.getElementById(id); }
+/* Busca una fila por el nombre del sector, sin importar tildes ni columna. */
+function fila(tabla, sector, col) {
+  const k = clave(sector);
+  return (DATOS[tabla] || []).find(f => clave(f[col ?? Object.keys(f)[0]]) === k);
+}
 
-  function fila(tabla, campo, valor) {
-    var a = DATOS[tabla] || [];
-    for (var i = 0; i < a.length; i++) if (a[i][campo] === valor) return a[i];
-    return null;
-  }
-  function porOrden(tabla) {
-    return (DATOS[tabla] || []).slice().sort(function (a, b) {
-      return ORDEN.indexOf(clave(a.Sector)) - ORDEN.indexOf(clave(b.Sector));
-    });
-  }
-  function visibles(rows) {
-    return rows.filter(function (r) { return !ocultos[clave(r.Sector)]; });
+/* El periodo que eligen los dos deslizadores del lateral. Lo consultan las
+   secciones que dependen del tiempo, y cada una se apunta con VENTANA.escuchar
+   para enterarse cuando cambia, en lugar de que el filtro tenga que conocer a
+   todas. Se declara aqui arriba porque las secciones se inicializan antes que
+   el lateral y ya lo necesitan. */
+const VENTANA = {
+  i0: 0,
+  i1: Math.max(0, (DER.fechas || []).length - 1),
+  oyentes: [],
+  escuchar(fn) { this.oyentes.push(fn); },
+  avisar() { this.oyentes.forEach(f => { try { f(this.i0, this.i1); } catch (e) {} }); },
+  get desde() { return (DER.fechas || [])[this.i0]; },
+  get hasta() { return (DER.fechas || [])[this.i1]; },
+  get dias() { return this.i1 - this.i0 + 1; },
+  get completa() { return this.i0 === 0 && this.i1 === (DER.fechas || []).length - 1; },
+};
+
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(t, at = {}, padre) {
+  const n = document.createElementNS(SVGNS, t);
+  for (const k in at) n.setAttribute(k, at[k]);
+  if (padre) padre.appendChild(n);
+  return n;
+}
+function lienzo(destino, an, al) {
+  const d = typeof destino === "string" ? $(destino) : destino;
+  d.innerHTML = "";
+  const s = el("svg", {viewBox:`0 0 ${an} ${al}`, role:"img"}, d);
+  return s;
+}
+
+/* consejo flotante */
+const tip = $("#tip");
+function conTip(nodo, html) {
+  nodo.addEventListener("mousemove", e => {
+    tip.innerHTML = html;
+    tip.style.opacity = 1;
+    const r = tip.getBoundingClientRect();
+    let x = e.clientX + 14, y = e.clientY - r.height - 10;
+    if (x + r.width > innerWidth - 10) x = e.clientX - r.width - 14;
+    if (y < 10) y = e.clientY + 18;
+    tip.style.left = x + "px";
+    tip.style.top = y + "px";
+  });
+  nodo.addEventListener("mouseleave", () => tip.style.opacity = 0);
+}
+
+/* ===================== reproductor reutilizable =====================
+   Casi todas las salidas del trabajo son el resultado de algo que avanza: los
+   dias de la muestra, las veinte mil carteras sorteadas, la prima que sube.
+   Verlas aparecer dice mas de como se construyeron que verlas ya terminadas,
+   asi que el mismo mando sirve para todas: un boton, una barra que se puede
+   arrastrar a mano y la velocidad. Cada reproductor recibe una funcion que
+   sabe dibujar su figura en un instante t, entre cero y uno, y nada mas.
+   Se declara con function y no con const para que este disponible desde
+   cualquiera de los bloques de abajo sin depender del orden. */
+let REPRO_N = 0;
+const REPROS = [];
+
+function montarRepro(cfg) {
+  /* cfg.donde    nodo o selector donde se inserta el mando
+     cfg.pinta    t => etiqueta, con t de 0 a 1; dibuja el estado en ese punto
+     cfg.segundos cuanto dura el recorrido completo a velocidad 1
+     cfg.pasos    si se da, t se redondea a esa cuadricula (dias, carteras...)
+     cfg.vista    id de la seccion; al entrar en ella arranca solo una vez
+     cfg.titulo   lo que dice la etiqueta al estar parado al final */
+  const d = typeof cfg.donde === "string" ? $(cfg.donde) : cfg.donde;
+  if (!d) return null;
+  const n = ++REPRO_N;
+  const caja = document.createElement("div");
+  caja.className = "reproductor";
+  caja.innerHTML =
+    `<button class="btn-play" id="rp${n}-play" aria-label="Reproducir">&#9654;</button>
+     <input type="range" id="rp${n}-barra" min="0" max="1000" value="1000"
+            aria-label="Avance">
+     <span class="p-fecha" id="rp${n}-et"></span>
+     <button class="btn rp-vel" id="rp${n}-vel">1x</button>`;
+  d.appendChild(caja);
+
+  const bPlay = caja.querySelector(`#rp${n}-play`);
+  const barra = caja.querySelector(`#rp${n}-barra`);
+  const et    = caja.querySelector(`#rp${n}-et`);
+  const bVel  = caja.querySelector(`#rp${n}-vel`);
+
+  const api = {t:1, sonando:null, velocidad:1, arrancado:false};
+
+  function cuadricula(t) {
+    if (!cfg.pasos) return Math.min(1, Math.max(0, t));
+    const k = Math.round(t * cfg.pasos);
+    return Math.min(1, Math.max(0, k / cfg.pasos));
   }
 
-  // ---------- utilidades de dibujo ----------
-  var NS = "http://www.w3.org/2000/svg";
-  function svgEl(t, at) {
-    var e = document.createElementNS(NS, t);
-    for (var k in at) if (at[k] !== null && at[k] !== undefined) e.setAttribute(k, at[k]);
-    return e;
+  function ir(t, mover = true) {
+    api.t = cuadricula(t);
+    const texto = cfg.pinta(api.t);
+    et.textContent = texto != null ? texto : "";
+    if (mover) barra.value = Math.round(api.t * 1000);
   }
-  function lienzo(host, h, label) {
-    host.textContent = "";
-    var w = Math.max(280, host.clientWidth || 320);
-    var s = svgEl("svg", {
-      viewBox: "0 0 " + w + " " + h, width: "100%", height: h,
-      role: "img", "aria-label": label
-    });
-    host.appendChild(s);
-    return { s: s, w: w, h: h };
+
+  function parar() {
+    if (api.sonando) { cancelAnimationFrame(api.sonando); api.sonando = null; }
+    bPlay.innerHTML = "&#9654;";
+    bPlay.classList.remove("sonando");
   }
-  function texto(p, x, y, txt, op) {
-    op = op || {};
-    var t = svgEl("text", {
-      x: x, y: y, fill: op.fill || "#8396ab",
-      "font-size": op.size || 11, "text-anchor": op.anchor || "start",
-      "font-weight": op.weight || null
-    });
-    if (op.mono) t.setAttribute("style", "font-variant-numeric:tabular-nums");
-    t.textContent = txt;
-    p.appendChild(t);
-    return t;
-  }
-  function tooltip(host) {
-    var d = document.createElement("div");
-    d.className = "tip";
-    host.style.position = "relative";
-    host.appendChild(d);
-    return {
-      ver: function (x, y, txt) {
-        d.textContent = txt;
-        d.style.opacity = 1;
-        var bw = d.offsetWidth, bh = d.offsetHeight, W = host.clientWidth;
-        d.style.left = Math.max(2, Math.min(x - bw / 2, W - bw - 2)) + "px";
-        d.style.top = Math.max(2, y - bh - 12) + "px";
-      },
-      ir: function () { d.style.opacity = 0; }
+
+  function reproducir() {
+    if (api.sonando) { parar(); return; }
+    if (api.t >= 1) ir(0);
+    bPlay.innerHTML = "&#10073;&#10073;";
+    bPlay.classList.add("sonando");
+    /* Se avanza por tiempo transcurrido y no por fotograma, para que el
+       recorrido dure lo mismo en un equipo rapido que en uno lento. */
+    const segs = cfg.segundos || 8;
+    let antes = performance.now();
+    const paso = ts => {
+      const dt = (ts - antes) / 1000;
+      antes = ts;
+      let t = api.t + dt * api.velocidad / segs;
+      if (t >= 1) { ir(1); parar(); return; }
+      ir(t);
+      api.sonando = requestAnimationFrame(paso);
     };
-  }
-  function zonaHover(p, at, texto_, tip, host) {
-    var z = svgEl("rect", at);
-    z.setAttribute("fill", "transparent");
-    z.style.cursor = "crosshair";
-    z.addEventListener("pointermove", function (ev) {
-      var r = host.getBoundingClientRect();
-      tip.ver(ev.clientX - r.left, ev.clientY - r.top, texto_);
-    });
-    z.addEventListener("pointerleave", tip.ir);
-    p.appendChild(z);
+    api.sonando = requestAnimationFrame(paso);
   }
 
-  // ---------- portada ----------
-  function portada() {
-    var b = porOrden("betas");
-    var c = DATOS.costo[0] || {};
-    var min = fila("betas", "Sector", "Consumo"), max = fila("betas", "Sector", "Mineria");
+  bPlay.onclick = reproducir;
+  barra.addEventListener("input", () => { parar(); ir(+barra.value / 1000, false); });
+  bVel.onclick = () => {
+    api.velocidad = api.velocidad === 1 ? 2 : api.velocidad === 2 ? 4
+                  : api.velocidad === 4 ? 0.5 : 1;
+    bVel.textContent = (api.velocidad === 0.5 ? "0,5" : api.velocidad) + "x";
+  };
 
-    el("h-dias").textContent = b.length ? (+b[0].N).toLocaleString("es-PE") : "—";
-    el("k-obs").textContent = b.length ? (+b[0].N).toLocaleString("es-PE") : "—";
-    el("h-bmax").textContent = max ? fmt(num(max.Beta), 3) : "—";
-    el("h-bmin").textContent = min ? fmt(num(min.Beta), 3) : "—";
+  const r = {ir, parar, reproducir, api, vista: cfg.vista || null,
+             auto: cfg.auto !== false};
+  REPROS.push(r);
+  ir(1);
+  return r;
+}
 
-    var kes = DATOS.costo.map(function (r) { return num(r["Costo de capital Ke (%)"]); })
-      .filter(isFinite);
-    el("k-ke").textContent = kes.length
-      ? fmt(Math.min.apply(null, kes), 1) + " a " + pct(Math.max.apply(null, kes), 1) : "—";
-    el("k-prima").textContent = pct(num(c["Prima de mercado (%)"]), 2);
-
-    var mej = fila("diversificacion", "Indicador", "Mejora porcentual del Sharpe");
-    el("k-sharpe").textContent = mej ? "+" + pct(num(mej.Valor), 1) : "—";
-
-    var tan = (DATOS.frontera || []).filter(function (r) {
-      return r.Cartera.indexOf("Maximo") === 0;
-    })[0];
-    el("h-const").textContent = tan ? fmt(num(tan["Construcción %"]), 1) : "—";
-  }
-
-  // ---------- grafico de betas ----------
-  function dibujarBetas() {
-    var host = el("c-betas");
-    var rows = visibles(porOrden("betas"));
-    if (!rows.length) { host.textContent = ""; return; }
-    var h = rows.length * 46 + 44;
-    var L = lienzo(host, h, "Beta de cada sector con su intervalo de confianza al 95 por ciento");
-    var m = { l: 94, r: 54, t: 12, b: 30 };
-    var maxv = Math.max.apply(null, rows.map(function (r) { return num(r["IC 95% superior"]); }));
-    var X = function (v) { return m.l + (v / (maxv * 1.08)) * (L.w - m.l - m.r); };
-    var bw = (h - m.t - m.b) / rows.length;
-    var tip = tooltip(host);
-
-    for (var g = 0; g <= 2; g += 0.5) {
-      if (g > maxv * 1.08) break;
-      L.s.appendChild(svgEl("line", {
-        x1: X(g), x2: X(g), y1: m.t, y2: h - m.b,
-        stroke: "#1e2b3a", "stroke-width": 1
-      }));
-      texto(L.s, X(g), h - m.b + 16, fmt(g, 1), { anchor: "middle" });
+/* Al salir de una seccion se para lo que estuviera corriendo, para no gastar
+   fotogramas en una figura que ya nadie mira. Al entrar, si no se ha visto
+   todavia, arranca sola: es lo que hace que se sienta como un video. */
+function reprosAlEntrar(id) {
+  REPROS.forEach(r => {
+    if (r.vista !== id) { r.parar(); return; }
+    if (r.auto && !r.api.arrancado) {
+      r.api.arrancado = true;
+      r.ir(0);
+      setTimeout(() => r.reproducir(), 420);
     }
-    L.s.appendChild(svgEl("line", {
-      x1: X(1), x2: X(1), y1: m.t, y2: h - m.b,
-      stroke: "#8396ab", "stroke-width": 1, "stroke-dasharray": "5 4", opacity: .8
-    }));
-    texto(L.s, X(1) + 6, m.t + 11, "mercado = 1", { size: 10 });
+  });
+}
 
-    rows.forEach(function (r, i) {
-      var cy = m.t + i * bw + bw / 2;
-      var b = num(r.Beta), lo = num(r["IC 95% inferior"]), hi = num(r["IC 95% superior"]);
-      var c = color(r.Sector);
-      texto(L.s, m.l - 12, cy + 4, nombre(r.Sector), { anchor: "end", fill: "#e9eff7", size: 12 });
-      L.s.appendChild(svgEl("line", {
-        x1: X(lo), x2: X(hi), y1: cy, y2: cy, stroke: c, "stroke-width": 7,
-        "stroke-linecap": "round", opacity: .34
-      }));
-      L.s.appendChild(svgEl("circle", {
-        cx: X(b), cy: cy, r: 7.5, fill: c, stroke: "#080c12", "stroke-width": 2.5
-      }));
-      texto(L.s, X(hi) + 10, cy + 4, fmt(b, 3), { fill: "#e9eff7", size: 12, mono: true });
-      zonaHover(L.s, { x: m.l, y: cy - bw / 2, width: L.w - m.l - m.r, height: bw },
-        nombre(r.Sector) + "\nBeta " + fmt(b, 4) +
-        "\nIC 95 %: " + fmt(lo, 3) + " a " + fmt(hi, 3) +
-        "\nR² " + fmt(num(r.R2), 3) + "\np " + (num(r["p-valor"]) < 0.001 ? "< 0,001" : fmt(num(r["p-valor"]), 3)),
-        tip, host);
+/* ===================== datos derivados de las tablas ===================== */
+const RF    = num(fila("costo","mineria","Sector")?.["Rf (%)"]);
+const PRIMA = num(fila("costo","mineria","Sector")?.["Prima de mercado (%)"]);
+/* La prima de referencia no esta en ninguna tabla como columna propia, de modo que se
+   despeja de la columna "Ke con prima de referencia". La tabla guarda beta y Ke con
+   cuatro decimales, y esa perdida de precision deja la division en 7,5004 en lugar de
+   7,5, de modo que el resultado se redondea a dos decimales. El valor declarado en
+   04_analisis.py linea 196 es PRIMA_REFERENCIA = 7.5 */
+const PRIMA_REF = (() => {
+  const f = fila("costo","mineria","Sector");
+  const b = num(f?.Beta), ke = num(f?.["Ke con prima de referencia (%)"]);
+  return (b && ke != null && RF != null) ? Math.round((ke - RF) / b * 100) / 100 : null;
+})();
+
+const BETA = {}, KE = {}, IC = {}, R2 = {}, EE = {};
+SEC.forEach(s => {
+  const f = fila("betas", s, "Sector") || {};
+  const g = fila("costo", s, "Sector") || {};
+  BETA[s] = num(f.Beta);
+  EE[s]   = num(f["Error estandar"]);
+  IC[s]   = [num(f["IC 95% inferior"]), num(f["IC 95% superior"])];
+  R2[s]   = num(f.R2);
+  KE[s]   = num(g["Costo de capital Ke (%)"]);
+});
+
+/* ===================== tarjetas ===================== */
+(function tarjetas() {
+  $("#tarjetas").innerHTML = SEC.map(s => {
+    const d = fila("desempeno", s, "Sector") || {};
+    return `<div class="tarjeta" style="--c:${COL[s]}">
+      <h4>${NOM[s]}</h4>
+      <div class="cifra" data-ke="${s}">${fmt(KE[s])} %</div>
+      <div class="pie">costo de capital</div>
+      <div class="pie" style="margin-top:9px">
+        beta <span data-beta="${s}">${fmt(BETA[s], 4)}</span>
+        &nbsp;&middot;&nbsp; R&sup2; ${fmt(R2[s], 3)}<br>
+        retorno ${fmt(num(d["Retorno anual %"]))} % &nbsp;&middot;&nbsp;
+        riesgo ${fmt(num(d["Volatilidad anual %"]))} %
+      </div>
+    </div>`;
+  }).join("");
+})();
+
+/* ===================== figura de betas ===================== */
+(function figBetas() {
+  const an = 760, al = 250, iz = 108, de = 56, ar = 18, ab = 40;
+  const s = lienzo("#fig-betas", an, al);
+  const lo = Math.min(0, ...SEC.map(k => IC[k][0])) - .08;
+  const hi = Math.max(...SEC.map(k => IC[k][1])) + .12;
+  const X = v => iz + (v - lo) / (hi - lo) * (an - iz - de);
+  const paso = (al - ar - ab) / SEC.length;
+
+  for (let t = Math.ceil(lo*5)/5; t <= hi; t += .2) {
+    const x = X(t);
+    el("line", {x1:x, y1:ar, x2:x, y2:al-ab, stroke:"#2a323d", "stroke-width":1}, s);
+    el("text", {x, y:al-ab+17, fill:"#6e7781", "font-size":11, "text-anchor":"middle"}, s)
+      .textContent = fmt(t, 1);
+  }
+  const x1 = X(1);
+  el("line", {x1, y1:ar, x2:x1, y2:al-ab, stroke:"#9aa4b2", "stroke-width":1.5,
+              "stroke-dasharray":"5 4"}, s);
+  el("text", {x:x1, y:ar-5, fill:"#9aa4b2", "font-size":11, "text-anchor":"middle"}, s)
+    .textContent = "beta del mercado = 1,0";
+
+  /* Las barras se dibujan en su propia capa para poder rehacerlas sin tocar
+     los ejes. Con t menor que uno se muestran a escala, de modo que crecen
+     desde cero hasta su valor estimado. */
+  const capa = el("g", {}, s);
+
+  function pinta(t) {
+    capa.textContent = "";
+    SEC.forEach((k, i) => {
+      const y = ar + paso*i + paso/2;
+      const b = BETA[k]*t, lo2 = IC[k][0]*t, hi2 = IC[k][1]*t;
+      const g = el("g", {}, capa);
+      el("line", {x1:X(lo2), y1:y, x2:X(hi2), y2:y,
+                  stroke:COL[k], "stroke-width":2.5, opacity:.42}, g);
+      [lo2, hi2].forEach(v =>
+        el("line", {x1:X(v), y1:y-6, x2:X(v), y2:y+6, stroke:COL[k],
+                    "stroke-width":2.5}, g));
+      el("circle", {cx:X(b), cy:y, r:6, fill:COL[k], stroke:"#0d1117",
+                    "stroke-width":2}, g);
+      el("text", {x:iz-12, y:y+4, fill:"#e6edf3", "font-size":13,
+                  "text-anchor":"end"}, g).textContent = NOM[k];
+      el("text", {x:X(hi2)+11, y:y+4, fill:COL[k], "font-size":12,
+                  "font-family":"ui-monospace,Menlo,monospace"}, g)
+        .textContent = fmt(b, 3);
+      if (t >= 1)
+        conTip(g, `<b>${NOM[k]}</b><br>beta ${fmt(BETA[k],4)}<br>` +
+          `error estandar ${fmt(EE[k],4)}<br>` +
+          `IC 95% ${fmt(IC[k][0],4)} a ${fmt(IC[k][1],4)}<br>` +
+          `R&sup2; ${fmt(R2[k],4)}<br>Ke ${fmt(KE[k])} %`);
     });
+    /* Las tarjetas de arriba van con la misma t: su beta y su Ke se mueven a la
+       par que la barra, de modo que se ve de donde sale cada cifra. */
+    SEC.forEach(k => {
+      const nb = document.querySelector(`[data-beta="${k}"]`);
+      const nk = document.querySelector(`[data-ke="${k}"]`);
+      if (nb) nb.textContent = fmt(BETA[k]*t, 4);
+      if (nk) nk.textContent = fmt(t >= 1 ? KE[k] : RF + BETA[k]*t*PRIMA) + " %";
+    });
+    return t >= 1 ? "betas estimadas"
+                  : "creciendo: " + fmt(t*100, 0) + " por ciento";
   }
 
-  function leyenda() {
-    var cont = el("leg-betas");
-    cont.textContent = "";
-    ORDEN.forEach(function (s) {
-      var b = document.createElement("button");
-      b.className = "chip" + (ocultos[s] ? " off" : "");
-      b.type = "button";
-      b.setAttribute("aria-pressed", ocultos[s] ? "false" : "true");
-      var d = document.createElement("i");
-      d.className = "dot";
-      d.style.background = COL[s];
-      b.appendChild(d);
-      b.appendChild(document.createTextNode(ETQ[s]));
-      b.addEventListener("click", function () {
-        ocultos[s] = !ocultos[s];
-        if (ORDEN.every(function (x) { return ocultos[x]; })) ocultos[s] = false;
-        leyenda(); dibujarBetas(); dibujarKe();
-      });
-      cont.appendChild(b);
-    });
-  }
+  montarRepro({donde:"#repro-betas", pinta, segundos:3.4, vista:"resultados"});
+})();
 
-  // ---------- simulador del costo de capital ----------
-  var primaReal = 15.4;
-  function dibujarKe() {
-    var host = el("c-ke");
-    var rows = visibles(porOrden("costo"));
-    if (!rows.length) { host.textContent = ""; return; }
-    var prima = parseFloat(el("prima").value);
-    var rf = num((DATOS.costo[0] || {})["Rf (%)"]);
-    var h = 300;
-    var L = lienzo(host, h, "Costo de capital de cada sector segun la prima de mercado elegida");
-    var m = { l: 46, r: 16, t: 24, b: 48 };
-    var kes = rows.map(function (r) { return rf + num(r.Beta) * prima; });
-    var top = Math.max(Math.max.apply(null, kes) * 1.17, 10);
-    var Y = function (v) { return h - m.b - (v / top) * (h - m.b - m.t); };
-    var bw = (L.w - m.l - m.r) / rows.length;
-    var tip = tooltip(host);
+/* ===================== hallazgo ===================== */
+(function hallazgo() {
+  const d = s => fila("desempeno", s, "Sector") || {};
+  const rm = num(d("mineria")["Retorno anual %"]), rb = num(d("banca")["Retorno anual %"]);
+  const bm = BETA.mineria, bb = BETA.banca;
+  $("#hallazgo").innerHTML =
+    `<b>Lo que mas llama la atencion.</b> La banca rindio ${fmt(rb)} por ciento al anio y la
+     mineria ${fmt(rm)} por ciento, una diferencia de apenas
+     ${fmt(Math.abs(rm-rb))} puntos, pero la beta de la banca
+     (${fmt(bb,4)}) es ${fmt((1-bb/bm)*100,0)} por ciento menor que la de la mineria
+     (${fmt(bm,4)}). Casi el mismo retorno con bastante menos riesgo sistematico, y por eso
+     la banca pesa ${fmt(num((DATOS.frontera[0]||{})["Banca %"]),1)} por ciento en la cartera
+     tangente mientras la mineria se queda en
+     ${fmt(num((DATOS.frontera[0]||{})["Minería %"] ??
+                (DATOS.frontera[0]||{})["Mineria %"]),1)} por ciento.`;
+})();
 
-    var paso = top > 30 ? 10 : 5;
-    for (var g = 0; g <= top; g += paso) {
-      L.s.appendChild(svgEl("line", {
-        x1: m.l, x2: L.w - m.r, y1: Y(g), y2: Y(g), stroke: "#1e2b3a", "stroke-width": 1
-      }));
-      texto(L.s, m.l - 8, Y(g) + 4, g + "%", { anchor: "end", size: 10 });
+/* ===================== simulador del CAPM ===================== */
+(function capm() {
+  const r = $("#prima");
+  /* El deslizador se mueve de decima en decima, pero la prima estimada tiene cuatro
+     decimales. Se guarda aparte para que al pulsar "Prima estimada" el Ke salga
+     identico al de la tabla 5 y no redondeado al paso del deslizador. */
+  let prima = PRIMA;
+  r.value = PRIMA;
+  const an = 760, al = 285, iz = 108, de = 60, ar = 24, ab = 42;
+
+  function pinta() {
+    const p = prima;
+    $("#v-prima").textContent = fmt(p, p === Math.round(p*10)/10 ? 2 : 4) + " %";
+    const ke = {}; SEC.forEach(k => ke[k] = RF + BETA[k]*p);
+    const hi = Math.max(12, ...Object.values(ke)) * 1.14;
+    const s = lienzo("#fig-capm", an, al);
+    const X = v => iz + v/hi * (an - iz - de);
+    const paso = (al - ar - ab) / SEC.length;
+
+    const pt = hi > 40 ? 10 : 5;
+    for (let t = 0; t <= hi; t += pt) {
+      const x = X(t);
+      el("line", {x1:x, y1:ar, x2:x, y2:al-ab, stroke:"#2a323d"}, s);
+      el("text", {x, y:al-ab+17, fill:"#6e7781", "font-size":11, "text-anchor":"middle"}, s)
+        .textContent = fmt(t, 0);
     }
-    L.s.appendChild(svgEl("line", {
-      x1: m.l, x2: L.w - m.r, y1: Y(rf), y2: Y(rf),
-      stroke: "#8396ab", "stroke-dasharray": "4 4", opacity: .75
-    }));
-    texto(L.s, m.l + 6, Y(rf) - 7, "Rf " + fmt(rf, 2) + " %", { size: 10 });
+    const xr = X(RF);
+    el("line", {x1:xr, y1:ar, x2:xr, y2:al-ab, stroke:"#9aa4b2", "stroke-width":1.5,
+                "stroke-dasharray":"5 4"}, s);
+    el("text", {x:xr-8, y:ar-7, fill:"#9aa4b2", "font-size":11, "text-anchor":"end"}, s)
+      .textContent = "Rf " + fmt(RF) + " %";
 
-    rows.forEach(function (r, i) {
-      var ke = rf + num(r.Beta) * prima;
-      var x = m.l + i * bw + bw * 0.2, an = bw * 0.6;
-      var c = color(r.Sector);
-      var alto = Math.max(0, h - m.b - Y(ke));
-      var b = svgEl("rect", { x: x, y: Y(ke), width: an, height: alto, rx: 4, fill: c });
-      b.setAttribute("style", "transition:y .18s,height .18s");
-      L.s.appendChild(b);
-      texto(L.s, x + an / 2, Y(ke) - 9, pct(ke, 1),
-        { anchor: "middle", fill: "#e9eff7", size: 12.5, mono: true, weight: 600 });
-      texto(L.s, x + an / 2, h - m.b + 18, nombre(r.Sector),
-        { anchor: "middle", size: 11 });
-      texto(L.s, x + an / 2, h - m.b + 33, "β " + fmt(num(r.Beta), 3),
-        { anchor: "middle", size: 10, mono: true });
-      zonaHover(L.s, { x: m.l + i * bw, y: m.t, width: bw, height: h - m.b - m.t },
-        nombre(r.Sector) + "\nKe " + pct(ke, 2) +
-        "\nβ " + fmt(num(r.Beta), 4) + "\nRf " + pct(rf, 3) + "\nPrima " + pct(prima, 1),
-        tip, host);
+    SEC.forEach((k, i) => {
+      const y = ar + paso*i + 9, h = paso - 20;
+      const g = el("g", {}, s);
+      el("rect", {x:iz, y, width:Math.max(1, X(ke[k])-iz), height:h, rx:4, fill:COL[k],
+                  opacity:.82}, g);
+      el("text", {x:iz-12, y:y+h/2+4, fill:"#e6edf3", "font-size":13, "text-anchor":"end"}, g)
+        .textContent = NOM[k];
+      el("text", {x:X(ke[k])+10, y:y+h/2+4, fill:COL[k], "font-size":12.5,
+                  "font-family":"ui-monospace,Menlo,monospace"}, g)
+        .textContent = fmt(ke[k]) + " %";
+      conTip(g, `<b>${NOM[k]}</b><br>Ke = ${fmt(RF)} + ${fmt(BETA[k],4)} &times; ${fmt(p)}` +
+        `<br>Ke = <b>${fmt(ke[k])} %</b>`);
     });
+    el("text", {x:(an+iz-de)/2, y:al-6, fill:"#6e7781", "font-size":11,
+                "text-anchor":"middle"}, s)
+      .textContent = "costo de capital Ke, por ciento anual";
+
+    const d = ke.mineria - ke.consumo;
+    const igual = Math.abs(p - PRIMA) < 1e-9;
+    $("#nota-capm").innerHTML =
+      `Con una prima de ${fmt(p, igual ? 4 : 2)} por ciento, a la mineria se le exige
+       ${fmt(d)} puntos mas que al consumo. La prima estimada del periodo es
+       ${fmt(PRIMA, 4)} por ciento` +
+      (PRIMA_REF == null ? "" : ` y la de referencia que usa el articulo para contrastar es
+       ${fmt(PRIMA_REF)} por ciento`) + `. ` +
+      (igual ? `Con esta prima el Ke de la mineria sale ${fmt(ke.mineria, 4)} por ciento y la
+                tabla 5 dice ${fmt(KE.mineria, 4)} por ciento. La diferencia de
+                ${fmt(Math.abs(ke.mineria - KE.mineria), 4)} puntos es el redondeo a cuatro
+                decimales con que el CSV guarda la prima; el codigo de Python la multiplica sin
+                redondear.`
+             : `Los Ke de la tabla 5 corresponden a la prima estimada; esta es otra, de modo
+                que las cifras de arriba no son las del articulo.`);
   }
+  r.addEventListener("input", () => { prima = parseFloat(r.value); pinta(); });
+  $("#btn-prima-est").textContent = "Prima estimada " + fmt(PRIMA, 4) + " %";
+  $("#btn-prima-est").onclick = () => { prima = PRIMA; r.value = PRIMA; pinta(); };
+  if (PRIMA_REF == null) {
+    $("#btn-prima-ref").remove();
+  } else {
+    $("#btn-prima-ref").textContent = "Prima de referencia " + fmt(PRIMA_REF) + " %";
+    $("#btn-prima-ref").onclick = () => { prima = PRIMA_REF; r.value = PRIMA_REF; pinta(); };
+  }
+  pinta();
 
-  // ---------- frontera ----------
-  function dibujarFrontera() {
-    var host = el("c-front");
-    var sec = porOrden("desempeno").map(function (r) {
-      return {
-        n: nombre(r.Sector), c: color(r.Sector),
-        v: num(r["Volatilidad anual %"]), r: num(r["Retorno anual %"]), s: num(r.Sharpe), tipo: "s"
-      };
-    });
-    var car = (DATOS.frontera || []).map(function (r) {
-      return {
-        n: r.Cartera, c: "#7c5cff", v: num(r["Volatilidad anual %"]),
-        r: num(r["Retorno anual %"]), s: num(r.Sharpe), tipo: "c"
-      };
-    });
-    var todo = sec.concat(car).filter(function (p) { return isFinite(p.v) && isFinite(p.r); });
-    if (!todo.length) { host.textContent = ""; return; }
-
-    var h = 300;
-    var L = lienzo(host, h, "Retorno frente a volatilidad de los sectores y de las carteras");
-    var m = { l: 46, r: 18, t: 20, b: 48 };
-    var vs = todo.map(function (p) { return p.v; }), rs = todo.map(function (p) { return p.r; });
-    var v0 = Math.min.apply(null, vs) * 0.88, v1 = Math.max.apply(null, vs) * 1.07;
-    var r0 = Math.min.apply(null, rs) * 0.82, r1 = Math.max.apply(null, rs) * 1.1;
-    var X = function (v) { return m.l + ((v - v0) / (v1 - v0)) * (L.w - m.l - m.r); };
-    var Y = function (v) { return h - m.b - ((v - r0) / (r1 - r0)) * (h - m.b - m.t); };
-    var tip = tooltip(host);
-
-    for (var i = 0; i <= 4; i++) {
-      var yv = r0 + (r1 - r0) * i / 4, xv = v0 + (v1 - v0) * i / 4;
-      L.s.appendChild(svgEl("line", { x1: m.l, x2: L.w - m.r, y1: Y(yv), y2: Y(yv), stroke: "#1e2b3a" }));
-      texto(L.s, m.l - 8, Y(yv) + 4, fmt(yv, 0) + "%", { anchor: "end", size: 10 });
-      texto(L.s, X(xv), h - m.b + 17, fmt(xv, 0) + "%", { anchor: "middle", size: 10 });
+  /* El barrido recorre la prima de cero a la estimada. Es la forma de ver de un
+     golpe lo que el supuesto decide: con prima cero los cuatro Ke se juntan en
+     la tasa libre de riesgo y las barras se abren a medida que sube. */
+  montarRepro({
+    donde:"#repro-capm", segundos:5, vista:"capm",
+    pinta: t => {
+      prima = PRIMA * t;
+      r.value = prima;
+      pinta();
+      return t >= 1 ? "prima estimada " + fmt(PRIMA, 4) + " %"
+                    : "prima " + fmt(prima, 2) + " %";
     }
-    texto(L.s, (m.l + L.w - m.r) / 2, h - 8, "Volatilidad anual", { anchor: "middle", size: 11 });
+  });
+})();
 
-    car.forEach(function (p) {
-      var g = svgEl("path", {
-        d: "M0,-11 L3,-3.4 L11,-3.4 L4.6,1.3 L6.9,9 L0,4.3 L-6.9,9 L-4.6,1.3 L-11,-3.4 L-3,-3.4 Z",
-        transform: "translate(" + X(p.v) + "," + Y(p.r) + ")",
-        fill: "#7c5cff", stroke: "#080c12", "stroke-width": 1.5
-      });
-      L.s.appendChild(g);
+/* ===================== panel diario ===================== */
+(function panel() {
+  const F = DER.fechas, I = DER.indice;
+  const apagados = new Set();
+  let i0 = 0, i1 = F.length - 1;
+  /* hastaDibujar marca donde se ha quedado la reproduccion. Cuando vale i1 la
+     serie esta entera, que es el estado de reposo. */
+  let hastaDibujar = i1, sonando = null, velocidad = 1;
+
+  $("#leyenda-panel").innerHTML = SEC.map(s =>
+    `<span class="chip" data-sec="${s}"><span class="punto" style="background:${COL[s]}"></span>
+     ${NOM[s]}</span>`).join("");
+  $("#leyenda-panel").querySelectorAll(".chip").forEach(c =>
+    c.onclick = () => {
+      const s = c.dataset.sec;
+      apagados.has(s) ? apagados.delete(s) : apagados.add(s);
+      c.classList.toggle("off");
+      pinta();
     });
-    sec.forEach(function (p) {
-      L.s.appendChild(svgEl("circle", {
-        cx: X(p.v), cy: Y(p.r), r: 9, fill: p.c, stroke: "#080c12", "stroke-width": 2.5
+
+  $("#desde").min = $("#hasta").min = F[0];
+  $("#desde").max = $("#hasta").max = F[F.length-1];
+
+  function pinta() {
+    const an = 760, al = 330, iz = 58, de = 68, ar = 20, ab = 42;
+    const s = lienzo("#fig-panel", an, al);
+    const vivos = SEC.filter(k => !apagados.has(k));
+    if (!vivos.length || i1 <= i0) {
+      el("text", {x:an/2, y:al/2, fill:"#6e7781", "font-size":13, "text-anchor":"middle"}, s)
+        .textContent = !vivos.length ? "Enciende al menos un sector"
+                                     : "El tramo elegido no tiene dias";
+      return;
+    }
+    const base = {}; vivos.forEach(k => base[k] = I[k][i0]);
+    let lo = Infinity, hi = -Infinity;
+    vivos.forEach(k => { for (let i = i0; i <= i1; i++) {
+      const v = I[k][i] / base[k] * 100;
+      if (v < lo) lo = v; if (v > hi) hi = v;
+    }});
+    const m = (hi - lo) * .09 || 5; lo -= m; hi += m;
+    const X = i => iz + (i - i0) / (i1 - i0) * (an - iz - de);
+    const Y = v => al - ab - (v - lo) / (hi - lo) * (al - ar - ab);
+
+    const salto = Math.pow(10, Math.floor(Math.log10(hi - lo))) *
+                  ((hi - lo) / Math.pow(10, Math.floor(Math.log10(hi - lo))) > 5 ? 2 : 1);
+    for (let t = Math.ceil(lo/salto)*salto; t <= hi; t += salto) {
+      el("line", {x1:iz, y1:Y(t), x2:an-de, y2:Y(t), stroke:"#2a323d"}, s);
+      el("text", {x:iz-9, y:Y(t)+4, fill:"#6e7781", "font-size":11, "text-anchor":"end"}, s)
+        .textContent = fmt(t, 0);
+    }
+    el("line", {x1:iz, y1:Y(100), x2:an-de, y2:Y(100), stroke:"#9aa4b2",
+                "stroke-dasharray":"4 4"}, s);
+
+    const n = 5;
+    for (let j = 0; j < n; j++) {
+      const i = Math.round(i0 + (i1-i0)*j/(n-1));
+      el("text", {x:X(i), y:al-ab+18, fill:"#6e7781", "font-size":11,
+                  "text-anchor": j===0 ? "start" : j===n-1 ? "end" : "middle"}, s)
+        .textContent = F[i].slice(0, 7);
+    }
+
+    /* Solo se traza hasta donde va la reproduccion. Los limites verticales se
+       calcularon con el tramo entero para que la escala no salte mientras
+       avanza: una grafica que se reescala sola es imposible de seguir. */
+    /* hastaDibujar avanza con decimales para que el movimiento sea suave, pero
+       aqui hace falta un indice entero: con uno fraccionario, I[k][corte] no
+       existe y todo el dibujo sale con coordenadas NaN. */
+    const corte = Math.round(Math.max(i0, Math.min(i1, hastaDibujar)));
+    vivos.forEach(k => {
+      let d = "";
+      for (let i = i0; i <= corte; i++)
+        d += (i === i0 ? "M" : "L") + X(i).toFixed(1) + " " +
+             Y(I[k][i]/base[k]*100).toFixed(1) + " ";
+      el("path", {d, fill:"none", stroke:COL[k], "stroke-width":1.9,
+                  "stroke-linejoin":"round"}, s);
+      const fin = I[k][corte]/base[k]*100;
+      /* la cabeza de la linea, mientras avanza */
+      if (corte < i1)
+        el("circle", {cx:X(corte), cy:Y(fin), r:3.4, fill:COL[k],
+                      stroke:"#0d1117", "stroke-width":1.4}, s);
+      el("text", {x:an-de+9, y:Y(fin)+4, fill:COL[k], "font-size":12,
+                  "font-family":"ui-monospace,Menlo,monospace"}, s)
+        .textContent = fmt(fin, 0);
+    });
+    if (corte < i1)
+      el("line", {x1:X(corte), y1:ar, x2:X(corte), y2:al-ab, stroke:"#9aa4b2",
+                  "stroke-width":1, opacity:.3, "stroke-dasharray":"3 3"}, s);
+    el("text", {x:14, y:ar+6, fill:"#6e7781", "font-size":11}, s)
+      .textContent = "indice";
+
+    /* lectura al pasar el cursor */
+    const capa = el("rect", {x:iz, y:ar, width:an-iz-de, height:al-ar-ab,
+                             fill:"transparent"}, s);
+    const guia = el("line", {x1:0, y1:ar, x2:0, y2:al-ab, stroke:"#9aa4b2",
+                             "stroke-width":1, opacity:0}, s);
+    capa.addEventListener("mousemove", e => {
+      const caja = s.getBoundingClientRect();
+      const px = (e.clientX - caja.left) / caja.width * an;
+      const i = Math.max(i0, Math.min(i1,
+        Math.round(i0 + (px - iz)/(an-iz-de)*(i1-i0))));
+      guia.setAttribute("x1", X(i)); guia.setAttribute("x2", X(i));
+      guia.setAttribute("opacity", .55);
+      tip.innerHTML = `<b>${F[i]}</b><br>` + vivos.map(k =>
+        `<span style="color:${COL[k]}">&#9679;</span> ${NOM[k]} ` +
+        fmt(I[k][i]/base[k]*100, 1)).join("<br>");
+      tip.style.opacity = 1;
+      const r = tip.getBoundingClientRect();
+      let x = e.clientX + 16;
+      if (x + r.width > innerWidth - 10) x = e.clientX - r.width - 16;
+      tip.style.left = x + "px";
+      tip.style.top = Math.max(10, e.clientY - r.height/2) + "px";
+    });
+    capa.addEventListener("mouseleave", () => {
+      tip.style.opacity = 0; guia.setAttribute("opacity", 0);
+    });
+
+    $("#desde").value = F[i0]; $("#hasta").value = F[i1];
+    $("#p-fecha").textContent = F[corte];
+    $("#p-barra").max = i1 - i0;
+    $("#p-barra").value = corte - i0;
+
+    const anios = (new Date(F[corte]) - new Date(F[i0])) / 31557600000;
+    $("#nota-panel").innerHTML =
+      `${corte-i0+1} sesiones, del ${F[i0]} al ${F[corte]}` +
+      (corte < i1 ? ` (reproduciendo; el tramo llega al ${F[i1]})` : "") + ". " +
+      vivos.map(k => {
+        const t = I[k][corte]/base[k]*100 - 100;
+        return `${NOM[k]} ${t >= 0 ? "+" : ""}${fmt(t,1)} por ciento` +
+               (anios > 1.2 ? ` (${fmt((Math.pow(1+t/100, 1/anios)-1)*100,1)} % al anio)` : "");
+      }).join(", ") + ". Cada curva arranca en 100 el primer dia del tramo.";
+  }
+
+  /* ---------- el reproductor ---------- */
+  function parar() {
+    if (sonando) { cancelAnimationFrame(sonando); sonando = null; }
+    $("#p-play").innerHTML = "&#9654;";
+    $("#p-play").classList.remove("sonando");
+  }
+
+  function reproducir() {
+    if (sonando) { parar(); return; }
+    if (hastaDibujar >= i1) hastaDibujar = i0;      /* si acabo, vuelve a empezar */
+    $("#p-play").innerHTML = "&#10073;&#10073;";
+    $("#p-play").classList.add("sonando");
+
+    /* Se avanza por tiempo transcurrido y no por fotograma, de modo que el
+       recorrido dura lo mismo en un equipo rapido que en uno lento. */
+    const SEGUNDOS = 9;
+    let anterior = performance.now();
+    const paso = ts => {
+      const dt = (ts - anterior) / 1000;
+      anterior = ts;
+      hastaDibujar += (i1 - i0) / SEGUNDOS * velocidad * dt;
+      if (hastaDibujar >= i1) { hastaDibujar = i1; pinta(); parar(); return; }
+      pinta();
+      sonando = requestAnimationFrame(paso);
+    };
+    sonando = requestAnimationFrame(paso);
+  }
+
+  $("#p-play").onclick = reproducir;
+  $("#p-barra").addEventListener("input", () => {
+    parar();
+    hastaDibujar = i0 + (+$("#p-barra").value);
+    pinta();
+  });
+  $("#p-vel").onclick = () => {
+    velocidad = velocidad === 1 ? 2 : velocidad === 2 ? 4 : velocidad === 4 ? 0.5 : 1;
+    $("#p-vel").textContent = (velocidad === 0.5 ? "0,5" : velocidad) + "x";
+  };
+
+  document.querySelectorAll("[data-rango]").forEach(b => b.onclick = () => {
+    document.querySelectorAll("[data-rango]").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    const d = {todo:1e9, "3a":756, "1a":252, "6m":126}[b.dataset.rango];
+    parar();
+    i1 = VENTANA.i1; i0 = Math.max(VENTANA.i0, i1 - d);
+    hastaDibujar = i1;
+    pinta();
+  });
+
+  /* El periodo del lateral manda sobre esta seccion: al moverlo se recorta el
+     tramo y se vuelve a mostrar entero, sin reproduccion a medias. */
+  VENTANA.escuchar((a, b) => {
+    parar();
+    i0 = a; i1 = b; hastaDibujar = b;
+    document.querySelectorAll("[data-rango]").forEach(x => x.classList.remove("on"));
+    const todo = document.querySelector('[data-rango="todo"]');
+    if (todo) todo.classList.add("on");
+    pinta();
+  });
+  function porFecha() {
+    const a = $("#desde").value, b = $("#hasta").value;
+    let na = F.findIndex(f => f >= a);
+    let nb = F.length - 1; while (nb > 0 && F[nb] > b) nb--;
+    if (na < 0) na = 0;
+    if (nb > na) {
+      parar();
+      i0 = na; i1 = nb; hastaDibujar = nb;
+      document.querySelectorAll("[data-rango]").forEach(x => x.classList.remove("on"));
+      pinta();
+    }
+  }
+  $("#desde").onchange = $("#hasta").onchange = porFecha;
+  pinta();
+  addEventListener("resize", () => { clearTimeout(window._rp);
+    window._rp = setTimeout(pinta, 180); });
+})();
+
+/* ===================== sector frente al mercado =====================
+   Las figuras 3 a 6 del articulo, rehechas en el navegador. Aqui no se dibuja
+   una imagen guardada sino la regresion misma: el panel original viaja en la
+   pagina, de modo que al mover el periodo del lateral las betas se vuelven a
+   estimar con las sesiones que queden dentro. Eso es lo que permite ver que la
+   diferencia entre la pendiente de la figura y la beta de la tabla 4 no es un
+   error: una es simple contra el mercado y la otra controla ademas por el
+   Tesoro a diez anios y por el tipo de cambio. */
+(function dispersion() {
+  const sec = $("#dispersion");
+  const Y = DER.y, X = DER.x, F = DER.fechas || [];
+  if (!sec || !Y || !X || !F.length) { if (sec) sec.remove(); return; }
+
+  let sector = "mineria", recta = "ambas", hastaFrac = 1;
+
+  /* Minimos cuadrados por eliminacion de Gauss sobre la matriz normal. Con
+     cuatro columnas como mucho no hace falta nada mas elaborado, y asi la
+     cuenta del navegador sale igual que la de 04_analisis.py: contra la tabla 4
+     coincide en los cuatro decimales que se publican. */
+  function ols(y, Xs, a, b) {
+    const col = [[], ...Xs.map(() => [])];
+    const yy = [];
+    for (let t = a; t <= b; t++) {
+      if (!isFinite(y[t])) continue;
+      col[0].push(1);
+      Xs.forEach((x, j) => col[j+1].push(x[t]));
+      yy.push(y[t]);
+    }
+    const n = yy.length, k = col.length;
+    if (n <= k + 2) return null;
+    const M = [];
+    for (let i = 0; i < k; i++) {
+      const f = [];
+      for (let j = 0; j < k; j++) {
+        let s = 0; for (let t = 0; t < n; t++) s += col[i][t]*col[j][t];
+        f.push(s);
+      }
+      let s = 0; for (let t = 0; t < n; t++) s += col[i][t]*yy[t];
+      f.push(s); M.push(f);
+    }
+    for (let c = 0; c < k; c++) {
+      let p = c;
+      for (let r = c+1; r < k; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+      [M[c], M[p]] = [M[p], M[c]];
+      if (!M[c][c]) return null;
+      for (let r = 0; r < k; r++) {
+        if (r === c) continue;
+        const f = M[r][c]/M[c][c];
+        for (let j = c; j <= k; j++) M[r][j] -= f*M[c][j];
+      }
+    }
+    const be = M.map((f, i) => f[k]/f[i]);
+    /* R cuadrado, que es lo que la figura del articulo anota en una esquina */
+    let my = 0; for (let t = 0; t < n; t++) my += yy[t]; my /= n;
+    let sr = 0, st = 0;
+    for (let t = 0; t < n; t++) {
+      let p = be[0];
+      for (let j = 1; j < k; j++) p += be[j]*col[j][t];
+      sr += (yy[t]-p)**2; st += (yy[t]-my)**2;
+    }
+    return {b: be, n, r2: st ? 1 - sr/st : null};
+  }
+
+  $("#disp-sectores").innerHTML = SEC.map(s =>
+    `<button class="btn${s === sector ? " on" : ""}" data-disp="${s}"
+             style="--c:${COL[s]}">${NOM[s]}</button>`).join("");
+
+  function pinta() {
+    const i0 = VENTANA.i0, i1 = VENTANA.i1;
+    /* El reproductor recorta por la derecha: se ve la nube formandose en el
+       orden en que llegaron las sesiones, no en un orden cualquiera. */
+    const corte = Math.max(i0 + 12, Math.round(i0 + (i1 - i0) * hastaFrac));
+    const y = Y[sector], x1 = X.X1;
+
+    const simple = ols(y, [x1], i0, corte);
+    const multi  = ols(y, [x1, X.X2, X.X3], i0, corte);
+
+    /* ---------- la nube ---------- */
+    /* El margen de arriba deja sitio al rotulo del eje vertical, que si no se
+       monta sobre la primera marca de la escala. */
+    const an = 760, al = 434, iz = 62, de = 24, ar = 34, ab = 46;
+    const s = lienzo("#fig-dispersion", an, al);
+    let xl = 0, yl = 0;
+    for (let t = i0; t <= i1; t++) {
+      xl = Math.max(xl, Math.abs(x1[t])); yl = Math.max(yl, Math.abs(y[t]));
+    }
+    xl = Math.ceil(xl*1.06); yl = Math.ceil(yl*1.06);
+    const PX = v => iz + (v + xl)/(2*xl) * (an - iz - de);
+    const PY = v => ar + (yl - v)/(2*yl) * (al - ar - ab);
+
+    const pasoX = xl > 6 ? 3 : xl > 3 ? 2 : 1;
+    for (let t = -Math.floor(xl/pasoX)*pasoX; t <= xl; t += pasoX) {
+      el("line", {x1:PX(t), y1:ar, x2:PX(t), y2:al-ab,
+                  stroke: t === 0 ? "#3d4651" : "#232a33"}, s);
+      el("text", {x:PX(t), y:al-ab+16, fill:"#6e7781", "font-size":11,
+                  "text-anchor":"middle"}, s).textContent = fmt(t, 0);
+    }
+    const pasoY = yl > 6 ? 3 : yl > 3 ? 2 : 1;
+    for (let t = -Math.floor(yl/pasoY)*pasoY; t <= yl; t += pasoY) {
+      el("line", {x1:iz, y1:PY(t), x2:an-de, y2:PY(t),
+                  stroke: t === 0 ? "#3d4651" : "#232a33"}, s);
+      el("text", {x:iz-8, y:PY(t)+4, fill:"#6e7781", "font-size":11,
+                  "text-anchor":"end"}, s).textContent = fmt(t, 0);
+    }
+
+    /* Novecientos circulos serian novecientos nodos: se dibujan como un solo
+       trazo de segmentos de longitud cero con punta redonda, igual que la nube
+       de la frontera. Las sesiones aun no alcanzadas quedan apagadas para que
+       se note que falta recorrido. */
+    const hechos = [], pend = [];
+    for (let t = i0; t <= i1; t++)
+      (t <= corte ? hechos : pend).push(
+        `M${PX(x1[t]).toFixed(1)} ${PY(y[t]).toFixed(1)}l0 0`);
+    if (pend.length)
+      el("path", {d:pend.join(""), fill:"none", stroke:"#2a323d",
+                  "stroke-linecap":"round", "stroke-width":3.4}, s);
+    el("path", {d:hechos.join(""), fill:"none", stroke:COL[sector],
+                "stroke-linecap":"round", "stroke-width":3.6, opacity:.52}, s);
+
+    /* ---------- las rectas ----------
+       La recta se recorta al recuadro: con pendientes mayores que uno, al
+       llegar al borde horizontal ya se ha salido por arriba, y dibujarla entera
+       la sacaria del area de los ejes. */
+    function trazo(b0, b1, color, guion) {
+      if (b1 == null) return;
+      let a = -xl, b = xl;
+      if (Math.abs(b1) > 1e-9) {
+        const c = [(-yl - b0)/b1, (yl - b0)/b1].sort((p, q) => p - q);
+        a = Math.max(a, c[0]); b = Math.min(b, c[1]);
+      }
+      if (!(b > a)) return;
+      el("line", {x1:PX(a), y1:PY(b0 + b1*a), x2:PX(b), y2:PY(b0 + b1*b),
+                  stroke:color, "stroke-width":2.4,
+                  "stroke-dasharray": guion ? "7 5" : ""}, s);
+    }
+    if (recta !== "multiple" && simple)
+      trazo(simple.b[0], simple.b[1], COL[sector], false);
+    if (recta !== "simple" && multi)
+      trazo(multi.b[0], multi.b[1], "#e6edf3", true);
+
+    /* La leyenda va en una esquina y no pegada a cada recta: con las dos casi
+       superpuestas, los dos rotulos se taparian. */
+    const ley = [];
+    if (recta !== "multiple" && simple)
+      ley.push([COL[sector], false, "simple    " + fmt(simple.b[1], 4)]);
+    if (recta !== "simple" && multi)
+      ley.push(["#e6edf3", true, "multiple  " + fmt(multi.b[1], 4)]);
+    if (ley.length) {
+      const g = el("g", {}, s);
+      el("rect", {x:iz+9, y:ar+8, width:168, height:14 + ley.length*18,
+                  rx:7, fill:"#0d1117", opacity:.82,
+                  stroke:"#2a323d"}, g);
+      ley.forEach(([c, gu, t], i) => {
+        const yy = ar + 26 + i*18;
+        el("line", {x1:iz+19, y1:yy-4, x2:iz+43, y2:yy-4, stroke:c,
+                    "stroke-width":2.4, "stroke-dasharray": gu ? "6 4" : ""}, g);
+        el("text", {x:iz+51, y:yy, fill:c, "font-size":11.5,
+                    "font-family":"ui-monospace,Menlo,monospace"}, g)
+          .textContent = t;
+      });
+    }
+
+    el("text", {x:(an+iz)/2, y:al-5, fill:"#6e7781", "font-size":11,
+                "text-anchor":"middle"}, s)
+      .textContent = "retorno diario del mercado, por ciento";
+    el("text", {x:13, y:ar-16, fill:"#6e7781", "font-size":11}, s)
+      .textContent = "retorno del sector, por ciento";
+
+    /* ---------- las cifras ---------- */
+    const dif = (simple && multi) ? simple.b[1] - multi.b[1] : null;
+    $("#disp-cifras").innerHTML = [
+      ["Pendiente simple", simple ? fmt(simple.b[1], 4) : "s. d.",
+       "la que dibuja la figura"],
+      ["Beta multiple", multi ? fmt(multi.b[1], 4) : "s. d.",
+       "la que publica la tabla 4"],
+      ["Diferencia", dif == null ? "s. d." : (dif >= 0 ? "+" : "") + fmt(dif, 4),
+       "simple menos multiple"],
+      ["R cuadrado", simple && simple.r2 != null ? fmt(simple.r2, 4) : "s. d.",
+       "de la regresion simple"],
+      ["Sesiones usadas", simple ? fmt(simple.n, 0) : "0",
+       "dentro del tramo y del avance"],
+    ].map(([t, v, p]) =>
+      `<div class="tarjeta" style="--c:${COL[sector]}">
+         <h4>${t}</h4><div class="cifra" style="font-size:21px">${v}</div>
+         <div class="pie">${p}</div></div>`).join("");
+
+    $("#disp-titulo").textContent =
+      NOM[sector] + " frente al mercado, " + fmt(simple ? simple.n : 0, 0) +
+      " sesiones";
+
+    const tab = BETA[sector];
+    $("#nota-dispersion").innerHTML = !simple ? "Faltan sesiones en este tramo."
+      : `La recta de color es la regresion simple del retorno del sector contra el del
+         mercado, que es la que trazan las figuras 3 a 6. La blanca a trazos es la de la
+         tabla 4, que ademas controla por el Tesoro a diez anios y por el tipo de cambio.
+         ${Math.abs(simple.b[1] - multi.b[1]) < 0.02
+           ? "Para este sector las dos casi coinciden, de modo que los dos controles apenas le cambian la beta."
+           : `Para ${NOM[sector].toLowerCase()} se separan
+              ${fmt(Math.abs(simple.b[1]-multi.b[1]), 4)} puntos: los dos controles
+              ${simple.b[1] > multi.b[1] ? "le quitan" : "le suman"} pendiente, porque
+              parte de lo que la simple le atribuye al mercado lo explican en realidad
+              ${simple.b[1] > multi.b[1] ? "esas otras dos variables" : "el mercado una vez descontadas esas dos"}.`}
+         ${VENTANA.completa
+           ? `Con la muestra entera la multiple da ${fmt(multi.b[1], 4)}, que es exactamente
+              lo que publica la tabla 4 (${fmt(tab, 4)}).`
+           : `Este es un tramo recortado: la tabla 4 publica ${fmt(tab, 4)} para la muestra
+              completa y aqui sale ${fmt(multi.b[1], 4)}. Suelta el periodo en el lateral
+              para volver a la cifra del articulo.`}`;
+
+    /* ---------- la serie de retornos, que es la figura 2 ---------- */
+    const an2 = 760, al2 = 190, iz2 = 54, ab2 = 26;
+    const s2 = lienzo("#fig-retornos", an2, al2);
+    const RX = i => iz2 + (i - i0)/Math.max(1, i1 - i0) * (an2 - iz2 - 14);
+    const RY = v => 12 + (yl - v)/(2*yl) * (al2 - 12 - ab2);
+    el("line", {x1:iz2, y1:RY(0), x2:an2-14, y2:RY(0), stroke:"#3d4651"}, s2);
+    const act = [], apag = [];
+    for (let t = i0; t <= i1; t++)
+      (t <= corte ? act : apag).push(
+        `M${RX(t).toFixed(1)} ${RY(0).toFixed(1)}L${RX(t).toFixed(1)} ${RY(y[t]).toFixed(1)}`);
+    if (apag.length)
+      el("path", {d:apag.join(""), fill:"none", stroke:"#2a323d",
+                  "stroke-width":1}, s2);
+    el("path", {d:act.join(""), fill:"none", stroke:COL[sector],
+                "stroke-width":1, opacity:.75}, s2);
+    [-1, 1].forEach(sg => {
+      const v = sg*Math.floor(yl/pasoY)*pasoY;
+      el("text", {x:iz2-7, y:RY(v)+4, fill:"#6e7781", "font-size":10.5,
+                  "text-anchor":"end"}, s2).textContent = fmt(v, 0) + " %";
+    });
+    [i0, Math.round((i0+corte)/2), corte].forEach(t => {
+      if (!F[t]) return;
+      el("text", {x:RX(t), y:al2-7, fill:"#6e7781", "font-size":10.5,
+                  "text-anchor":"middle"}, s2).textContent = F[t].slice(0, 7);
+    });
+
+    return simple ? `${fmt(simple.n, 0)} sesiones, beta ${fmt(simple.b[1], 3)}` : "";
+  }
+
+  /* Tocar un mando corta la reproduccion y salta al final. Si no, al cambiar
+     de sector a media pasada las cifras saldrian de una muestra recortada y
+     parecerian no cuadrar con la tabla 4. */
+  let rp = null;
+  function completa() {
+    if (!rp) { hastaFrac = 1; return; }
+    rp.parar(); rp.ir(1);
+  }
+
+  $("#disp-sectores").querySelectorAll("[data-disp]").forEach(b => b.onclick = () => {
+    $("#disp-sectores").querySelectorAll("[data-disp]")
+      .forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); sector = b.dataset.disp; completa(); pinta();
+  });
+  document.querySelectorAll("[data-recta]").forEach(b => b.onclick = () => {
+    document.querySelectorAll("[data-recta]").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); recta = b.dataset.recta; completa(); pinta();
+  });
+  VENTANA.escuchar(() => { completa(); pinta(); });
+  pinta();
+
+  rp = montarRepro({
+    donde:"#repro-dispersion", segundos:8, vista:"dispersion", pasos:300,
+    pinta: t => { hastaFrac = t; return pinta(); }
+  });
+})();
+
+/* ===================== cartera y frontera ===================== */
+(function cartera() {
+  const mu = DER.mu, cov = DER.cov;
+  const evalua = w => {
+    let r = 0, v = 0;
+    SEC.forEach((a, i) => { r += w[i]*mu[a];
+      SEC.forEach((b, j) => v += w[i]*w[j]*cov[a+"|"+b]); });
+    const s = Math.sqrt(Math.max(v, 0));
+    return {r, s, sharpe: s > 0 ? (r - RF)/s : null};
+  };
+
+  /* La nube: generador con semilla fija, de modo que sale igual en cada visita.
+     Se usa mulberry32 y no un congruencial clasico porque JavaScript guarda los
+     numeros en coma flotante de 53 bits: el producto de un congruencial de 31 bits
+     pasa de ese limite, pierde los bits bajos y la serie degenera en unos pocos
+     valores repetidos. Math.imul multiplica en 32 bits enteros y evita eso. */
+  const nube = (() => {
+    let a = 522 >>> 0;
+    const az = () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    /* Pesos de una Dirichlet(1,1,1,1): cuatro exponenciales normalizadas. */
+    const expo = () => -Math.log(1 - az() * 0.9999999);
+    const p = [];
+    for (let n = 0; n < 20000; n++) {
+      const g = SEC.map(expo), t = g[0]+g[1]+g[2]+g[3];
+      const w = [g[0]/t, g[1]/t, g[2]/t, g[3]/t], e = evalua(w);
+      p.push([e.s, e.r, e.sharpe]);
+    }
+    return p;
+  })();
+
+  /* Cuantas de las veinte mil carteras se estan dibujando. En reposo son todas;
+     el reproductor lo baja a cero y las va soltando, que es la forma de ver que
+     la nube no es un dibujo sino un sorteo repetido veinte mil veces. */
+  let visibles = nube.length;
+
+  const PRE = {
+    igual:   [25, 25, 25, 25],
+    cero:    [0, 0, 0, 0],
+    tangente: null, minvar: null
+  };
+  (DATOS.frontera || []).forEach(f => {
+    const w = [num(f["Minería %"] ?? f["Mineria %"]), num(f["Banca %"]),
+               num(f["Construcción %"] ?? f["Construccion %"]), num(f["Consumo %"])];
+    if (/tangente|sharpe/i.test(f.Cartera)) PRE.tangente = w;
+    if (/minima varianza|mínima varianza/i.test(f.Cartera)) PRE.minvar = w;
+  });
+
+  $("#pesos").innerHTML = SEC.map((s, i) =>
+    `<div class="campo">
+       <label>${NOM[s]}: <span class="valor" id="p-${s}">25,0 %</span></label>
+       <input type="range" id="w-${s}" min="0" max="100" step="0.1" value="25"
+              style="accent-color:${COL[s]}">
+     </div>`).join("");
+
+  const mandos = SEC.map(s => $("#w-"+s));
+
+  function pinta() {
+    const bruto = mandos.map(m => parseFloat(m.value));
+    const suma = bruto.reduce((a,b) => a+b, 0);
+    const w = suma > 0 ? bruto.map(v => v/suma) : [0,0,0,0];
+    SEC.forEach((s, i) => $("#p-"+s).textContent = fmt(w[i]*100, 1) + " %");
+
+    const e = suma > 0 ? evalua(w) : {r:null, s:null, sharpe:null};
+    const refT = PRE.tangente ? evalua(PRE.tangente.map(v => v/100)) : null;
+
+    $("#resultado-cartera").innerHTML = [
+      ["Retorno anual", e.r, "%", "--acento", 2],
+      ["Riesgo anual", e.s, "%", null, 2],
+      ["Sharpe", e.sharpe, "", null, 4],
+      ["Suma de pesos", suma > 0 ? 100 : 0, "%", null, 1],
+    ].map(([t, v, u, c, d]) =>
+      `<div class="tarjeta" style="--c:${c ? "var("+c+")" : "var(--borde)"}">
+         <h4>${t}</h4>
+         <div class="cifra" style="font-size:25px">${v == null ? "s. d." : fmt(v, d)}${u ? " "+u : ""}</div>
+       </div>`).join("") +
+      (refT && e.sharpe != null
+        ? `<div class="tarjeta" style="--c:${e.sharpe >= refT.sharpe ? "var(--consumo)" : "var(--borde)"}">
+             <h4>Frente a la tangente</h4>
+             <div class="cifra" style="font-size:25px">${fmt(e.sharpe - refT.sharpe, 4)}</div>
+             <div class="pie">de Sharpe, ${e.sharpe >= refT.sharpe ? "mejor" : "peor"}</div>
+           </div>` : "");
+
+    /* el scatter */
+    const an = 760, al = 360, iz = 62, de = 72, ar = 26, ab = 46;
+    const sv = lienzo("#fig-frontera", an, al);
+    /* El dominio abarca la nube y ademas los cuatro sectores por separado, que
+       quedan fuera de ella: una Dirichlet practicamente nunca da el cien por
+       ciento a un solo activo, de modo que la mineria caeria fuera del grafico. */
+    const sueltos = SEC.map(k => {
+      const d = fila("desempeno", k, "Sector") || {};
+      return [num(d["Volatilidad anual %"]), num(d["Retorno anual %"])];
+    }).filter(p => p[0] != null && p[1] != null);
+    const extra = sueltos.concat(
+      [PRE.tangente, PRE.minvar].filter(Boolean).map(w => {
+        const e2 = evalua(w.map(v => v/100)); return [e2.s, e2.r];
       }));
-      texto(L.s, X(p.v), Y(p.r) - 17, p.n, { anchor: "middle", size: 10.5 });
+    const xs = nube.map(p => p[0]).concat(extra.map(p => p[0]));
+    const ys = nube.map(p => p[1]).concat(extra.map(p => p[1]));
+    const x0 = Math.min(...xs)*.94, x1 = Math.max(...xs)*1.04;
+    const y0 = Math.min(...ys, RF)*.88, y1 = Math.max(...ys)*1.07;
+    const X = v => iz + (v-x0)/(x1-x0)*(an-iz-de);
+    const Y = v => al-ab - (v-y0)/(y1-y0)*(al-ar-ab);
+
+    for (let t = Math.ceil(y0/5)*5; t <= y1; t += 5) {
+      el("line", {x1:iz, y1:Y(t), x2:an-de, y2:Y(t), stroke:"#2a323d"}, sv);
+      el("text", {x:iz-9, y:Y(t)+4, fill:"#6e7781", "font-size":11, "text-anchor":"end"}, sv)
+        .textContent = t;
+    }
+    for (let t = Math.ceil(x0/5)*5; t <= x1; t += 5) {
+      el("line", {x1:X(t), y1:ar, x2:X(t), y2:al-ab, stroke:"#2a323d"}, sv);
+      el("text", {x:X(t), y:al-ab+17, fill:"#6e7781", "font-size":11,
+                  "text-anchor":"middle"}, sv).textContent = t;
+    }
+
+    /* Veinte mil circulos serian veinte mil nodos y el navegador se arrastraria.
+       Se reparten en bandas de Sharpe y cada banda va en un solo trazo, con
+       segmentos de longitud cero y punta redonda, que dibujan un punto cada uno. */
+    const BANDAS = 14;
+    const maxS = Math.max(...nube.map(p => p[2]));
+    const minS = Math.min(...nube.map(p => p[2]));
+    const cubos = Array.from({length:BANDAS}, () => []);
+    /* Los extremos de color se calculan con la nube entera para que el reparto
+       de tonos no cambie mientras se van sorteando las carteras. */
+    nube.slice(0, visibles).forEach(p => {
+      const t = (p[2]-minS)/(maxS-minS || 1);
+      const b = Math.min(BANDAS-1, Math.floor(t*BANDAS));
+      cubos[b].push(`M${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}l0 0`);
     });
-    todo.forEach(function (p) {
-      var z = svgEl("circle", { cx: X(p.v), cy: Y(p.r), r: 16, fill: "transparent" });
-      z.style.cursor = "crosshair";
-      z.addEventListener("pointermove", function (ev) {
-        var rc = host.getBoundingClientRect();
-        tip.ver(ev.clientX - rc.left, ev.clientY - rc.top,
-          p.n + "\nRetorno " + pct(p.r, 2) + "\nVolatilidad " + pct(p.v, 2) +
-          "\nSharpe " + fmt(p.s, 4));
+    cubos.forEach((c, b) => {
+      if (!c.length) return;
+      const t = (b + .5) / BANDAS;
+      el("path", {d:c.join(""), fill:"none", "stroke-linecap":"round",
+        "stroke-width":2.1, opacity:.5,
+        stroke:`hsl(${(214 - t*186).toFixed(0)} ${(58 + t*22).toFixed(0)}% ${(40 + t*18).toFixed(0)}%)`
+      }, sv);
+    });
+
+    /* los cuatro sectores solos */
+    SEC.forEach(k => {
+      const d = fila("desempeno", k, "Sector") || {};
+      const vx = num(d["Volatilidad anual %"]), vy = num(d["Retorno anual %"]);
+      if (vx == null || vy == null) return;
+      const g = el("g", {}, sv);
+      el("circle", {cx:X(vx), cy:Y(vy), r:6, fill:COL[k], stroke:"#0d1117",
+                    "stroke-width":1.8}, g);
+      el("text", {x:X(vx), y:Y(vy)-11, fill:COL[k], "font-size":11,
+                  "text-anchor":"middle"}, g).textContent = NOM[k];
+      conTip(g, `<b>${NOM[k]} solo</b><br>retorno ${fmt(vy)} %<br>riesgo ${fmt(vx)} %` +
+        `<br>Sharpe ${fmt(num(d.Sharpe), 4)}`);
+    });
+
+    /* las dos carteras de la tabla 8 */
+    [["tangente","Tangente","#ffffff"],["minvar","Minima varianza","#9aa4b2"]]
+      .forEach(([k, et, c]) => {
+        if (!PRE[k]) return;
+        const e2 = evalua(PRE[k].map(v => v/100));
+        const g = el("g", {}, sv);
+        el("path", {d:`M${X(e2.s)} ${Y(e2.r)-7}L${X(e2.s)+7} ${Y(e2.r)}L${X(e2.s)} ${Y(e2.r)+7}L${X(e2.s)-7} ${Y(e2.r)}Z`,
+                    fill:c, stroke:"#0d1117", "stroke-width":1.5}, g);
+        el("text", {x:X(e2.s), y:Y(e2.r)-12, fill:c, "font-size":11,
+                    "text-anchor":"middle"}, g).textContent = et;
+        conTip(g, `<b>${et}</b><br>retorno ${fmt(e2.r)} %<br>riesgo ${fmt(e2.s)} %` +
+          `<br>Sharpe ${fmt(e2.sharpe, 4)}<br>` +
+          SEC.map((s,i) => `${NOM[s]} ${fmt(PRE[k][i],1)} %`).join("<br>"));
       });
-      z.addEventListener("pointerleave", tip.ir);
-      L.s.appendChild(z);
-    });
+
+    /* la cartera que armo quien mira */
+    if (suma > 0) {
+      const g = el("g", {}, sv);
+      el("circle", {cx:X(e.s), cy:Y(e.r), r:9, fill:"none", stroke:"#58a6ff",
+                    "stroke-width":2.2}, g);
+      el("circle", {cx:X(e.s), cy:Y(e.r), r:3.2, fill:"#58a6ff"}, g);
+      conTip(g, `<b>Tu cartera</b><br>retorno ${fmt(e.r)} %<br>riesgo ${fmt(e.s)} %` +
+        `<br>Sharpe ${fmt(e.sharpe, 4)}`);
+    }
+
+    el("text", {x:(an+iz)/2, y:al-6, fill:"#6e7781", "font-size":11,
+                "text-anchor":"middle"}, sv)
+      .textContent = "riesgo: desviacion estandar anual, por ciento";
+    el("text", {x:15, y:ar+4, fill:"#6e7781", "font-size":11}, sv)
+      .textContent = "retorno";
+
+    $("#nota-frontera").innerHTML =
+      `Veinte mil carteras con pesos no negativos que suman uno. El color va del azul al
+       naranja segun el Sharpe. Los circulos con nombre son los cuatro sectores por separado,
+       los rombos son las dos carteras de la tabla 8 y el circulo hueco azul es la que acabas
+       de armar. La tabla 8 le da a la tangente un Sharpe de
+       ${fmt(num((DATOS.frontera||[]).find(f => /tangente|sharpe/i.test(f.Cartera))?.Sharpe), 4)};
+       tu cartera ${e.sharpe == null ? "no tiene pesos" : "da " + fmt(e.sharpe, 4)}.
+       Los sectores por separado caen fuera de la nube porque ninguna de las veinte mil
+       carteras pone el cien por ciento en uno solo.`;
   }
 
-  // ---------- correlaciones ----------
-  function dibujarCorr() {
-    var host = el("c-corr");
-    var rows = DATOS.correlaciones || [];
-    if (!rows.length) { host.textContent = ""; return; }
-    var h = 300;
-    var L = lienzo(host, h, "Matriz de correlaciones entre los retornos de los cuatro sectores");
-    var m = { l: 56, r: 14, t: 32, b: 14 };
-    var corto = { Mineria: "Min.", Banca: "Ban.", Construccion: "Con.", Consumo: "Cns." };
-    var cw = (L.w - m.l - m.r) / 4, ch = (h - m.t - m.b) / 4;
-    var tip = tooltip(host);
+  mandos.forEach(m => m.addEventListener("input", pinta));
+  document.querySelectorAll("[data-pre]").forEach(b => b.onclick = () => {
+    const w = PRE[b.dataset.pre];
+    if (!w) return;
+    mandos.forEach((m, i) => m.value = w[i]);
+    pinta();
+  });
+  pinta();
 
-    ORDEN.forEach(function (s, j) {
-      texto(L.s, m.l + j * cw + cw / 2, m.t - 11, corto[s], { anchor: "middle", size: 11 });
-      texto(L.s, m.l - 10, m.t + j * ch + ch / 2 + 4, corto[s], { anchor: "end", size: 11 });
-    });
+  montarRepro({
+    donde:"#repro-frontera", segundos:7, vista:"cartera", pasos:400,
+    pinta: t => {
+      visibles = Math.round(t * nube.length);
+      pinta();
+      return fmt(visibles, 0) + " de " + fmt(nube.length, 0) + " carteras";
+    }
+  });
+})();
 
-    rows.forEach(function (r) {
-      var i = ORDEN.indexOf(clave(r.Sector));
-      if (i < 0) return;
-      ORDEN.forEach(function (c, j) {
-        var v = num(r[c]);
-        if (!isFinite(v)) return;
-        var mismo = r.Sector === c;
-        var op = mismo ? 0.12 : Math.max(0.1, Math.min(0.95, v / 0.6));
-        L.s.appendChild(svgEl("rect", {
-          x: m.l + j * cw + 2, y: m.t + i * ch + 2,
-          width: cw - 4, height: ch - 4, rx: 4,
-          fill: "#4da3ff", opacity: op
-        }));
-        texto(L.s, m.l + j * cw + cw / 2, m.t + i * ch + ch / 2 + 4,
-          mismo ? "—" : fmt(v, 3).replace("0,", ","),
-          { anchor: "middle", size: 12, mono: true, fill: mismo ? "#8396ab" : (v > 0.42 ? "#06121f" : "#e9eff7") });
-        zonaHover(L.s, { x: m.l + j * cw, y: m.t + i * ch, width: cw, height: ch },
-          nombre(r.Sector) + " con " + nombre(c) + "\n" + fmt(v, 4), tip, host);
+/* ===================== comparador ===================== */
+(function comparar() {
+  const a = $("#sec-a"), b = $("#sec-b");
+  const op = SEC.map(s => `<option value="${s}">${NOM[s]}</option>`).join("");
+  a.innerHTML = op; b.innerHTML = op;
+  a.value = "mineria"; b.value = "banca";
+
+  const pAlfa = s => num(fila("desempeno", s, "Sector")?.["p del alfa"]);
+
+  /* [etiqueta, de donde sale, decimales, "mas es mejor" (null: no se marca), sufijo]
+
+     El alfa de Jensen y su p-valor no se marcan en verde. Un alfa positivo solo
+     dice algo si es significativo, y aqui ninguno lo es, de modo que pintar de
+     verde el mas alto daria a entender que ese sector le gano al mercado cuando
+     los datos no lo sostienen. Se muestra el valor con la marca "n. s." al lado.
+     El p-valor tampoco se marca: no mide desempeno, mide evidencia, y un p mas
+     bajo serviria igual para un alfa negativo. */
+  const FILAS = [
+    ["Beta",                 s => BETA[s],                                 4, null],
+    ["Error estandar",       s => EE[s],                                   4, false],
+    ["R cuadrado",           s => R2[s],                                   4, true],
+    ["Retorno anual %",      s => num(fila("desempeno",s,"Sector")?.["Retorno anual %"]), 2, true],
+    ["Riesgo anual %",       s => num(fila("desempeno",s,"Sector")?.["Volatilidad anual %"]), 2, false],
+    ["Costo de capital %",   s => KE[s],                                   2, false],
+    ["Sharpe",               s => num(fila("desempeno",s,"Sector")?.Sharpe), 4, true],
+    ["Treynor %",            s => num(fila("desempeno",s,"Sector")?.["Treynor %"]), 2, true],
+    ["Alfa de Jensen %",     s => num(fila("desempeno",s,"Sector")?.["Alfa de Jensen anual %"]), 2, null,
+                             s => pAlfa(s) != null && pAlfa(s) >= .05 ? " n. s." : ""],
+    ["p del alfa",           s => pAlfa(s),                                3, null],
+    ["Retorno menos Ke %",   s => num(fila("desempeno",s,"Sector")?.["Retorno menos Ke %"]), 2, true],
+    ["Durbin-Watson",        s => num(fila("diagnostico",s,"Especificacion")?.["Durbin-Watson"]), 3, null],
+  ];
+
+  function pinta() {
+    const x = a.value, y = b.value;
+    const cor = num((DATOS.correlaciones.find(f => clave(f[Object.keys(f)[0]]) === clave(x))
+                     || {})[NOM[y]]);
+    $("#enfrentados").innerHTML = [x, y].map((s, lado) => {
+      const otro = lado === 0 ? y : x;
+      return `<div class="cara" style="--c:${COL[s]}">
+        <h4>${NOM[s]}</h4><dl>` + FILAS.map(([et, f, d, mas, suf]) => {
+          const v = f(s), o = f(otro);
+          let c = "";
+          if (mas !== null && v != null && o != null && v !== o)
+            c = ((v > o) === mas) ? "gana" : "pierde";
+          return `<dt>${et}</dt><dd class="${c}">${fmt(v, d)}${suf ? suf(s) : ""}</dd>`;
+        }).join("") + `</dl></div>`;
+    }).join("");
+
+    $("#nota-comparar").innerHTML = x === y
+      ? "Elige dos sectores distintos para que la comparacion diga algo."
+      : `La correlacion diaria entre ${NOM[x]} y ${NOM[y]} es
+         ${cor == null ? "s. d." : fmt(cor, 4)}, de modo que
+         ${cor == null ? "" : cor < .35 ? "se mueven bastante por separado y juntarlos baja el riesgo de la cartera"
+           : cor < .6 ? "se mueven en parte juntos y queda algo de ganancia por diversificar"
+           : "se mueven casi a la par y juntarlos ayuda poco"}. En verde queda el sector que
+         sale mejor en cada indicador; para el riesgo, el costo de capital y el error
+         estandar, mejor es menos. La beta y el Durbin-Watson no se marcan porque no son
+         mejores ni peores por ser mas grandes. El alfa de Jensen tampoco: la marca "n. s."
+         dice que su p-valor pasa de 0,05, de modo que no se puede afirmar que ese sector
+         le haya ganado al mercado aunque la cifra salga positiva. ` + (() => {
+           const sig = SEC.filter(k => pAlfa(k) != null && pAlfa(k) < .05);
+           return !sig.length
+             ? "Ninguno de los cuatro sectores tiene un alfa significativo al 5 por ciento."
+             : `Con un alfa significativo al 5 por ciento: ` +
+               sig.map(k => NOM[k]).join(", ") + ".";
+         })();
+  }
+  a.onchange = b.onchange = pinta;
+  pinta();
+
+  /* Las seis parejas posibles, una tras otra. Recorrerlas seguidas sirve para
+     algo mas que el efecto: deja ver que el orden de las betas y del costo de
+     capital se repite en cualquier combinacion, no solo en la que uno elige. */
+  const PAREJAS = [];
+  for (let i = 0; i < SEC.length; i++)
+    for (let j = i + 1; j < SEC.length; j++) PAREJAS.push([SEC[i], SEC[j]]);
+
+  montarRepro({
+    donde:"#repro-comparar", segundos:9, vista:"comparar", pasos:PAREJAS.length,
+    pinta: t => {
+      const k = Math.min(PAREJAS.length - 1, Math.floor(t * PAREJAS.length));
+      a.value = PAREJAS[k][0]; b.value = PAREJAS[k][1];
+      pinta();
+      return `pareja ${k + 1} de ${PAREJAS.length}`;
+    }
+  });
+})();
+
+/* Los cinco pasos del metodo, uno tras otro y en el orden en que se ejecutan.
+   Esta es la seccion que se expone de viva voz, de modo que poder detenerla en
+   un paso concreto sirve mas que verla entera de golpe. */
+(function pasosMetodo() {
+  const lista = $("#pasos-metodo");
+  if (!lista) return;
+  const pasos = Array.from(lista.children);
+  if (pasos.length < 2) return;
+
+  montarRepro({
+    donde:"#repro-metodo", segundos:2.6 * pasos.length, vista:"metodo",
+    pasos:pasos.length, auto:false,
+    pinta: t => {
+      const k = Math.min(pasos.length - 1, Math.floor(t * pasos.length));
+      pasos.forEach((n, i) => {
+        n.classList.toggle("paso-on", i === k && t < 1);
+        n.style.opacity = (t >= 1 || i <= k) ? "" : ".3";
       });
+      return t >= 1 ? "los " + pasos.length + " pasos"
+                    : `paso ${k + 1} de ${pasos.length}`;
+    }
+  });
+})();
+
+/* El numero de acciones reasignadas se cuenta en la tabla 0 y no se escribe a
+   mano, para que el texto no se quede atras si la clasificacion cambia. */
+(function reasignadas() {
+  const n = $("#m-reasig");
+  if (!n) return;
+  const f = DATOS.composicion || [];
+  if (!f.length) return;
+  const si = f.filter(x => /^s[ií]$/i.test(String(x.Reasignada || "").trim())).length;
+  const PAL = ["Ninguna","Una","Dos","Tres","Cuatro","Cinco","Seis","Siete","Ocho",
+               "Nueve","Diez","Once","Doce","Trece","Catorce","Quince","Dieciseis"];
+  n.textContent = (PAL[si] || si) + " de las " + (PAL[f.length] || f.length).toLowerCase();
+})();
+
+/* ===================== las tablas ===================== */
+(function tablas() {
+  const llaves = Object.keys(TITULOS);
+  let activa = llaves[0], orden = null, asc = true;
+  let visibles = [], columnas = [];      /* lo que hay en pantalla ahora mismo */
+
+  $("#pestanas").innerHTML = llaves.map(k =>
+    `<button data-t="${k}">${esc(TITULOS[k].t)}</button>`).join("");
+
+  function pinta() {
+    const filas0 = DATOS[activa] || [];
+    const cols = filas0.length ? Object.keys(filas0[0]) : [];
+    const q = clave($("#buscar").value);
+    let filas = q ? filas0.filter(f =>
+      cols.some(c => clave(f[c]).includes(q))) : filas0.slice();
+
+    if (orden) filas.sort((p, q2) => {
+      const x = num(p[orden]), y = num(q2[orden]);
+      const r = (x != null && y != null) ? x - y
+              : String(p[orden]).localeCompare(String(q2[orden]), "es");
+      return asc ? r : -r;
     });
+
+    /* Una columna de texto se lee mejor pegada a la izquierda y una de cifras
+       pegada a la derecha, de modo que se mira el contenido para decidir. */
+    const esTexto = {};
+    cols.forEach(c => esTexto[c] =
+      !filas0.some(f => num(f[c]) != null && String(f[c]).trim() !== ""));
+
+    $("#marco-tabla").innerHTML = !filas.length
+      ? `<div class="vacio">Ninguna fila dice "${esc($("#buscar").value)}"</div>`
+      : `<table><thead><tr>` + cols.map(c =>
+          `<th data-c="${esc(c)}" style="text-align:${esTexto[c] ? "left" : "right"}"
+               class="${orden === c ? (asc ? "asc" : "desc") : ""}">${esc(c)}</th>`
+        ).join("") + `</tr></thead><tbody>` + filas.map(f =>
+          `<tr>` + cols.map(c => {
+            const n = num(f[c]);
+            const txt = n != null && String(f[c]).trim() !== ""
+              ? (Math.abs(n) < 1e-4 && n !== 0 ? n.toExponential(3)
+                 : fmt(n, Number.isInteger(n) ? 0 : 4))
+              : esc(f[c] ?? "");
+            return `<td class="${n != null ? "num" : ""}"
+                        style="text-align:${esTexto[c] ? "left" : "right"}">${txt}</td>`;
+          }).join("") + `</tr>`).join("") + `</tbody></table>`;
+
+    $("#marco-tabla").querySelectorAll("th").forEach(t => t.onclick = () => {
+      const c = t.dataset.c;
+      asc = (orden === c) ? !asc : true;
+      orden = c; pinta();
+    });
+
+    $("#conteo").textContent = filas.length === filas0.length
+      ? `${filas0.length} filas, ${cols.length} columnas`
+      : `${filas.length} de ${filas0.length} filas`;
+    visibles = filas; columnas = cols;
+    $("#baja-csv").href = "datos/" + TITULOS[activa].a;
+    $("#baja-csv").setAttribute("download", TITULOS[activa].a);
+    $("#baja-visto").textContent = filas.length === filas0.length
+      ? "Descargar ordenada" : `Descargar las ${filas.length} filtradas`;
+    $("#nota-tabla").textContent =
+      "Los numeros se muestran con cuatro decimales; el CSV completo y el Excel llevan la " +
+      "precision entera. «Descargar lo que veo» respeta el orden y el filtro de " +
+      "arriba; «Copiar» deja la tabla lista para pegar en una hoja de calculo.";
+    $("#pestanas").querySelectorAll("button").forEach(b =>
+      b.classList.toggle("on", b.dataset.t === activa));
   }
 
-  // ---------- tablas ----------
-  function tablaOrdenable(datos, campos, cabecera, cuerpo, formato) {
-    var estado = { campo: null, asc: false };
+  $("#pestanas").querySelectorAll("button").forEach(b => b.onclick = () => {
+    activa = b.dataset.t; orden = null; asc = true; pinta();
+  });
+  $("#buscar").addEventListener("input", pinta);
+
+  /* Lo que se lleva es lo que se esta viendo: mismo orden, mismo filtro y la
+     precision original del CSV, no los cuatro decimales de la pantalla. */
+  const serializar = (sep, comillas) => [
+    columnas.map(c => comillas ? `"${String(c).replace(/"/g, '""')}"` : c).join(sep),
+    ...visibles.map(f => columnas.map(c => {
+      const v = f[c] ?? "";
+      return comillas && /["\n,;]/.test(v) ? `"${String(v).replace(/"/g, '""')}"` : v;
+    }).join(sep))
+  ].join("\n");
+
+  $("#baja-visto").onclick = () => bajar(
+    serializar(",", true),
+    TITULOS[activa].a.replace(/\.csv$/, "") +
+      (visibles.length === (DATOS[activa] || []).length ? "_ordenada" : "_filtrada") + ".csv",
+    "text/csv;charset=utf-8");
+
+  $("#copiar").onclick = async () => {
+    const b = $("#copiar"), antes = b.textContent;
+    try {
+      /* Separado por tabuladores: asi Excel y Sheets lo reparten en columnas. */
+      await navigator.clipboard.writeText(serializar("\t", false));
+      b.textContent = `Copiadas ${visibles.length} filas`;
+    } catch (e) {
+      b.textContent = "El navegador no dejo copiar";
+    }
+    b.classList.add("on");
+    setTimeout(() => { b.textContent = antes; b.classList.remove("on"); }, 2200);
+  };
+
+  pinta();
+
+  /* El pase va por las once tablas en el orden en que las numera el articulo.
+     No arranca solo: quien entra aqui suele venir a buscar una tabla concreta
+     y cambiarsela de golpe seria un estorbo. */
+  montarRepro({
+    donde:"#repro-tablas", segundos:2.4 * llaves.length, vista:"tablas",
+    pasos:llaves.length, auto:false,
+    pinta: t => {
+      const k = Math.min(llaves.length - 1, Math.floor(t * llaves.length));
+      if (llaves[k] !== activa) { activa = llaves[k]; orden = null; asc = true; pinta(); }
+      return `${TITULOS[activa].t} (${k + 1} de ${llaves.length})`;
+    }
+  });
+})();
+
+/* ===================== archivos ===================== */
+(function archivos() {
+  /* Cuantos archivos cuelgan de una carpeta, contando sus subcarpetas. Se
+     declara como funcion y no como const para que este disponible en todo el
+     bloque: el mapa circular, que va mas abajo, la usa. */
+  function cuenta(n) {
+    return (n.f || []).length + (n.d || []).reduce((a, h) => a + cuenta(h), 0);
+  }
+
+  /* los ZIP por carpeta */
+  $("#zips").innerHTML = (ARBOL || []).map(c => {
+    const z = ZIPS[c.slug];
+    if (!z) return "";
+    return `<a class="descarga" href="${z.url}" download>
+      <span class="tipo">ZIP</span>
+      <span class="cuerpo"><b>${esc(c.n)}</b>
+      <small>${z.archivos} archivos, ${pesa(z.bytes)}</small></span></a>`;
+  }).join("") || `<p class="nota">Los ZIP se generan al correr 06_generar_web.py.</p>`;
+
+  /* los productos: el que no se hallo se muestra apagado, no como enlace roto */
+  $("#productos").innerHTML = (PRODUCTOS || []).map(([t, d, r, hay, mb]) =>
+    hay
+      ? `<a class="descarga" href="${r}" download>
+           <span class="tipo">PDF</span>
+           <span class="cuerpo"><b>${esc(t)}</b>
+           <small>${esc(d)}, ${fmt(mb, 1)} MB</small></span></a>`
+      : `<span class="descarga falta">
+           <span class="tipo">PDF</span>
+           <span class="cuerpo"><b>${esc(t)}</b>
+           <small>todavia no esta en la carpeta de productos</small></span></span>`
+  ).join("");
+
+  /* los datos */
+  $("#datos").innerHTML =
+    `<a class="descarga" href="datos/tablas.xlsx" download>
+       <span class="tipo">XLSX</span>
+       <span class="cuerpo"><b>Las once tablas en Excel</b>
+       <small>una hoja por tabla, con filtros</small></span></a>` +
+    Object.keys(TITULOS).map(k =>
+    `<a class="descarga" href="datos/${TITULOS[k].a}" download>
+       <span class="tipo">CSV</span>
+       <span class="cuerpo"><b>${esc(TITULOS[k].t)}</b>
+       <small>${(DATOS[k]||[]).length} filas</small></span></a>`).join("");
+
+  /* el arbol. El resumen cuenta los archivos de toda la rama, no solo los
+     sueltos en ese nivel, porque una carpeta que solo contiene subcarpetas
+     diria "0 archivos" y no es lo que la gente espera leer. */
+  const total = n => (n.f||[]).length + (n.d||[]).reduce((a,h) => a + total(h), 0);
+  function rama(n, abierta) {
+    const hijos = (n.d||[]).map(h => rama(h, false)).join("") +
+      (n.f||[]).map(f =>
+        `<div class="hoja"><span class="ext">${ext(f.n)}</span>
+         <span>${esc(f.n)}</span><span class="peso">${pesa(f.b)}</span></div>`).join("");
+    const nsub = (n.d||[]).length, narch = total(n);
+    return `<details${abierta ? " open" : ""}>
+      <summary><span class="flecha">&#9654;</span>
+        <span>${esc(n.n)}</span>
+        ${n.ajeno ? '<span class="ajeno">de terceros</span>' : ""}
+        <span class="peso">${nsub ? nsub + (nsub === 1 ? " carpeta, " : " carpetas, ") : ""}${
+          narch} ${narch === 1 ? "archivo" : "archivos"} &middot; ${pesa(n.b)}</span>
+      </summary><div class="dentro">${hijos}</div></details>`;
+  }
+  $("#arbol").innerHTML = (ARBOL || []).map(c =>
+    `<div class="carpeta-raiz">${rama(c, false)}</div>`).join("")
+    || `<p class="nota">El arbol se arma al correr 06_generar_web.py junto a las tres carpetas.</p>`;
+
+  /* ---------- el mapa circular de carpetas ---------- */
+  (function sunburst() {
+    const destino = $("#fig-sunburst");
+    if (!destino || !(ARBOL || []).length) {
+      const m = document.querySelector(".mapa-carpetas");
+      if (m) m.remove();
+      return;
+    }
+
+    /* La raiz es un nodo inventado que cuelga de las tres carpetas, para que
+       el centro del circulo tenga algo que mostrar y se pueda volver a el. */
+    const RAIZ = {n:"Unidad II", d:ARBOL, f:[],
+                  b:ARBOL.reduce((a, c) => a + c.b, 0), raiz:true};
+    const padres = new Map();
+    (function emparenta(n) {
+      (n.d || []).forEach(h => { padres.set(h, n); emparenta(h); });
+    })(RAIZ);
+
+    const COLS = ["#e8a33d","#4ea1e8","#9b7fe0","#4fc9a0","#58a6ff","#f0883e"];
+    const colorDe = n => {
+      let x = n, cadena = [];
+      while (x && x !== RAIZ) { cadena.unshift(x); x = padres.get(x); }
+      return cadena.length ? COLS[ARBOL.indexOf(cadena[0]) % COLS.length] : "#58a6ff";
+    };
+
+    let foco = RAIZ;
+    let medida = "archivos";
+    const ANILLOS = 3;                       /* cuantos niveles se ven a la vez */
+
+    /* Por peso en disco los articulos de terceros se comen el grafico: pesan
+       cien de los ciento veintiseis megabytes y dejan el resto en una rendija.
+       Contando archivos, las tres carpetas quedan parejas y se ve la forma del
+       trabajo, de modo que esa es la medida de partida. */
+    const tam = n => medida === "peso" ? n.b : cuenta(n);
 
     function pinta() {
-      var rows = datos.slice();
-      if (estado.campo) {
-        rows.sort(function (a, b) {
-          var x = num(a[estado.campo]), y = num(b[estado.campo]);
-          if (isNaN(x) && isNaN(y)) {
-            return String(a[estado.campo]).localeCompare(String(b[estado.campo])) * (estado.asc ? 1 : -1);
+      const an = 460, R = 196, cx = an / 2, cy = an / 2, r0 = 60;
+      const s = lienzo(destino, an, an);
+      const grosor = (R - r0) / ANILLOS;
+      /* Dos capas: primero todos los arcos y encima todas las etiquetas. Si
+         se dibujaran entremezclados, los anillos de fuera, que van despues en
+         la recursion, taparian los nombres de los de dentro. */
+      const capaArcos = el("g", {}, s);
+      const capaTexto = el("g", {"pointer-events":"none"}, s);
+
+      /* Se recorre el arbol desde el foco repartiendo el angulo por peso. */
+      function anillo(nodo, nivel, a0, a1) {
+        if (nivel >= ANILLOS) return;
+        const hijos = (nodo.d || []).filter(h => tam(h) > 0);
+        const suma = hijos.reduce((a, h) => a + tam(h), 0) || 1;
+        let a = a0;
+        hijos.forEach(h => {
+          const paso = (a1 - a0) * (tam(h) / suma);
+          const ri = r0 + nivel * grosor, re = ri + grosor - 2;
+          const g = el("g", {}, capaArcos);
+          const p = el("path", {
+            d: sector(cx, cy, ri, re, a, a + paso),
+            fill: colorDe(h),
+            opacity: h.ajeno ? .3 : (0.85 - nivel * 0.17),
+            stroke: "#0d1117", "stroke-width": 1.4,
+          }, g);
+          p.addEventListener("click", e => {
+            e.stopPropagation();
+            if ((h.d || []).length) { foco = h; pinta(); }
+            muestra(h);
+          });
+          p.addEventListener("mouseenter", () => muestra(h, true));
+
+          /* La etiqueta va curvada sobre su propia porcion y solo entra si el
+             arco da de si: se mide el largo disponible y se recorta ahi, para
+             que ningun nombre se derrame fuera de su trozo. */
+          /* La etiqueta no va en el centro exacto del anillo sino algo hacia
+             fuera: centrada, el extremo de un nombre largo se metia sobre el
+             disco del centro y parecia cortado. */
+          const med = a + paso / 2, rr = ri + (re - ri) * 0.62;
+          const largo = paso * rr;                     /* longitud del arco, en px */
+          const tipo = nivel ? 9.5 : 11.5;
+          const caben = Math.floor(largo / (tipo * 0.56));
+          const nombre = h.n.replace(/\s*Meglinho.*$/i, "").replace(/^\d+\.\s*/, "");
+          if (caben >= 4 && paso * 180 / Math.PI > 7) {
+            const x = cx + Math.cos(med) * rr, y = cy + Math.sin(med) * rr;
+            let giro = med * 180 / Math.PI;
+            if (giro > 90 && giro < 270) giro += 180;
+            const t = el("text", {
+              x, y: y + tipo * 0.35, fill:"#11161d", "font-size":tipo,
+              "font-weight": nivel ? 550 : 680, "text-anchor":"middle",
+              transform:`rotate(${giro} ${x} ${y})`,
+            }, capaTexto);
+            t.textContent = nombre.length > caben
+              ? nombre.slice(0, Math.max(3, caben - 1)) + "…"
+              : nombre;
           }
-          if (isNaN(x)) return 1;
-          if (isNaN(y)) return -1;
-          return (x - y) * (estado.asc ? 1 : -1);
+          anillo(h, nivel + 1, a, a + paso);
+          a += paso;
         });
       }
-      cuerpo.textContent = "";
-      rows.forEach(function (r) {
-        var tr = document.createElement("tr");
-        campos.forEach(function (c, i) {
-          var cel = document.createElement(i === 0 ? "th" : "td");
-          if (i === 0) {
-            cel.scope = "row";
-            cel.style.cssText = "font-weight:500;color:var(--fg);text-transform:none;letter-spacing:0;font-size:.85rem;cursor:default";
-            if (COL[clave(r[c])]) {
-              var d = document.createElement("i");
-              d.className = "dot";
-              d.style.cssText = "background:" + color(r[c]) + ";margin-right:8px;display:inline-block";
-              cel.appendChild(d);
-            }
-            cel.appendChild(document.createTextNode(nombre(r[c])));
-          } else {
-            var txt = formato ? formato(c, r[c], cel) : r[c];
-            cel.textContent = txt;
-          }
-          tr.appendChild(cel);
-        });
-        cuerpo.appendChild(tr);
+      anillo(foco, 0, -Math.PI / 2, Math.PI * 1.5);
+
+      /* el centro: dice donde estas y te devuelve al nivel de arriba */
+      const centro = el("g", {style:"cursor:pointer"}, s);
+      el("circle", {cx, cy, r:r0 - 14, fill:"#151b23", stroke:"#2a323d",
+                    "stroke-width":1.5}, centro);
+      const nom = foco.n.replace(/\s*Meglinho.*$/i, "");
+      el("text", {x:cx, y:cy - 6, fill:"#e6edf3", "font-size":12.5,
+                  "text-anchor":"middle", "font-weight":600}, centro)
+        .textContent = nom.length > 15 ? nom.slice(0, 14) + "." : nom;
+      el("text", {x:cx, y:cy + 11, fill:"#6e7781", "font-size":10.5,
+                  "text-anchor":"middle"}, centro)
+        .textContent = foco === RAIZ
+          ? (medida === "peso" ? pesa(RAIZ.b) : `${cuenta(RAIZ)} archivos`)
+          : "volver";
+      centro.addEventListener("click", () => {
+        if (foco !== RAIZ) { foco = padres.get(foco) || RAIZ; pinta(); muestra(foco); }
+      });
+
+      /* El disco del centro se dibuja al final y tapaba la primera letra de
+         las etiquetas del anillo interior, de modo que la capa de texto se
+         vuelve a poner encima de todo. */
+      s.appendChild(capaTexto);
+
+      muestra(foco);
+    }
+
+    /* Un sector de corona circular, que es la forma de cada porcion. */
+    function sector(cx, cy, ri, re, a0, a1) {
+      const p = (r, a) => [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+      const grande = (a1 - a0) > Math.PI ? 1 : 0;
+      const [x1, y1] = p(re, a0), [x2, y2] = p(re, a1);
+      const [x3, y3] = p(ri, a1), [x4, y4] = p(ri, a0);
+      return `M${x1} ${y1}A${re} ${re} 0 ${grande} 1 ${x2} ${y2}` +
+             `L${x3} ${y3}A${ri} ${ri} 0 ${grande} 0 ${x4} ${y4}Z`;
+    }
+
+    function ruta(n) {
+      const r = [];
+      let x = n;
+      while (x && x !== RAIZ) { r.unshift(x.n.replace(/\s*Meglinho.*$/i, "")); x = padres.get(x); }
+      return r.length ? r.join(" / ") : "Unidad II";
+    }
+
+    function muestra(n, soloPasar) {
+      const d = $("#detalle-carpeta");
+      const subs = (n.d || []).slice().sort((a, b) => b.b - a.b);
+      const archivos = (n.f || []).slice().sort((a, b) => b.b - a.b);
+      d.style.setProperty("--c", colorDe(n));
+      d.innerHTML =
+        `<p class="ruta">${esc(ruta(n))}</p>
+         <h4>${esc(n.n.replace(/\s*Meglinho.*$/i, ""))}</h4>
+         ${n.ajeno ? '<span class="sello aviso">material de terceros</span>' : ""}
+         <div class="cifras">
+           <span><b>${fmt(cuenta(n), 0)}</b>archivos</span>
+           <span><b>${pesa(n.b)}</b>en disco</span>
+           <span><b>${fmt(subs.length, 0)}</b>subcarpetas</span>
+         </div>` +
+        (subs.length
+          ? `<ul>` + subs.map(h =>
+              `<li><span class="punto" style="background:${colorDe(h)}"></span>
+                 <button data-entrar="1">${esc(h.n.replace(/\s*Meglinho.*$/i, ""))}</button>
+                 <span class="peso">${fmt(cuenta(h), 0)} arch &middot; ${pesa(h.b)}</span>
+               </li>`).join("") + `</ul>`
+          : archivos.length
+            ? `<ul>` + archivos.slice(0, 14).map(f =>
+                `<li><span class="ext">${ext(f.n)}</span>
+                   <span>${esc(f.n)}</span>
+                   <span class="peso">${pesa(f.b)}</span></li>`).join("") +
+              (archivos.length > 14
+                ? `<li style="color:var(--tenue)">y ${archivos.length - 14} mas</li>` : "") +
+              `</ul>`
+            : "");
+
+      /* los botones de la lista entran en esa subcarpeta */
+      d.querySelectorAll("[data-entrar]").forEach((b, i) => b.onclick = () => {
+        foco = subs[i]; pinta(); muestra(subs[i]);
       });
     }
 
-    cabecera.textContent = "";
-    campos.forEach(function (c) {
-      var th = document.createElement("th");
-      th.textContent = c;
-      th.setAttribute("scope", "col");
-      th.addEventListener("click", function () {
-        estado.asc = estado.campo === c ? !estado.asc : false;
-        estado.campo = c;
-        Array.prototype.forEach.call(cabecera.children, function (x) {
-          x.className = "";
-        });
-        th.className = estado.asc ? "asc" : "desc";
-        pinta();
-      });
-      cabecera.appendChild(th);
+    document.querySelectorAll("[data-medida]").forEach(b => b.onclick = () => {
+      document.querySelectorAll("[data-medida]").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      medida = b.dataset.medida;
+      pinta();
     });
+
     pinta();
+
+    /* El recorrido entra en las tres carpetas, una tras otra, y acaba en el
+       circulo completo. Es el mismo paseo que haria alguien pulsando, y deja
+       ver de un golpe cuanto pesa cada parte de la entrega. No arranca solo
+       porque el mapa ya se entiende quieto. */
+    const PARADAS = (ARBOL || []).concat([RAIZ]);
+    montarRepro({
+      donde:"#repro-sunburst", segundos:2.8 * PARADAS.length, vista:"archivos",
+      pasos:PARADAS.length, auto:false,
+      pinta: t => {
+        const k = Math.min(PARADAS.length - 1, Math.floor(t * PARADAS.length));
+        if (foco !== PARADAS[k]) { foco = PARADAS[k]; pinta(); muestra(PARADAS[k]); }
+        return PARADAS[k] === RAIZ ? "las tres carpetas"
+                                   : String(PARADAS[k].n).slice(0, 24);
+      }
+    });
+  })();
+
+  /* el aviso del material de terceros */
+  const ajenas = [];
+  (function busca(ns) { ns.forEach(n => {
+    if (n.ajeno) ajenas.push([n.n, cuenta(n)]); else busca(n.d||[]);
+  }); })(ARBOL || []);
+  $("#aviso-ajeno").innerHTML = ajenas.length
+    ? `<b>Lo que esta pagina no reparte.</b> ` + ajenas.map(([n, c]) =>
+        `${n} (${c} archivos)`).join(" y ") + `. Los articulos en ingles son de sus
+       editoriales y las traducciones al espanol son obras derivadas de ellos, de modo que el
+       arbol los lista para que se vea el trabajo hecho pero los ZIP no los incluyen. Cada uno
+       se consulta por su DOI en las referencias del articulo.`
+    : `<b>Nota.</b> El arbol de arriba se armo sin las carpetas de articulos de terceros.`;
+
+  const tot = (ARBOL||[]).reduce((a,c) => a + cuenta(c), 0);
+  const bytes = (ARBOL||[]).reduce((a,c) => a + c.b, 0);
+  $("#pie-datos").innerHTML =
+    `${(DER.fechas||[]).length} sesiones diarias por sector, del ${(DER.fechas||[])[0]} al
+     ${(DER.fechas||[]).slice(-1)[0]}. ${Object.keys(TITULOS).length} tablas y ${tot} archivos
+     en ${(ARBOL||[]).length} carpetas, ${pesa(bytes)} en total. Pagina estatica, sin
+     dependencias externas: todo lo que ves se dibuja en tu navegador con los datos
+     incrustados en este mismo archivo.`;
+})();
+
+/* ===================== el proceso ===================== */
+(function proceso() {
+  const sec = $("#proceso");
+  const hayLog = typeof LOG !== "undefined" && LOG.lineas && LOG.lineas.length;
+  const hayFlujo = typeof FLUJO !== "undefined" && FLUJO.length;
+  if (!hayLog && !hayFlujo) {
+    sec.remove();
+    const b = document.querySelector('.lat-item[data-ir="proceso"]');
+    if (b) b.remove();
+    return;
   }
 
-  function tablas() {
-    var campos = ["Sector", "Beta", "Retorno anual %", "Volatilidad anual %",
-      "Ke del CAPM %", "Sharpe", "Treynor %", "Alfa de Jensen anual %", "p del alfa"];
-    var dec = { Beta: 4, Sharpe: 4, "p del alfa": 3 };
-    tablaOrdenable(porOrden("desempeno"), campos, el("t-head"), el("t-body"),
-      function (campo, valor, celda) {
-        var v = num(valor);
-        if (!isFinite(v)) return valor;
-        if (campo === "Alfa de Jensen anual %") {
-          celda.className = v > 0 ? "pos" : "neg";
-        }
-        return fmt(v, dec[campo] === undefined ? 2 : dec[campo]);
+  /* ---------- el flujo de acciones a carteras ---------- */
+  if (hayFlujo) {
+    const movidas = FLUJO.filter(f => f.mov).length;
+    $("#sello-flujo").textContent = `${FLUJO.length} acciones`;
+    let filtro = "todas";
+
+    function pintaFlujo() {
+      const destinos = [...new Set(FLUJO.map(f => f.d))]
+        .sort((a, b) => SEC.indexOf(clave(a)) - SEC.indexOf(clave(b)));
+
+      /* Los origenes se ordenan por el destino al que mandan la mayoria de sus
+         acciones, y dentro de cada origen las acciones se ordenan por destino.
+         Sin esto las cintas se cruzan mucho mas de lo necesario y el dibujo
+         deja de leerse. */
+      const pesoOrigen = {};
+      FLUJO.forEach(f => {
+        const k = destinos.indexOf(f.d);
+        pesoOrigen[f.o] = pesoOrigen[f.o] || {suma:0, n:0};
+        pesoOrigen[f.o].suma += k;
+        pesoOrigen[f.o].n += 1;
+      });
+      const origenes = [...new Set(FLUJO.map(f => f.o))].sort((a, b) =>
+        (pesoOrigen[a].suma / pesoOrigen[a].n) - (pesoOrigen[b].suma / pesoOrigen[b].n));
+
+      const ver = FLUJO
+        .filter(f => filtro === "todas" ? true : filtro === "movidas" ? f.mov : !f.mov)
+        .slice()
+        .sort((a, b) =>
+          origenes.indexOf(a.o) - origenes.indexOf(b.o) ||
+          destinos.indexOf(a.d) - destinos.indexOf(b.d) ||
+          String(a.n).localeCompare(String(b.n)));
+
+      const an = 640, fila = 26, ar = 30, ab = 22;
+      const alto = Math.max(origenes.length, destinos.length) * 0 +
+                   Math.max(240, ver.length * fila + ar + ab);
+      const s = lienzo("#fig-flujo", an, alto);
+      /* El margen izquierdo da sitio al nombre mas largo que publica la BVL,
+         que es "BANCOS Y FINANCIERAS". */
+      const xi = 196, xd = an - 150;
+
+      if (!ver.length) {
+        el("text", {x:an/2, y:alto/2, fill:"#6e7781", "font-size":13,
+                    "text-anchor":"middle"}, s).textContent = "Ninguna en este grupo";
+        return;
+      }
+
+      /* Cada accion es una fila; sus extremos se agrupan por origen y destino. */
+      const yDe = {}, nDe = {}, yA = {}, nA = {};
+      const cuentaO = {}, cuentaD = {};
+      ver.forEach(f => {
+        cuentaO[f.o] = (cuentaO[f.o] || 0) + 1;
+        cuentaD[f.d] = (cuentaD[f.d] || 0) + 1;
+      });
+      let y = ar;
+      origenes.filter(o => cuentaO[o]).forEach(o => {
+        yDe[o] = y + (cuentaO[o] - 1) * fila / 2;
+        nDe[o] = y;
+        y += cuentaO[o] * fila;
+      });
+      y = ar;
+      destinos.filter(d => cuentaD[d]).forEach(d => {
+        yA[d] = y + (cuentaD[d] - 1) * fila / 2;
+        nA[d] = y;
+        y += cuentaD[d] * fila;
       });
 
-    var cc = ["Nemonico", "Empresa", "Sector BVL", "Cartera asignada", "Reasignada", "Moneda"];
-    var comp = (DATOS.composicion || []).slice().sort(function (a, b) {
-      var d = ORDEN.indexOf(clave(a["Cartera asignada"])) - ORDEN.indexOf(clave(b["Cartera asignada"]));
-      return d || a.Nemonico.localeCompare(b.Nemonico);
-    });
-    tablaOrdenable(comp, cc, el("tc-head"), el("tc-body"), function (campo, valor, celda) {
-      if (campo === "Reasignada") celda.className = valor === "si" ? "pos" : "";
-      if (campo === "Cartera asignada") return nombre(valor);
-      return valor;
-    });
-  }
+      /* los bloques de la izquierda y la derecha */
+      origenes.filter(o => cuentaO[o]).forEach(o => {
+        const y0 = nDe[o], h = cuentaO[o] * fila - 7;
+        el("rect", {x:xi-7, y:y0-9, width:7, height:h, rx:3, fill:"#3d4754"}, s);
+        el("text", {x:xi-15, y:yDe[o]+4, fill:"#9aa4b2", "font-size":10.5,
+                    "text-anchor":"end"}, s).textContent = o;
+      });
+      destinos.filter(d => cuentaD[d]).forEach(d => {
+        const y0 = nA[d], h = cuentaD[d] * fila - 7;
+        const c = COL[clave(d)] || "#58a6ff";
+        el("rect", {x:xd, y:y0-9, width:7, height:h, rx:3, fill:c}, s);
+        el("text", {x:xd+15, y:yA[d]+4, fill:c, "font-size":12,
+                    "font-weight":600}, s).textContent = d;
+      });
 
-  // ---------- descargas ----------
-  function descargas() {
-    var p = el("dl-prod");
-    p.textContent = "";
-    PRODUCTOS.forEach(function (x) {
-      var a = document.createElement("a");
-      a.href = x[2];
-      a.setAttribute("download", "");
-      var i = document.createElement("span");
-      i.className = "ico";
-      i.textContent = "PDF";
-      var c = document.createElement("span");
-      var t = document.createElement("span");
-      t.className = "t";
-      t.textContent = x[0];
-      var d = document.createElement("span");
-      d.className = "d";
-      d.textContent = x[1];
-      c.appendChild(t);
-      c.appendChild(document.createElement("br"));
-      c.appendChild(d);
-      a.appendChild(i);
-      a.appendChild(c);
-      p.appendChild(a);
-    });
+      /* una cinta por accion, y la bolita que la recorre */
+      const desplaza = {}, llega = {};
+      ver.forEach((f, i) => {
+        const y1 = (desplaza[f.o] = (desplaza[f.o] ?? nDe[f.o] - fila) + fila);
+        const y2 = (llega[f.d] = (llega[f.d] ?? nA[f.d] - fila) + fila);
+        const c = COL[clave(f.d)] || "#58a6ff";
+        const d = `M${xi} ${y1} C${xi + 95} ${y1}, ${xd - 95} ${y2}, ${xd} ${y2}`;
+        const g = el("g", {}, s);
+        el("path", {d, fill:"none", stroke:c, "stroke-width":1.6,
+                    opacity: f.mov ? .72 : .28,
+                    "stroke-dasharray": f.mov ? "" : "4 3"}, g);
+        const et = el("text", {x:xi+13, y:y1-4, fill: f.mov ? "#e6edf3" : "#7d8794",
+                    "font-size":10.5,
+                    "font-family":"ui-monospace,Menlo,monospace"}, g);
+        et.textContent = f.n || f.e;
+        /* Un punto naranja basta para marcar la que cambio de cartera: la
+           palabra repetida dieciseis veces tapaba el dibujo. */
+        if (f.mov)
+          el("circle", {cx:xi+8, cy:y1-8, r:2.6, fill:"#f0883e"}, g);
 
-    var NOM = {
-      composicion: ["Composición de las carteras", "tabla0_composicion_carteras.csv"],
-      descriptiva: ["Descriptiva de los retornos", "tabla1_descriptiva.csv"],
-      correlaciones: ["Correlaciones entre sectores", "tabla3_correlaciones.csv"],
-      betas: ["Betas sectoriales", "tabla4_betas.csv"],
-      costo: ["Costo de capital", "tabla5_costo_capital.csv"],
-      frontera: ["Carteras de la frontera", "tabla8_frontera_carteras.csv"],
-      desempeno: ["Desempeño ajustado", "tabla9_desempeno_ajustado.csv"],
-      diversificacion: ["Ganancia de diversificar", "tabla10_ganancia_diversificacion.csv"]
-    };
-    var cont = el("dl-datos");
-    cont.textContent = "";
-    Object.keys(NOM).forEach(function (k) {
-      var a = document.createElement("a");
-      a.href = "datos/" + NOM[k][1];
-      a.setAttribute("download", "");
-      var i = document.createElement("span");
-      i.className = "ico";
-      i.textContent = "CSV";
-      var c = document.createElement("span");
-      var t = document.createElement("span");
-      t.className = "t";
-      t.textContent = NOM[k][0];
-      var d = document.createElement("span");
-      d.className = "d";
-      d.textContent = (DATOS[k] || []).length + " filas";
-      c.appendChild(t);
-      c.appendChild(document.createElement("br"));
-      c.appendChild(d);
-      a.appendChild(i);
-      a.appendChild(c);
-      cont.appendChild(a);
-    });
-  }
+        /* la bolita recorre la cinta, como en el diagrama de referencia */
+        const bola = el("circle", {r: f.mov ? 3.2 : 2.2, fill:c,
+                                   opacity: f.mov ? .95 : .45}, g);
+        const mov = el("animateMotion", {
+          dur: (3.4 + (i % 5) * 0.45) + "s", repeatCount:"indefinite",
+          path: d, begin: (i * 0.17) + "s",
+        }, bola);
 
-  // ---------- navegacion ----------
-  function navegacion() {
-    var links = Array.prototype.slice.call(document.querySelectorAll(".nav a"));
-    var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
-    function marca() {
-      var y = window.scrollY + 90, act = -1;
-      secs.forEach(function (s, i) { if (s && s.offsetTop <= y) act = i; });
-      links.forEach(function (a, i) { a.className = i === act ? "on" : ""; });
+        conTip(g, `<b>${esc(f.n || f.e)}</b>` + (f.e && f.n ? `<br>${esc(f.e)}` : "") +
+          `<br>BVL: ${esc(f.o || "sin dato")}` +
+          `<br>aqui: <span style="color:${c}">${esc(f.d)}</span>` +
+          (f.m ? `<br>cotiza en ${esc(f.m)}` : "") +
+          (f.mov ? `<br><span style="color:#f0883e">cambio de cartera</span>` : ""));
+      });
+
+      $("#nota-flujo").innerHTML =
+        `La BVL agrupa por el sector de la empresa; aqui se agrupa por el negocio del que
+         sale el flujo de caja. <b style="color:var(--alerta)">${movidas} de las
+         ${FLUJO.length}</b> acciones cambiaron de cartera por eso: van con linea llena y
+         un punto naranja. Las ${FLUJO.length - movidas} que coinciden con la BVL van
+         punteadas y en gris. Pasa el cursor sobre cualquiera para ver su caso.`;
     }
-    window.addEventListener("scroll", marca, { passive: true });
-    marca();
-  }
 
-  // ---------- arranque ----------
-  function dibujarTodo() {
-    dibujarBetas(); dibujarKe(); dibujarFrontera(); dibujarCorr();
-  }
-
-  function iniciar() {
-    primaReal = num((DATOS.costo[0] || {})["Prima de mercado (%)"]);
-    if (!isFinite(primaReal)) primaReal = 15.4;
-    var r = el("prima");
-    r.value = primaReal;
-    el("prima-val").textContent = pct(primaReal, 1);
-
-    portada();
-    leyenda();
-    tablas();
-    descargas();
-    dibujarTodo();
-    navegacion();
-
-    r.addEventListener("input", function () {
-      el("prima-val").textContent = pct(parseFloat(r.value), 1);
-      dibujarKe();
+    document.querySelectorAll("[data-flujo]").forEach(b => b.onclick = () => {
+      document.querySelectorAll("[data-flujo]").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      filtro = b.dataset.flujo;
+      pintaFlujo();
     });
-    el("prima-reset").addEventListener("click", function () {
-      r.value = primaReal;
-      el("prima-val").textContent = pct(primaReal, 1);
-      dibujarKe();
-    });
-
-    var t;
-    window.addEventListener("resize", function () {
-      clearTimeout(t);
-      t = setTimeout(dibujarTodo, 140);
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", iniciar);
+    pintaFlujo();
   } else {
-    iniciar();
+    const c = $("#fig-flujo").closest(".lienzo");
+    if (c) c.remove();
   }
+
+  /* ---------- la terminal con el registro ---------- */
+  if (hayLog) {
+    const cuerpo = $("#term-log");
+    let hasta = LOG.lineas.length, reproduciendo = null;
+
+    /* Se resaltan los trozos que importan: codigos de estado, conteos,
+       hashes y nombres de archivo. El resto queda en gris. */
+    function colorea(t) {
+      return esc(t)
+        .replace(/(HTTP 2\d{2}|\bOK\b)/g, '<span class="ok">$1</span>')
+        .replace(/(HTTP [45]\d{2}|descarta\w*|Descartad\w*|PROHIBE)/gi,
+                 '<span class="av">$1</span>')
+        .replace(/((?:SHA-256|sha256)[:= ]+[0-9a-f]{8,})/gi, '<span class="hs">$1</span>')
+        .replace(/(filas=\d+|bytes=\d+)/g, '<span class="nm">$1</span>');
+    }
+
+    function pintaLog() {
+      const q = clave($("#buscar-log").value);
+      const vis = LOG.lineas.slice(0, hasta)
+        .filter(L => !q || clave(L.t).includes(q));
+      cuerpo.innerHTML = vis.map(L => L.n === 0
+        ? `<div class="term-corte">. . .</div>`
+        : `<div class="term-linea"><span class="ln">L${L.n}</span>` +
+          (L.f ? `<span class="hora">${esc(L.f)}</span>` : "") +
+          `<span class="txt">${colorea(L.t)}</span></div>`).join("") +
+        (hasta < LOG.lineas.length ? `<div class="cursor-term"></div>` : "");
+      $("#conteo-log").textContent = q
+        ? `${vis.length} de ${LOG.lineas.length}`
+        : `${LOG.lineas.length} de ${LOG.total} lineas`;
+      if (hasta < LOG.lineas.length) cuerpo.scrollTop = cuerpo.scrollHeight;
+    }
+
+    $("#log-play").onclick = () => {
+      if (reproduciendo) {
+        clearInterval(reproduciendo); reproduciendo = null;
+        hasta = LOG.lineas.length;
+        $("#log-play").textContent = "Reproducir";
+        $("#log-play").classList.remove("on");
+        pintaLog();
+        return;
+      }
+      hasta = 0;
+      $("#log-play").textContent = "Detener";
+      $("#log-play").classList.add("on");
+      reproduciendo = setInterval(() => {
+        hasta += 3;
+        if (hasta >= LOG.lineas.length) {
+          hasta = LOG.lineas.length;
+          clearInterval(reproduciendo); reproduciendo = null;
+          $("#log-play").textContent = "Reproducir";
+          $("#log-play").classList.remove("on");
+        }
+        pintaLog();
+      }, 55);
+    };
+    $("#buscar-log").addEventListener("input", () => {
+      if (reproduciendo) { clearInterval(reproduciendo); reproduciendo = null;
+        hasta = LOG.lineas.length; $("#log-play").textContent = "Reproducir";
+        $("#log-play").classList.remove("on"); }
+      pintaLog();
+    });
+
+    $("#nota-log").innerHTML =
+      `El registro lo escribe el propio codigo mientras corre. Cada linea lleva su numero
+       real dentro de <code>log_ejecucion.txt</code>, de modo que se puede abrir el archivo
+       y comprobar que dice eso en ese sitio. De las ${fmt(LOG.total, 0)} lineas del archivo
+       se muestran ${fmt(LOG.lineas.length, 0)}: las que informan de una peticion, un
+       conteo, un descarte o un hash. El boton de reproducir las va sacando como salieron.`;
+    pintaLog();
+  } else {
+    const t = $(".terminal");
+    if (t) t.remove();
+  }
+})();
+
+/* ===================== galeria de figuras ===================== */
+(function galeria() {
+  const sec = $("#figuras");
+  if (typeof FIGURAS === "undefined" || !FIGURAS.length) {
+    sec.remove();
+    const e = document.querySelector('.menu a[href="#figuras"]');
+    if (e) e.remove();
+    return;
+  }
+
+  const total = FIGURAS.reduce((a, f) => a + f.kb, 0);
+  $("#sub-figuras").innerHTML =
+    `Las ${FIGURAS.length} figuras, tal como salieron de 04_analisis.py y
+     05_markowitz.py a 300 puntos por pulgada. Lo que se ve aqui es una version
+     reducida para que la pagina cargue rapido; al ampliar o descargar se
+     entrega el original, que es el que sirve para imprimir. Entre todas pesan
+     ${fmt(total / 1024, 1)} MB.`;
+
+  $("#galeria").innerHTML = FIGURAS.map((f, i) =>
+    `<figure class="figura">
+       <div class="marco-img" data-fig="${i}" title="Ampliar">
+         <span class="num">Figura ${f.n}</span>
+         <img src="${esc(f.img)}" alt="${esc(f.t)}" loading="lazy">
+       </div>
+       <figcaption class="cuerpo">
+         <b>${esc(f.t)}</b>
+         ${f.p ? `<small>${esc(f.p)}</small>` : ""}
+         <span class="abajo">${f.s ? esc(f.s) : ""} &middot; ${fmt(f.kb, 0)} KB
+           <a href="${esc(f.full)}" download>Descargar original</a></span>
+       </figcaption>
+     </figure>`).join("");
+
+  /* el visor */
+  const visor = $("#visor"), img = $("#visor-img"), texto = $("#visor-texto");
+  let actual = 0;
+
+  function abrir(i) {
+    actual = (i + FIGURAS.length) % FIGURAS.length;
+    const f = FIGURAS[actual];
+    img.src = f.full;                      /* el visor si carga el original */
+    img.alt = f.t;
+    texto.innerHTML = `<b>Figura ${f.n}.</b> ${esc(f.t)}` +
+      (f.p ? `<br><span style="color:var(--tenue)">${esc(f.p)}</span>` : "");
+    visor.classList.add("abierto");
+    document.body.style.overflow = "hidden";
+  }
+  function cerrar() {
+    visor.classList.remove("abierto");
+    document.body.style.overflow = "";
+    img.src = "";
+  }
+
+  $("#galeria").addEventListener("click", e => {
+    const m = e.target.closest("[data-fig]");
+    if (m) abrir(parseInt(m.dataset.fig, 10));
+  });
+  $("#visor-cerrar").onclick = cerrar;
+  $("#visor-ant").onclick = () => abrir(actual - 1);
+  $("#visor-sig").onclick = () => abrir(actual + 1);
+  visor.addEventListener("click", e => { if (e.target === visor) cerrar(); });
+
+  /* El visor se queda con el teclado mientras esta abierto, de modo que las
+     flechas pasan de figura y no de seccion. */
+  addEventListener("keydown", e => {
+    if (!visor.classList.contains("abierto")) return;
+    e.stopPropagation();
+    if (e.key === "Escape") { e.preventDefault(); cerrar(); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); abrir(actual + 1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); abrir(actual - 1); }
+  }, true);
+
+  /* El pase recorre las figuras en el orden en que las produce el codigo y se
+     detiene en cada una. No arranca solo: en una seccion que ya se ve entera
+     mover la pagina sin que nadie lo pida estorba mas de lo que ayuda. */
+  const fichas = Array.from(document.querySelectorAll("#galeria .figura"));
+  montarRepro({
+    donde:"#repro-figuras", segundos:2.2 * FIGURAS.length, vista:"figuras",
+    pasos:FIGURAS.length, auto:false,
+    pinta: t => {
+      const k = Math.min(FIGURAS.length - 1, Math.floor(t * FIGURAS.length));
+      fichas.forEach((n, i) => n.classList.toggle("en-pase", i === k));
+      if (fichas[k]) fichas[k].scrollIntoView({block:"center", behavior:"smooth"});
+      return `figura ${FIGURAS[k].n} de ${FIGURAS.length}`;
+    }
+  });
+})();
+
+/* ===================== bibliografia ===================== */
+(function bibliografia() {
+  const sec = $("#bibliografia");
+  /* Se mira con typeof y no con window.REFS: una variable declarada con const
+     no queda como propiedad de window, de modo que window.REFS seria siempre
+     indefinida y la seccion se borraria aunque los datos esten. */
+  if (typeof REFS === "undefined" || !REFS.length) {
+    sec.remove();
+    const enlace = document.querySelector('.menu a[href="#bibliografia"]');
+    if (enlace) enlace.remove();
+    return;
+  }
+  const con = REFS.filter(r => r.doi).length;
+
+  const otros = REFS.filter(r => !r.doi && r.url).length;
+  $("#sub-bib").innerHTML =
+    `Las ${REFS.length} referencias del articulo, leidas de su propia bibliografia.
+     ${con} llevan DOI` + (otros ? ` y ${otros} un enlace estable del archivo de la
+     revista` : "") + `. Cada enlace lleva a la pagina oficial del articulo en su
+     editorial, con su resumen y sus datos de publicacion; no descarga el PDF, de modo
+     que quien entre vera lo que la editorial permite ver segun su propia licencia.
+     Los articulos en ingles de la carpeta de productos son estos mismos: pertenecen a
+     sus editoriales, y por eso esta pagina enlaza al original en lugar de repartir
+     el archivo.`;
+
+  function pinta() {
+    const q = clave($("#buscar-ref").value);
+    const vis = q ? REFS.filter(r => clave(r.t + " " + (r.doi || "")).includes(q)) : REFS;
+    $("#refs").innerHTML = vis.length
+      ? vis.map(r => `<li>${esc(r.t)}` + (
+            r.doi ? ` <a class="doi" href="https://doi.org/${encodeURI(r.doi)}"
+                        target="_blank" rel="noopener noreferrer"
+                        title="Abre la pagina oficial del articulo en su editorial"
+                     >doi.org/${esc(r.doi)}</a>`
+          : r.url ? ` <a class="doi" href="${esc(r.url)}"
+                        target="_blank" rel="noopener noreferrer"
+                        title="Abre la pagina oficial del articulo"
+                     >${esc(r.url.replace(/^https?:\/\/(www\.)?/, ""))}</a>`
+          : ` <span class="sin">sin enlace</span>`) + `</li>`).join("")
+      : `<li style="padding-left:16px;color:var(--tenue)">Ninguna referencia dice
+         "${esc($("#buscar-ref").value)}"</li>`;
+    $("#conteo-ref").textContent = vis.length === REFS.length
+      ? `${REFS.length} referencias` : `${vis.length} de ${REFS.length}`;
+  }
+  $("#buscar-ref").addEventListener("input", pinta);
+  pinta();
+})();
+
+/* ===================== la portada ===================== */
+(function umbral() {
+  const caja = $("#umbral"), lienzoEsfera = $("#esfera");
+  const ctx = lienzoEsfera.getContext("2d");
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Cada punto es una sesion de la muestra y su color dice que sector rindio
+     mas ese dia. El ganador diario viene calculado desde el panel, una letra
+     por sesion, y no se deduce aqui del indice: ese llega redondeado a dos
+     decimales y en las sesiones de casi empate el redondeo cambia el ganador. */
+  const puntos = [];
+  const cuenta = {}; SEC.forEach(s => cuenta[s] = 0);
+  for (const ch of (DER.gana || "")) {
+    const s = (DER.letra || {})[ch];
+    if (s) { puntos.push(s); cuenta[s]++; }
+  }
+
+  /* Reparto en espiral de Fibonacci: deja los puntos a distancia pareja sobre
+     la esfera, sin los amontonamientos que da una malla de meridianos. */
+  const N = puntos.length;
+  const oro = Math.PI * (3 - Math.sqrt(5));
+  const base = [];
+  for (let i = 0; i < N; i++) {
+    const y = 1 - (i / Math.max(1, N - 1)) * 2;
+    const rad = Math.sqrt(Math.max(0, 1 - y*y));
+    const th = oro * i;
+    base.push([Math.cos(th)*rad, y, Math.sin(th)*rad, COL[puntos[i]]]);
+  }
+
+  let an = 0, al = 0, dpr = 1;
+  function medir() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    an = caja.clientWidth; al = caja.clientHeight;
+    lienzoEsfera.width = an * dpr; lienzoEsfera.height = al * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  const INCL = -0.34;                       /* inclinacion del eje, en radianes */
+  const si = Math.sin(INCL), co = Math.cos(INCL);
+  let giro = 0, vivo = true;
+
+  function cuadro() {
+    if (!vivo) return;
+    ctx.clearRect(0, 0, an, al);
+    const ancha = an >= 900;
+    const R = Math.min(ancha ? an * .46 : an, al) * (ancha ? 0.40 : 0.36);
+    const cx = ancha ? an * 0.715 : an / 2, cy = al / 2;
+    const sg = Math.sin(giro), cg = Math.cos(giro);
+
+    /* Un resplandor muy tenue detras sugiere el volumen que un punteado solo
+       no alcanza a dar. */
+    const halo = ctx.createRadialGradient(cx, cy, R*0.1, cx, cy, R*1.5);
+    halo.addColorStop(0, "rgba(88,166,255,.085)");
+    halo.addColorStop(.55, "rgba(88,166,255,.03)");
+    halo.addColorStop(1, "rgba(88,166,255,0)");
+    ctx.fillStyle = halo;
+    ctx.fillRect(cx - R*1.5, cy - R*1.5, R*3, R*3);
+
+    /* Se ordenan por profundidad para que los de atras queden detras. */
+    const vistos = [];
+    for (let i = 0; i < base.length; i++) {
+      const [x0, y0, z0, c] = base[i];
+      const x1 = x0*cg - z0*sg, z1 = x0*sg + z0*cg;      /* giro sobre el eje Y */
+      const y2 = y0*co - z1*si, z2 = y0*si + z1*co;      /* inclinacion */
+      vistos.push([x1, y2, z2, c]);
+    }
+    vistos.sort((a, b) => a[2] - b[2]);
+
+    for (let i = 0; i < vistos.length; i++) {
+      const [x, y, z, c] = vistos[i];
+      const p = 1 / (1 + z * 0.42);                       /* algo de perspectiva */
+      const px = cx + x * R * p, py = cy + y * R * p;
+      /* La sensacion de esfera viene de aqui: los puntos de atras quedan muy
+         pequenos y casi apagados, y los de delante grandes y vivos. Con tamano
+         y opacidad parejos el conjunto se ve como un disco plano. */
+      const t = (z + 1) / 2;                              /* 0 detras, 1 delante */
+      const f = t * t;                                    /* la curva acentua el frente */
+      ctx.globalAlpha = 0.07 + f * 0.86;
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      ctx.arc(px, py, (0.45 + f * 2.15) * p, 0, 6.2832);
+      ctx.fill();
+      if (t > .93) {                                      /* brillo en el borde frontal */
+        ctx.globalAlpha = (t - .93) * 3.4;
+        ctx.beginPath();
+        ctx.arc(px, py, (1.5 + f * 3.4) * p, 0, 6.2832);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    if (!quieto) { giro += 0.0022; requestAnimationFrame(cuadro); }
+  }
+
+  medir(); cuadro();
+  addEventListener("resize", () => { medir(); if (quieto) cuadro(); });
+
+  const orden = SEC.slice().sort((a, b) => cuenta[b] - cuenta[a]);
+  $("#umbral-pie").innerHTML =
+    `Cada punto es una de las <b>${fmt(N, 0)} sesiones</b> con retorno de la muestra, y su
+     color dice que sector rindio mas ese dia: ` +
+    orden.map(s => `<b style="color:${COL[s]}">${NOM[s]}</b> ${cuenta[s]}`).join(" &middot; ");
+
+  function entrar() {
+    caja.classList.add("fuera");
+    setTimeout(() => { vivo = false; caja.remove(); }, 800);
+    document.body.style.overflow = "";
+  }
+  document.body.style.overflow = "hidden";
+  $("#entrar").onclick = entrar;
+  addEventListener("keydown", e => {
+    if (caja.isConnected && (e.key === "Enter" || e.key === "Escape" || e.key === " ")) {
+      e.preventDefault(); entrar();
+    }
+  }, {once:false});
+  /* Quien llega con un ancla en la direccion (#tablas, por ejemplo) ya sabe a
+     que viene, de modo que no se le pone la portada por delante. */
+  if (location.hash && document.querySelector(location.hash)) entrar();
+})();
+
+/* ===================== sacar las figuras como imagen ===================== */
+/* Un SVG dibujado aqui no se puede pegar en el beamer ni en el journal tal
+   cual, de modo que cada figura lleva un boton que la pasa a PNG al doble de
+   resolucion, listo para una diapositiva. */
+function figuraPNG(svg, nombre) {
+  const vb = (svg.getAttribute("viewBox") || "0 0 760 400").split(/[\s,]+/).map(Number);
+  const an = vb[2] || 760, al = vb[3] || 400, escala = 2;
+
+  const copia = svg.cloneNode(true);
+  copia.setAttribute("xmlns", SVGNS);
+  copia.setAttribute("width", an);
+  copia.setAttribute("height", al);
+
+  const texto = new XMLSerializer().serializeToString(copia);
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement("canvas");
+    c.width = an * escala; c.height = al * escala;
+    const cx = c.getContext("2d");
+    cx.fillStyle = "#151b23";                   /* el fondo del panel oscuro */
+    cx.fillRect(0, 0, c.width, c.height);
+    cx.drawImage(img, 0, 0, c.width, c.height);
+    c.toBlob(b => {
+      if (!b) return;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(b);
+      a.download = nombre;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }, "image/png");
+  };
+  img.onerror = () => alert("No se pudo convertir esta figura a imagen.");
+  /* Se codifica en base64 para que valga como origen de una imagen. */
+  img.src = "data:image/svg+xml;base64," +
+            btoa(unescape(encodeURIComponent(texto)));
+}
+
+function bajar(texto, nombre, tipo) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["﻿" + texto], {type: tipo}));
+  a.download = nombre;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+(function botonesFigura() {
+  document.querySelectorAll(".lienzo").forEach((caja, i) => {
+    const titulo = caja.querySelector(".titulo-fig");
+    const b = document.createElement("button");
+    b.className = "btn baja-fig";
+    b.textContent = "Guardar como imagen";
+    b.onclick = () => {
+      const svg = caja.querySelector("svg");
+      if (!svg) return;
+      const n = (titulo ? titulo.textContent : "figura")
+        .normalize("NFD").replace(/[̀-ͯ]/g, "")
+        .toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 44);
+      figuraPNG(svg, `${n || "figura"}_2024200522B.png`);
+    };
+    caja.appendChild(b);
+  });
+})();
+
+/* ===================== navegacion entre vistas ===================== */
+/* Una sola pagina, pero cada seccion ocupa la pantalla entera por turnos. Se
+   entra a una y se sale de ella; no se baja de una a la siguiente. */
+/* El orden y los grupos son los de las tres carpetas de la entrega, para que
+   la web se recorra igual que el archivo que recibe el docente. */
+const GRUPOS = [
+  ["1. Productos",                ["resultados", "bibliografia"]],
+  ["2. Desarrollo",               ["proceso", "metodo"]],
+  ["3. Base de datos y código",   ["tablas", "figuras", "panel", "dispersion",
+                                   "capm", "cartera", "comparar", "archivos"]],
+];
+
+const RUTAS = (function rutas() {
+  /* El orden es el de las tres carpetas de la entrega: primero lo que el
+     articulo concluye, luego como se desarrollo y al final los datos. */
+  const DEF = [
+    /* 1. Productos */
+    ["resultados",  "Resultados",      "Las betas de los cuatro sectores y su costo de capital.",
+     s => `${SEC.length} sectores`],
+    ["bibliografia","Bibliografía",    "Las referencias del articulo, cada una con su enlace.",
+     s => (typeof REFS !== "undefined" ? REFS.length + " referencias" : "")],
+    /* 2. Desarrollo */
+    ["proceso",     "El proceso",      "El registro de ejecucion y como se armaron las carteras.",
+     s => (typeof LOG !== "undefined" ? LOG.total + " lineas" : "")],
+    ["metodo",      "Método",          "Como se construyo cada cifra, paso por paso.",
+     s => "5 pasos"],
+    /* 3. Base de datos y codigo */
+    ["tablas",      "Tablas",          "Las once tablas, ordenables y con buscador.",
+     s => `${Object.keys(TITULOS).length} tablas`],
+    ["figuras",     "Figuras",         "Las diez figuras del articulo, para ver y descargar.",
+     s => (typeof FIGURAS !== "undefined" ? FIGURAS.length + " figuras" : "")],
+    ["panel",       "Panel diario",    "Como fue cada sector dia a dia, con el tramo que elijas.",
+     s => `${(DER.fechas||[]).length} sesiones`],
+    ["dispersion",  "Sector y mercado","Las figuras 3 a 6, con la regresion rehecha en vivo.",
+     s => "4 sectores"],
+    ["capm",        "Simulador CAPM",  "Mueve la prima de mercado y mira como cambia el Ke.",
+     s => "1 deslizador"],
+    ["cartera",     "Tu cartera",      "Reparte cien por ciento entre los sectores y mira el riesgo.",
+     s => "4 deslizadores"],
+    ["comparar",    "Comparar",        "Dos sectores enfrentados en doce indicadores.",
+     s => "12 indicadores"],
+    ["archivos",    "Archivos",        "El mapa de las tres carpetas y sus descargas.",
+     s => "3 carpetas"],
+  ];
+  return DEF.filter(r => document.getElementById(r[0]));
+})();
+
+const COLORES_RUTA = ["--mineria","--banca","--construccion","--consumo",
+                      "--acento","--mineria","--banca","--construccion",
+                      "--consumo","--acento","--mineria","--banca"];
+
+function irA(id, empujar = true) {
+  const destino = document.getElementById(id) ? id : "indice";
+  document.querySelectorAll(".vista").forEach(v =>
+    v.classList.toggle("activa", v.id === destino));
+  document.querySelectorAll(".menu a").forEach(a =>
+    a.classList.toggle("activo", a.getAttribute("href") === "#" + destino));
+  document.querySelectorAll(".lat-item").forEach(b =>
+    b.classList.toggle("on", b.dataset.ir === destino));
+  scrollTo({top:0, behavior:"instant"});
+  /* El cierre con la firma y la nota legal solo tiene sentido en el indice. */
+  const pie = document.querySelector("footer");
+  if (pie) pie.style.display = destino === "indice" ? "" : "none";
+  if (typeof reprosAlEntrar === "function") reprosAlEntrar(destino);
+  if (empujar && location.hash !== "#" + destino)
+    history.pushState({v:destino}, "", "#" + destino);
+  const n = document.getElementById(destino);
+  if (n) { n.setAttribute("tabindex","-1"); n.focus({preventScroll:true}); }
+}
+
+(function lateral() {
+  /* El menu de la izquierda, agrupado por temas. Se arma desde RUTAS para que
+     una seccion que no exista (porque faltaron sus datos) tampoco aparezca. */
+  const porId = Object.fromEntries(RUTAS.map((r, i) => [r[0], [r, i]]));
+  $("#lat-grupos").innerHTML = GRUPOS.map(([titulo, ids]) => {
+    const items = ids.filter(id => porId[id]).map(id => {
+      const [r, i] = porId[id];
+      return `<button class="lat-item" data-ir="${id}" style="--c:var(${COLORES_RUTA[i]})">
+                <span class="pepita"></span><span>${esc(r[1])}</span>
+                <span class="cuanto">${esc((r[3]() || "").split(" ")[0])}</span>
+              </button>`;
+    }).join("");
+    return items ? `<div class="lat-grupo"><h5>${esc(titulo)}</h5>${items}</div>` : "";
+  }).join("");
+})();
+
+(function filtroGlobal() {
+  const F = DER.fechas || [];
+  if (F.length < 2) { $(".lat-filtro").remove(); return; }
+
+  const ini = $("#f-ini"), fin = $("#f-fin"), tramo = $("#f-tramo");
+  ini.max = fin.max = F.length - 1;
+  ini.value = 0; fin.value = F.length - 1;
+
+  function pinta(avisar) {
+    let a = +ini.value, b = +fin.value;
+    if (a > b) { [a, b] = [b, a]; }             /* que no se crucen */
+    if (b - a < 20) {                            /* un minimo util */
+      if (+ini.value === a) b = Math.min(F.length - 1, a + 20);
+      else a = Math.max(0, b - 20);
+      ini.value = a; fin.value = b;
+    }
+    VENTANA.i0 = a; VENTANA.i1 = b;
+
+    const pa = a / (F.length - 1) * 100, pb = b / (F.length - 1) * 100;
+    tramo.style.left = pa + "%";
+    tramo.style.width = (pb - pa) + "%";
+    $("#f-desde").textContent = F[a].slice(0, 7);
+    $("#f-hasta").textContent = F[b].slice(0, 7);
+    const anios = (new Date(F[b]) - new Date(F[a])) / 31557600000;
+    $("#f-pie").innerHTML = VENTANA.completa
+      ? `Las ${fmt(F.length, 0)} sesiones de la muestra.`
+      : `${fmt(b - a + 1, 0)} de ${fmt(F.length, 0)} sesiones, ${fmt(anios, 1)} anios.
+         Lo que se ve abajo usa solo este tramo; las tablas y el articulo
+         siempre llevan el periodo entero.`;
+    $("#f-todo").style.display = VENTANA.completa ? "none" : "";
+    if (avisar) VENTANA.avisar();
+  }
+
+  ini.addEventListener("input", () => pinta(true));
+  fin.addEventListener("input", () => pinta(true));
+  $("#f-todo").onclick = () => {
+    ini.value = 0; fin.value = F.length - 1; pinta(true);
+  };
+  pinta(false);
+})();
+
+(function navegacion() {
+  /* El indice, partido en las tres carpetas de la entrega. La numeracion
+     corre seguida de la primera a la ultima, como en el archivo. */
+  const porRuta = Object.fromEntries(RUTAS.map((r, i) => [r[0], [r, i]]));
+  $("#puertas").outerHTML = GRUPOS.map(([titulo, ids]) => {
+    const puertas = ids.filter(id => porRuta[id]).map(id => {
+      const [[rid, nombre, que, cuantos], i] = porRuta[id];
+      return `<button class="puerta" data-ir="${rid}" style="--c:var(${COLORES_RUTA[i]})">
+                <span class="num">${String(i+1).padStart(2,"0")}</span>
+                <b>${esc(nombre)}</b><small>${esc(que)}</small>
+                <span class="cuantos">${esc(cuantos() || "")}</span>
+              </button>`;
+    }).join("");
+    if (!puertas) return "";
+    return `<div class="carpeta-indice">
+              <h4 class="carpeta-tit"><span class="carpeta-ico">&#128193;</span>
+                ${esc(titulo)}
+                <span class="carpeta-n">${ids.filter(id => porRuta[id]).length}
+                  ${ids.filter(id => porRuta[id]).length === 1 ? "seccion" : "secciones"}</span>
+              </h4>
+              <div class="tarjetas-indice">${puertas}</div>
+            </div>`;
+  }).join("");
+
+  /* el pie de cada vista: salir, anterior y siguiente */
+  RUTAS.forEach(([id], i) => {
+    const caja = document.getElementById(id).querySelector(".caja");
+    const ant = RUTAS[i-1], sig = RUTAS[i+1];
+    const pie = document.createElement("div");
+    pie.className = "pasos";
+    pie.innerHTML =
+      `<button class="btn" data-ir="indice">&#8676; Indice</button>` +
+      (ant ? `<button class="btn" data-ir="${ant[0]}">${ant[1]}</button>` : "") +
+      `<span class="hueco"></span>` +
+      (sig ? `<button class="btn on" data-ir="${sig[0]}">${sig[1]} &#8677;</button>` : "");
+    caja.appendChild(pie);
+
+    /* y las migas de arriba, para saber donde se esta */
+    const migas = document.createElement("div");
+    migas.className = "migas";
+    const carpeta = (GRUPOS.find(([, ids]) => ids.includes(id)) || ["", []])[0];
+    migas.innerHTML = `<button data-ir="indice">Indice</button> &rsaquo;
+      ${carpeta ? `<span style="color:var(--tenue)">${esc(carpeta)}</span> &rsaquo; ` : ""}
+      <span>${RUTAS[i][1]}</span>
+      <span style="margin-left:auto;font-family:var(--mono)">${i+1} de ${RUTAS.length}</span>`;
+    caja.insertBefore(migas, caja.firstChild);
+  });
+
+  /* todo lo que lleve data-ir cambia de vista */
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-ir]");
+    if (b) { e.preventDefault(); irA(b.dataset.ir); return; }
+    const a = e.target.closest('.menu a[href^="#"]');
+    if (a) { e.preventDefault(); irA(a.getAttribute("href").slice(1)); }
+  });
+  $("#ir-indice").onclick = () => irA("indice");
+
+  /* teclado: escape sale, las flechas pasan de una a otra */
+  addEventListener("keydown", e => {
+    if (document.getElementById("umbral")) return;      /* la portada manda */
+    const campo = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+    if (campo && e.key !== "Escape") return;
+    const act = document.querySelector(".vista.activa");
+    const i = RUTAS.findIndex(r => r[0] === (act && act.id));
+    if (e.key === "Escape") { e.preventDefault(); irA("indice"); }
+    else if (e.key === "ArrowRight" && i >= 0 && RUTAS[i+1]) irA(RUTAS[i+1][0]);
+    else if (e.key === "ArrowLeft"  && i >  0) irA(RUTAS[i-1][0]);
+  });
+
+  addEventListener("popstate", () => irA((location.hash || "#indice").slice(1), false));
+
+  const inicio = (location.hash || "#indice").slice(1);
+  irA(document.getElementById(inicio) ? inicio : "indice", false);
 })();
 </script>
 </body>
