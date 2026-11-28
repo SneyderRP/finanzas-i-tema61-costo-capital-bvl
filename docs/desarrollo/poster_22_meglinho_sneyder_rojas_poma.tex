@@ -1,0 +1,195 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster de revisión de literatura (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{31}{40.9}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{36.6}{43.9}\selectfont}
+\newcommand{\smallsize}{\fontsize{25.4}{33.0}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=20mm, bottom=20mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{REVISIÓN DE LITERATURA \quad|\quad FINANZAS I \quad|\quad TEMA 61}\par}
+\vspace{10mm}
+{\color{white}\fontsize{66}{74.6}\selectfont\bfseries What determines return risks for bank equities in Turkey?\par}
+\vspace{8mm}
+{\color{mist}\fontsize{38}{46.4}\selectfont\itshape ¿Qué determina el riesgo de retorno de las acciones bancarias en Turquía?\par}
+\vspace{10mm}
+{\color{white}\fontsize{29}{35}\selectfont\bfseries Emre Ozsoz, Erick W. Rengifo y Mustapha A. Akinkunmi\par}
+\vspace{9mm}
+\pill{white}{white}{\color{navy}Q1}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries \textit{Borsa Istanbul Review}, 14(1), 23-31 (2014)}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=8mm, bottom=8mm, halign=center]
+{\color{navy}\fontsize{27}{36}\selectfont \textbf{Póster elaborado por:} Meglinho Sneyder Rojas Poma \enspace\textbar\enspace Código 2024200522B\par \fontsize{24}{32}\selectfont Escuela Profesional de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace Finanzas I (055D), 2026-II\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{237.7mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Mercado}}}\par\vspace{2mm}{\color{white}Bancos cotizados de Turquía}\end{minipage}\hfill\begin{minipage}[t]{237.7mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Muestra}}}\par\vspace{2mm}{\color{white}13 bancos comerciales y de depósito}\end{minipage}\hfill\begin{minipage}[t]{237.7mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Método}}}\par\vspace{2mm}{\color{white}Regresión sobre la volatilidad de retornos}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Contexto}El desempeño de la banca es clave para el crecimiento: la crisis de 2008 mostró que los problemas en los balances bancarios pueden cortar el crédito y llevar a una recesión.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Problema}No se conocían los factores que determinan el riesgo de las acciones bancarias en un mercado emergente como Turquía.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo}Estimar los determinantes de la volatilidad de los retornos de las acciones de los bancos comerciales turcos.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item La variable dependiente es la volatilidad de los retornos de cada banco.
+\item Se usan como explicativas la estructura de vencimientos de los créditos, la composición de ingresos y la propiedad.
+\item Es el primer estudio que analiza el riesgo de la banca turca desde los retornos de sus acciones.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item El riesgo se mide como la desviación estándar de los retornos mensuales, también en ventanas móviles de 12 meses.
+\item Se controla por tamaño del banco, propiedad extranjera y una variable de crisis financiera.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Figura clave del estudio}
+\begin{minipage}[c]{335.3mm}\centering
+\fcolorbox{line}{white}{\includegraphics[width=\dimexpr335.3mm-2\fboxsep-2\fboxrule\relax]{figura.png}}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-335.3mm-18mm\relax}\raggedright
+{\color{navy}\bfseries Figura 2.}\enspace{\itshape Riesgo y retorno de los bancos turcos: mediana trimestral del retorno mensual promedio y de su desviación estándar, 2002 a 2010 (datos de la Bolsa de Estambul y de la Asociación de Bancos de Turquía).}\par\vspace{8mm}
+{\color{teal}\smallsize\bfseries\textls[110]{CÓMO LEERLA}}\par\vspace{4mm}
+\begin{itemize}
+\item La línea roja es la desviación estándar de los retornos (riesgo) y la azul el retorno promedio.
+\item El riesgo del sector bancario fue relativamente estable, salvo en 2008 y 2009, durante la crisis financiera global.
+\item En esa crisis el retorno promedio cayó a terreno negativo mientras el riesgo subía.
+\end{itemize}
+\vspace{8mm}
+{\color{muted}\smallsize Figura tomada de Ozsoz et al. (2014).}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Resultados}
+\begin{tcolorbox}[enhanced, sharp corners, colback=tealSoft, boxrule=0pt, left=14mm, right=14mm, top=10mm, bottom=11mm,
+  borderline west={4mm}{0mm}{teal}, fontupper=\bodysize\color{ink}\raggedright]
+{\color{teal}\smallsize\bfseries\textls[110]{HALLAZGO CENTRAL}}\par\vspace{4mm}
+{\bfseries Los bancos con créditos de menor plazo son vistos como más seguros: un punto más de créditos de corto plazo reduce la volatilidad en casi un cuarto de desviación estándar.}
+\end{tcolorbox}
+\vspace{11mm}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Un mayor peso de los ingresos por negociación aumenta la volatilidad de las acciones.
+\item La propiedad extranjera reduce el riesgo de las acciones.
+\item Para el inversionista, el estado de resultados es tan importante como el balance.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Los bancos con créditos de menor vencimiento son vistos como inversiones más seguras.
+\item La fuente de ingresos del banco es un buen predictor de la volatilidad de sus acciones.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}El riesgo de la banca depende de su estructura de vencimientos, de sus fuentes de ingreso y de quién es su dueño, información útil para inversionistas y reguladores.\end{tcolorbox}
+\begin{tcolorbox}[card=gold, colback=goldSoft]\cardtitle{Aporte al tema 61}Ayuda a interpretar la beta del sector bancario de la BVL, cercana a 1: el riesgo de la banca también depende de su balance y de su estructura de propiedad.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{245mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{FUENTE DE DATOS DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Precios de las acciones y estados financieros de 13 bancos cotizados en Turquía.}
+\end{minipage}\hfill
+\begin{minipage}[c]{385mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{REFERENCIA}}\par\vspace{5mm}
+{\color{white}\smallsize\hangindent=1.2em\hangafter=1 Ozsoz, E., Rengifo, E. W., y Akinkunmi, M. A. (2014). What determines return risks for bank equities in Turkey? \textit{Borsa Istanbul Review}, \textit{14}(1), 23-31. \url{https://doi.org/10.1016/j.bir.2013.12.002}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://doi.org/10.1016/j.bir.2013.12.002}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y LEE EL ARTÍCULO}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

@@ -1,0 +1,195 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster de revisión de literatura (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{32}{42.2}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{37.8}{45.4}\selectfont}
+\newcommand{\smallsize}{\fontsize{26.2}{34.1}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=20mm, bottom=20mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{REVISIÓN DE LITERATURA \quad|\quad FINANZAS I \quad|\quad TEMA 61}\par}
+\vspace{10mm}
+{\color{white}\fontsize{58}{65.5}\selectfont\bfseries Tick size, liquid stocks and market quality: Evidence from a natural experiment in a unique setting\par}
+\vspace{8mm}
+{\color{mist}\fontsize{34}{41.5}\selectfont\itshape Tamaño del tick, acciones líquidas y calidad del mercado: evidencia de un experimento natural en un entorno único\par}
+\vspace{10mm}
+{\color{white}\fontsize{29}{35}\selectfont\bfseries Güzhan Gülay y Yaşar Ersan\par}
+\vspace{9mm}
+\pill{white}{white}{\color{navy}Q1}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries \textit{Borsa Istanbul Review}, 23(5), 1037-1057 (2023)}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=8mm, bottom=8mm, halign=center]
+{\color{navy}\fontsize{27}{36}\selectfont \textbf{Póster elaborado por:} Meglinho Sneyder Rojas Poma \enspace\textbar\enspace Código 2024200522B\par \fontsize{24}{32}\selectfont Escuela Profesional de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace Finanzas I (055D), 2026-II\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Mercado}}}\par\vspace{2mm}{\color{white}Borsa Istanbul (Turquía)}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Muestra}}}\par\vspace{2mm}{\color{white}Acciones muy líquidas}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Periodo}}}\par\vspace{2mm}{\color{white}Reforma del 1 de enero de 2014}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Método}}}\par\vspace{2mm}{\color{white}Diferencias en diferencias}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Contexto}El tick es la variación mínima permitida en el precio de una acción. Muchas bolsas lo han cambiado para mejorar la calidad del mercado, pero el efecto se confunde en países con negociación fuera de bolsa.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Problema}No había evidencia causal limpia del efecto de reducir el tick en acciones muy líquidas, en un mercado sin negociación oculta como el turco.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo}Medir el efecto causal de la reducción del tick sobre la liquidez, la negociación y los retornos de las acciones más líquidas de Borsa Istanbul.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Se aprovecha un experimento natural: la reforma afectó a unas acciones y a otras no.
+\item Se usan datos intradía del libro de órdenes y de operaciones.
+\item Se comparan acciones tratadas y de control antes y después.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item La reforma redujo el tick de un grupo de acciones muy líquidas de Borsa Istanbul el 1 de enero de 2014.
+\item Los resultados se agrupan en un índice de calidad de mercado y se verifica el supuesto de tendencias paralelas.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Figura clave del estudio}
+\begin{minipage}[c]{265.3mm}\centering
+\fcolorbox{line}{white}{\includegraphics[width=\dimexpr265.3mm-2\fboxsep-2\fboxrule\relax]{figura.png}}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-265.3mm-18mm\relax}\raggedright
+{\color{navy}\bfseries Figura 2.}\enspace{\itshape Efecto de la reducción del tick en la calidad de mercado: estimaciones puntuales (puntos) e intervalos de confianza al 90 \% (líneas) para cada variable de resultado.}\par\vspace{8mm}
+{\color{teal}\smallsize\bfseries\textls[110]{CÓMO LEERLA}}\par\vspace{4mm}
+\begin{itemize}
+\item Los resultados de liquidez quedan a la izquierda de cero: bajan los spreads cotizado, efectivo y realizado, la profundidad y el impacto en precio.
+\item En negociación, el número de operaciones sube y el tamaño promedio de cada operación baja.
+\item Volumen, rotación, volatilidad y retornos quedan sobre la línea de cero: no hay efecto.
+\end{itemize}
+\vspace{8mm}
+{\color{muted}\smallsize Figura tomada de Gülay y Ersan (2023).}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Resultados}
+\begin{tcolorbox}[enhanced, sharp corners, colback=tealSoft, boxrule=0pt, left=14mm, right=14mm, top=10mm, bottom=11mm,
+  borderline west={4mm}{0mm}{teal}, fontupper=\bodysize\color{ink}\raggedright]
+{\color{teal}\smallsize\bfseries\textls[110]{HALLAZGO CENTRAL}}\par\vspace{4mm}
+{\bfseries Reducir el tick mejoró la calidad del mercado al bajar los spreads cotizado, efectivo y realizado.}
+\end{tcolorbox}
+\vspace{11mm}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item La profundidad en el mejor precio y la profundidad total disminuyeron.
+\item El impacto de cada operación en el precio fue menor.
+\item El volumen no cambió, pero hubo más operaciones y de menor tamaño.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item No hubo efectos en volatilidad, retornos ni órdenes de mercado.
+\item En el mercado turco no hay negociación en dark pools ni internalización de órdenes, lo que limpia el experimento.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}Las reglas de microestructura cambian la liquidez de forma medible, y su efecto depende de las características de las acciones.\end{tcolorbox}
+\begin{tcolorbox}[card=gold, colback=goldSoft]\cardtitle{Aporte al tema 61}Muestra que la liquidez depende de las reglas del mercado, algo importante para entender la baja negociación de muchas acciones de la BVL que obligó a aplicar un filtro de liquidez.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{245mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{FUENTE DE DATOS DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Libro de órdenes y registro de operaciones intradía de Borsa Istanbul alrededor de 2014.}
+\end{minipage}\hfill
+\begin{minipage}[c]{385mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{REFERENCIA}}\par\vspace{5mm}
+{\color{white}\smallsize\hangindent=1.2em\hangafter=1 Gülay, G., y Ersan, Y. (2023). Tick size, liquid stocks and market quality: Evidence from a natural experiment in a unique setting. \textit{Borsa Istanbul Review}, \textit{23}(5), 1037-1057. \url{https://doi.org/10.1016/j.bir.2023.07.003}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://doi.org/10.1016/j.bir.2023.07.003}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y LEE EL ARTÍCULO}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

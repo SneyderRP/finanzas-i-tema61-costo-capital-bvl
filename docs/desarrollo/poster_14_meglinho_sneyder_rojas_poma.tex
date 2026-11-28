@@ -1,0 +1,195 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster de revisión de literatura (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{27}{35.6}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{31.9}{38.3}\selectfont}
+\newcommand{\smallsize}{\fontsize{22.1}{28.7}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=20mm, bottom=20mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{REVISIÓN DE LITERATURA \quad|\quad FINANZAS I \quad|\quad TEMA 61}\par}
+\vspace{10mm}
+{\color{white}\fontsize{66}{74.6}\selectfont\bfseries Decoding systemic risks across commodities and emerging market stock markets\par}
+\vspace{8mm}
+{\color{mist}\fontsize{38}{46.4}\selectfont\itshape Descifrando los riesgos sistémicos entre materias primas y mercados bursátiles emergentes\par}
+\vspace{10mm}
+{\color{white}\fontsize{29}{35}\selectfont\bfseries Fahmi Ghallabi, Ahmed Ghorbel y Sitara Karim\par}
+\vspace{9mm}
+\pill{white}{white}{\color{navy}Q1}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries \textit{Financial Innovation}, 11, 47 (2025)}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=8mm, bottom=8mm, halign=center]
+{\color{navy}\fontsize{27}{36}\selectfont \textbf{Póster elaborado por:} Meglinho Sneyder Rojas Poma \enspace\textbar\enspace Código 2024200522B\par \fontsize{24}{32}\selectfont Escuela Profesional de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace Finanzas I (055D), 2026-II\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{237.7mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Mercado}}}\par\vspace{2mm}{\color{white}Índice Dow Jones de mercados emergentes}\end{minipage}\hfill\begin{minipage}[t]{237.7mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Periodo}}}\par\vspace{2mm}{\color{white}Diciembre de 2005 a febrero de 2024}\end{minipage}\hfill\begin{minipage}[t]{237.7mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Método}}}\par\vspace{2mm}{\color{white}Correlación dinámica asimétrica y CoVaR}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Contexto}Los mercados financieros están cada vez más conectados, y las economías emergentes dependen mucho de las materias primas. Por eso los choques en el petróleo, el oro o los metales pueden pasar a sus bolsas.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Problema}No se conocía bien cómo se transmiten los riesgos a la baja y al alza entre las materias primas y las bolsas emergentes durante las grandes crisis.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo}Analizar las correlaciones y la transmisión de riesgos entre el petróleo, el oro, un índice global de materias primas y las bolsas emergentes.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Se modelan correlaciones condicionales dinámicas asimétricas.
+\item Se mide la transmisión de riesgo con el valor en riesgo condicional (CoVaR).
+\item Se compara el riesgo a la baja y al alza con una prueba de Kolmogorov-Smirnov con remuestreo.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Periodo del 30 de diciembre de 2005 al 28 de febrero de 2024.
+\item Se prueba si la transmisión de riesgo extremo es mayor durante la pandemia y la guerra que en otros periodos.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Figura clave del estudio}
+\begin{minipage}[c]{272.8mm}\centering
+\fcolorbox{line}{white}{\includegraphics[width=\dimexpr272.8mm-2\fboxsep-2\fboxrule\relax]{figura.png}}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-272.8mm-18mm\relax}\raggedright
+{\color{navy}\bfseries Figura 2.}\enspace{\itshape Correlaciones condicionales dinámicas entre el índice de mercados emergentes (DJEM) y el índice de materias primas (DJCOM), el petróleo WTI y el oro.}\par\vspace{8mm}
+{\color{teal}\smallsize\bfseries\textls[110]{CÓMO LEERLA}}\par\vspace{4mm}
+\begin{itemize}
+\item Las correlaciones entre materias primas y acciones emergentes cambian en el tiempo.
+\item Muestran gran variabilidad y suben en las crisis: la financiera global de 2008, la pandemia y la guerra entre Rusia y Ucrania.
+\item La correlación con el oro es la más baja, coherente con su papel de activo refugio.
+\end{itemize}
+\vspace{8mm}
+{\color{muted}\smallsize Figura tomada de Ghallabi et al. (2025).}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Resultados}
+\begin{tcolorbox}[enhanced, sharp corners, colback=tealSoft, boxrule=0pt, left=14mm, right=14mm, top=10mm, bottom=11mm,
+  borderline west={4mm}{0mm}{teal}, fontupper=\bodysize\color{ink}\raggedright]
+{\color{teal}\smallsize\bfseries\textls[110]{HALLAZGO CENTRAL}}\par\vspace{4mm}
+{\bfseries Las correlaciones aumentan durante las crisis y el riesgo a la baja suele transmitirse con más fuerza que el riesgo al alza.}
+\end{tcolorbox}
+\vspace{11mm}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item El oro transmite muy poco riesgo y confirma su papel de refugio.
+\item La transmisión entre oro, materias primas y acciones creció en la pandemia y en la guerra entre Rusia y Ucrania.
+\item La transmisión ligada al petróleo se mantuvo estable.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Las correlaciones son significativas y asimétricas para los pares WTI, oro y DJCOM frente al DJEM.
+\item La transmisión a la baja supera a la transmisión al alza en varios casos.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}La relación entre materias primas y bolsas emergentes cambia según el periodo y las condiciones del mercado, información útil para los gestores de carteras en tiempos volátiles.\end{tcolorbox}
+\begin{tcolorbox}[card=gold, colback=goldSoft]\cardtitle{Aporte al tema 61}La minería es el sector con mayor beta en el tema 61 (1.62). Este estudio ayuda a entender por qué las bolsas que dependen de materias primas amplifican los choques en las crisis.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{245mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{FUENTE DE DATOS DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Índice Dow Jones Commodity, petróleo WTI, oro e índice Dow Jones de mercados emergentes, de 2005 a 2024.}
+\end{minipage}\hfill
+\begin{minipage}[c]{385mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{REFERENCIA}}\par\vspace{5mm}
+{\color{white}\smallsize\hangindent=1.2em\hangafter=1 Ghallabi, F., Ghorbel, A., y Karim, S. (2025). Decoding systemic risks across commodities and emerging market stock markets. \textit{Financial Innovation}, \textit{11}, Artículo 47. \url{https://doi.org/10.1186/s40854-024-00732-1}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://doi.org/10.1186/s40854-024-00732-1}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y LEE EL ARTÍCULO}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

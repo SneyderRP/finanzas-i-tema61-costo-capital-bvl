@@ -1,0 +1,194 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster de revisión de literatura (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{32}{42.2}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{37.8}{45.4}\selectfont}
+\newcommand{\smallsize}{\fontsize{26.2}{34.1}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=20mm, bottom=20mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{REVISIÓN DE LITERATURA \quad|\quad FINANZAS I \quad|\quad TEMA 61}\par}
+\vspace{10mm}
+{\color{white}\fontsize{58}{65.5}\selectfont\bfseries Inverted U-shaped dynamics of capital structure and firm value: Evidence from an emerging market\par}
+\vspace{8mm}
+{\color{mist}\fontsize{34}{41.5}\selectfont\itshape Dinámica en forma de U invertida entre estructura de capital y valor de la empresa: evidencia de un mercado emergente\par}
+\vspace{10mm}
+{\color{white}\fontsize{29}{35}\selectfont\bfseries Cengizhan Karaca, Walid Mensi y Eray Gemici\par}
+\vspace{9mm}
+\pill{white}{white}{\color{navy}Q1}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries \textit{Borsa Istanbul Review}, 25(5), 939-952 (2025)}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=8mm, bottom=8mm, halign=center]
+{\color{navy}\fontsize{27}{36}\selectfont \textbf{Póster elaborado por:} Meglinho Sneyder Rojas Poma \enspace\textbar\enspace Código 2024200522B\par \fontsize{24}{32}\selectfont Escuela Profesional de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace Finanzas I (055D), 2026-II\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Mercado}}}\par\vspace{2mm}{\color{white}Manufactureras de Borsa Istanbul}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Muestra}}}\par\vspace{2mm}{\color{white}94 empresas}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Periodo}}}\par\vspace{2mm}{\color{white}2005 a 2023}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Frecuencia}}}\par\vspace{2mm}{\color{white}Anual}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Contexto}Cómo afecta la deuda al valor de una empresa es un debate central de las finanzas corporativas. Endeudarse mal puede elevar el costo de capital y reducir el valor.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Problema}No se sabía si la relación entre deuda y valor de la empresa es lineal o si existe un punto a partir del cual endeudarse más empieza a destruir valor.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo}Analizar la relación no lineal entre la estructura de capital y el valor de las empresas manufactureras de Borsa Istanbul.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item El valor se mide con el valor de mercado y la Q de Tobin.
+\item La deuda se mide con pasivos de corto y largo plazo y totales.
+\item Se usa regresión cuantílica por método de momentos y pruebas de causalidad en panel.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item La robustez se verifica con el estimador jackknife de medio panel, la prueba de no causalidad de Granger JKS y un LA-VAR con remuestreo.
+\item Las pruebas consideran la heterogeneidad y la dependencia entre empresas.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Figura clave del estudio}
+\begin{minipage}[c]{358.3mm}\centering
+\fcolorbox{line}{white}{\includegraphics[width=\dimexpr358.3mm-2\fboxsep-2\fboxrule\relax]{figura.png}}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-358.3mm-18mm\relax}\raggedright
+{\color{navy}\bfseries Figura 1.}\enspace{\itshape Estructura de capital y tasas de interés del sector manufacturero de Borsa Istanbul, 2005 a 2023: tasa promedio de los créditos comerciales y pasivos de corto plazo, largo plazo y totales sobre activos.}\par\vspace{8mm}
+{\color{teal}\smallsize\bfseries\textls[110]{CÓMO LEERLA}}\par\vspace{4mm}
+\begin{itemize}
+\item La tasa de los créditos comerciales cae mucho después de 2008, sube con fuerza hacia 2018 y aún más en el cuarto trimestre de 2023.
+\item Los pasivos totales sobre activos (línea verde) tienen tendencia al alza: las empresas usan cada vez más deuda.
+\item En el cuarto trimestre de 2023 la deuda total baja y la de corto plazo sube, cuando el costo de endeudarse aumenta.
+\end{itemize}
+\vspace{8mm}
+{\color{muted}\smallsize Figura tomada de Karaca et al. (2025).}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Resultados}
+\begin{tcolorbox}[enhanced, sharp corners, colback=tealSoft, boxrule=0pt, left=14mm, right=14mm, top=10mm, bottom=11mm,
+  borderline west={4mm}{0mm}{teal}, fontupper=\bodysize\color{ink}\raggedright]
+{\color{teal}\smallsize\bfseries\textls[110]{HALLAZGO CENTRAL}}\par\vspace{4mm}
+{\bfseries La relación entre estructura de capital y valor tiene forma de U invertida.}
+\end{tcolorbox}
+\vspace{11mm}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Más deuda aumenta el valor en las empresas de menor valor.
+\item Pasado cierto umbral, endeudarse más reduce el valor.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item La causalidad va de la estructura de capital hacia el valor, y no al revés.
+\item Las empresas deben limitar su endeudamiento para no destruir valor.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}Las empresas deben limitar su deuda para maximizar su valor y mantener su estabilidad financiera, lo que sirve tanto a gerentes como a responsables de política.\end{tcolorbox}
+\begin{tcolorbox}[card=gold, colback=goldSoft]\cardtitle{Aporte al tema 61}El costo de capital de una empresa combina deuda y patrimonio. El tema 61 estima el costo del patrimonio por sector, y este estudio muestra cómo la deuda completa esa decisión.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{245mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{FUENTE DE DATOS DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Valor de mercado y estados financieros de 94 empresas manufactureras de Borsa Istanbul, de 2005 a 2023.}
+\end{minipage}\hfill
+\begin{minipage}[c]{385mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{REFERENCIA}}\par\vspace{5mm}
+{\color{white}\smallsize\hangindent=1.2em\hangafter=1 Karaca, C., Mensi, W., y Gemici, E. (2025). Inverted U-shaped dynamics of capital structure and firm value: Evidence from an emerging market. \textit{Borsa Istanbul Review}, \textit{25}(5), 939-952. \url{https://doi.org/10.1016/j.bir.2025.05.010}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://doi.org/10.1016/j.bir.2025.05.010}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y LEE EL ARTÍCULO}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

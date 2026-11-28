@@ -1,0 +1,194 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster de revisión de literatura (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{27}{35.6}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{31.9}{38.3}\selectfont}
+\newcommand{\smallsize}{\fontsize{22.1}{28.7}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=20mm, bottom=20mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{REVISIÓN DE LITERATURA \quad|\quad FINANZAS I \quad|\quad TEMA 61}\par}
+\vspace{10mm}
+{\color{white}\fontsize{58}{65.5}\selectfont\bfseries The benefits of sectoral diversification for investors with different risk perceptions\par}
+\vspace{8mm}
+{\color{mist}\fontsize{38}{46.4}\selectfont\itshape Los beneficios de la diversificación sectorial para inversionistas con distintas percepciones del riesgo\par}
+\vspace{10mm}
+{\color{white}\fontsize{29}{35}\selectfont\bfseries Serdar Yaman y Mert Baran Tuncel\par}
+\vspace{9mm}
+\pill{white}{white}{\color{navy}Q1}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries \textit{Borsa Istanbul Review}, 25(3), 597-616 (2025)}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=8mm, bottom=8mm, halign=center]
+{\color{navy}\fontsize{27}{36}\selectfont \textbf{Póster elaborado por:} Meglinho Sneyder Rojas Poma \enspace\textbar\enspace Código 2024200522B\par \fontsize{24}{32}\selectfont Escuela Profesional de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace Finanzas I (055D), 2026-II\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Mercado}}}\par\vspace{2mm}{\color{white}Borsa Istanbul (Turquía)}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Muestra}}}\par\vspace{2mm}{\color{white}200 empresas de 10 sectores}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Periodo}}}\par\vspace{2mm}{\color{white}Enero de 2019 a agosto de 2024}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Frecuencia}}}\par\vspace{2mm}{\color{white}Mensual (68 periodos)}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Contexto}Invertir en un solo sector expone al inversionista a los problemas de ese sector. Diversificar entre sectores reduce ese riesgo y ayuda a enfrentar los ciclos económicos.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Problema}Los beneficios de la diversificación sectorial dependen de cómo se arme la cartera y de cuánto riesgo esté dispuesto a asumir cada inversionista, algo poco estudiado en Turquía.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo}Evaluar los beneficios de diversificar dentro de un sector y entre sectores, con enfoques tradicionales y modernos, para inversionistas con distinta tolerancia al riesgo.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Se eligen sectores con al menos diez empresas con datos completos.
+\item Enfoque tradicional con ponderación igual.
+\item Enfoque moderno con optimización para inversionistas aversos y tolerantes al riesgo.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Se comparan carteras intrasectoriales, una cartera intersectorial a nivel de empresa, la del índice y la del mercado.
+\item El desempeño se evalúa con métricas de retorno ajustado por riesgo y caída máxima.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Figura clave del estudio}
+\begin{minipage}[c]{207.2mm}\centering
+\fcolorbox{line}{white}{\includegraphics[width=\dimexpr207.2mm-2\fboxsep-2\fboxrule\relax]{figura.png}}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-207.2mm-18mm\relax}\raggedright
+{\color{navy}\bfseries Figura 2.}\enspace{\itshape Perfiles de riesgo y retorno de las carteras con ponderación igual (EW), para el inversionista averso al riesgo (RAI) y para el tolerante al riesgo (RTI), de enero de 2019 a agosto de 2024.}\par\vspace{8mm}
+{\color{teal}\smallsize\bfseries\textls[110]{CÓMO LEERLA}}\par\vspace{4mm}
+\begin{itemize}
+\item El eje horizontal es la desviación estándar y el vertical el retorno promedio mensual de cada cartera sectorial.
+\item En las tres estrategias todas las carteras superan a la tasa libre de riesgo; con EW y RAI todas, salvo bancos, superan al mercado.
+\item Con EW, turismo tiene a la vez el mayor retorno y el mayor riesgo.
+\end{itemize}
+\vspace{8mm}
+{\color{muted}\smallsize Figura tomada de Yaman y Tuncel (2025).}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Resultados}
+\begin{tcolorbox}[enhanced, sharp corners, colback=tealSoft, boxrule=0pt, left=14mm, right=14mm, top=10mm, bottom=11mm,
+  borderline west={4mm}{0mm}{teal}, fontupper=\bodysize\color{ink}\raggedright]
+{\color{teal}\smallsize\bfseries\textls[110]{HALLAZGO CENTRAL}}\par\vspace{4mm}
+{\bfseries El enfoque moderno de carteras supera al tradicional tanto en la diversificación dentro de un sector como entre sectores.}
+\end{tcolorbox}
+\vspace{11mm}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Las carteras con ponderación igual rinden menos que las optimizadas en todas las métricas.
+\item Para el inversionista averso al riesgo, diversificar entre sectores aporta poco a su utilidad.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item La percepción de riesgo del inversionista define la mejor estrategia.
+\item La cartera intersectorial tiene el riesgo total más bajo con las estrategias RAI y RTI.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}La diversificación sectorial reduce la vulnerabilidad a los ciclos y da retornos más equilibrados, pero su beneficio depende del perfil de riesgo y del método con que se arma la cartera.\end{tcolorbox}
+\begin{tcolorbox}[card=gold, colback=goldSoft]\cardtitle{Aporte al tema 61}Las carteras del tema 61 usan ponderación igual porque la BVL no publica la capitalización en su backend. Este estudio muestra que la forma de ponderar cambia los resultados, por lo que esa decisión se declara como limitación.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{245mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{FUENTE DE DATOS DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Precios de cierre mensuales de 200 empresas de Borsa Istanbul y datos del sistema EVDS del Banco Central de la República de Turquía.}
+\end{minipage}\hfill
+\begin{minipage}[c]{385mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{REFERENCIA}}\par\vspace{5mm}
+{\color{white}\smallsize\hangindent=1.2em\hangafter=1 Yaman, S., y Tuncel, M. B. (2025). The benefits of sectoral diversification for investors with different risk perceptions. \textit{Borsa Istanbul Review}, \textit{25}(3), 597-616. \url{https://doi.org/10.1016/j.bir.2025.02.008}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://doi.org/10.1016/j.bir.2025.02.008}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y LEE EL ARTÍCULO}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

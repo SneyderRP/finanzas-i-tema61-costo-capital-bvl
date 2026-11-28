@@ -1,0 +1,195 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster de revisión de literatura (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{30}{39.6}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{35.4}{42.5}\selectfont}
+\newcommand{\smallsize}{\fontsize{24.6}{32.0}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=20mm, bottom=20mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{REVISIÓN DE LITERATURA \quad|\quad FINANZAS I \quad|\quad TEMA 61}\par}
+\vspace{10mm}
+{\color{white}\fontsize{58}{65.5}\selectfont\bfseries Price discovery and government intervention during the COVID-19 pandemic: Evidence from European cross-listed firms\par}
+\vspace{8mm}
+{\color{mist}\fontsize{34}{41.5}\selectfont\itshape Descubrimiento de precios e intervención gubernamental durante la pandemia de COVID-19: evidencia de empresas europeas con doble cotización\par}
+\vspace{10mm}
+{\color{white}\fontsize{29}{35}\selectfont\bfseries Cosmin-Octavian Cepoi, Bogdan-Andrei Dumitrescu y Ionu\c{t} Daniel Pop\par}
+\vspace{9mm}
+\pill{white}{white}{\color{navy}Q1}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries \textit{Borsa Istanbul Review}, 25(6), 1572-1584 (2025)}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=8mm, bottom=8mm, halign=center]
+{\color{navy}\fontsize{27}{36}\selectfont \textbf{Póster elaborado por:} Meglinho Sneyder Rojas Poma \enspace\textbar\enspace Código 2024200522B\par \fontsize{24}{32}\selectfont Escuela Profesional de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace Finanzas I (055D), 2026-II\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Mercado}}}\par\vspace{2mm}{\color{white}Francia, Italia y España frente a Alemania}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Muestra}}}\par\vspace{2mm}{\color{white}26 empresas con doble cotización}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Periodo}}}\par\vspace{2mm}{\color{white}Primeros seis meses de la pandemia}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Frecuencia}}}\par\vspace{2mm}{\color{white}Datos intradía por minuto}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Contexto}La pandemia fue un choque sin precedentes para los mercados. Cuando una empresa cotiza en dos bolsas, la información nueva puede reflejarse primero en una u otra.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Problema}No se sabía cómo cambió el liderazgo en la formación de precios entre la bolsa local y la extranjera durante la crisis, ni qué papel tuvieron las medidas de los gobiernos.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo}Analizar el descubrimiento de precios de empresas francesas, italianas y españolas que también cotizan en Alemania, en los primeros meses de la pandemia.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Se mide el liderazgo con la participación informativa de Hasbrouck y la participación por componentes de Gonzalo y Granger.
+\item Se explican sus cambios con un modelo Tobit de efectos fijos.
+\item Se complementa con aprendizaje automático.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Se comparan tres etapas: antes, durante y después del desplome de marzo de 2020.
+\item Las variables de control incluyen el comercio informado (PIN), la liquidez y los índices de respuesta del gobierno.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Figura clave del estudio}
+\begin{minipage}[c]{290.6mm}\centering
+\fcolorbox{line}{white}{\includegraphics[width=\dimexpr290.6mm-2\fboxsep-2\fboxrule\relax]{figura.png}}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-290.6mm-18mm\relax}\raggedright
+{\color{navy}\bfseries Figura 1.}\enspace{\itshape Evolución del liderazgo en el descubrimiento de precios (media móvil de 10 días) para empresas francesas, italianas y españolas que cotizan también en Alemania; la franja gris marca el desplome por el COVID-19.}\par\vspace{8mm}
+{\color{teal}\smallsize\bfseries\textls[110]{CÓMO LEERLA}}\par\vspace{4mm}
+\begin{itemize}
+\item Durante el desplome la participación de la bolsa local cae en los tres países, aunque sigue liderando.
+\item Después del desplome el liderazgo local se recupera de forma gradual.
+\item La recuperación es más rápida en las empresas españolas.
+\end{itemize}
+\vspace{8mm}
+{\color{muted}\smallsize Figura tomada de Cepoi et al. (2025).}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Resultados}
+\begin{tcolorbox}[enhanced, sharp corners, colback=tealSoft, boxrule=0pt, left=14mm, right=14mm, top=10mm, bottom=11mm,
+  borderline west={4mm}{0mm}{teal}, fontupper=\bodysize\color{ink}\raggedright]
+{\color{teal}\smallsize\bfseries\textls[110]{HALLAZGO CENTRAL}}\par\vspace{4mm}
+{\bfseries Las bolsas locales perdieron liderazgo en la formación de precios durante el desplome, pero lo recuperaron con el tiempo.}
+\end{tcolorbox}
+\vspace{11mm}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Las empresas españolas recuperaron su liderazgo en un mes; las francesas e italianas tardaron más.
+\item Más apoyo económico del gobierno fortaleció a la bolsa local.
+\item Medidas sanitarias más estrictas lo debilitaron.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item La participación informativa local de empresas francesas pasó de 63.03 \% antes del desplome a 55.17 \% durante él y 56.53 \% después.
+\item En las italianas bajó de 75.85 \% a 55.05 \% y en las españolas de 77.18 \% a 65.76 \%, para volver a 77.88 \%.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}La eficiencia del mercado es sensible a las políticas públicas, y la interdependencia entre bolsas cobra importancia en las crisis.\end{tcolorbox}
+\begin{tcolorbox}[card=gold, colback=goldSoft]\cardtitle{Aporte al tema 61}Credicorp, Intercorp, Buenaventura y Southern Copper cotizan en Lima y en Nueva York, de modo que su precio puede formarse fuera de la BVL, un punto a considerar al construir las carteras.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{245mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{FUENTE DE DATOS DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Datos intradía por minuto de 26 empresas con doble cotización e indicadores de respuesta de los gobiernos a la pandemia.}
+\end{minipage}\hfill
+\begin{minipage}[c]{385mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{REFERENCIA}}\par\vspace{5mm}
+{\color{white}\smallsize\hangindent=1.2em\hangafter=1 Cepoi, C.-O., Dumitrescu, B.-A., y Pop, I. D. (2025). Price discovery and government intervention during the COVID-19 pandemic: Evidence from European cross-listed firms. \textit{Borsa Istanbul Review}, \textit{25}(6), 1572-1584. \url{https://doi.org/10.1016/j.bir.2025.10.012}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://doi.org/10.1016/j.bir.2025.10.012}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y LEE EL ARTÍCULO}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

@@ -686,6 +686,97 @@ footer{padding:38px 0 54px;color:var(--tenue);font-size:12.5px;line-height:1.85}
 .metodo{font-size:13.5px;color:var(--suave)}
 .metodo ol{padding-left:20px;margin:0 0 16px}
 .grupo-btn{display:flex;gap:7px;flex-wrap:wrap}
+/* un enlace dentro de un parrafo que lleva a otra seccion */
+.enlace{
+  background:none;border:0;padding:0;font:inherit;color:var(--acento);
+  cursor:pointer;text-decoration:underline;text-underline-offset:2px;
+}
+.enlace:hover{color:#a5d6ff}
+
+/* ---------- los papers, lista a la izquierda y visor a la derecha ---------- */
+.papers-dos{display:grid;grid-template-columns:330px 1fr;gap:16px;margin-top:16px}
+@media (max-width:1000px){.papers-dos{grid-template-columns:1fr}}
+.papers-lista{
+  max-height:720px;overflow-y:auto;border:1px solid var(--borde);
+  border-radius:11px;background:var(--panel);padding:7px;
+}
+.papers-lista::-webkit-scrollbar{width:9px}
+.papers-lista::-webkit-scrollbar-thumb{background:#2a323d;border-radius:9px}
+.pa-item{
+  display:grid;grid-template-columns:30px 1fr;gap:9px;width:100%;
+  text-align:left;background:none;border:0;border-radius:8px;
+  padding:9px 8px;cursor:pointer;color:var(--texto);
+  border-left:3px solid transparent;
+}
+.pa-item:hover{background:#161b22}
+.pa-item.on{background:#1b2530;border-left-color:var(--acento)}
+.pa-item .pa-n{
+  font:600 11.5px var(--mono);color:var(--tenue);padding-top:2px;
+  letter-spacing:.03em;
+}
+.pa-item.on .pa-n{color:var(--acento)}
+.pa-item .pa-t{font-size:12.6px;line-height:1.38}
+.pa-item .pa-chips{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.pa-chip{
+  font:10.5px var(--mono);padding:1px 5px;border-radius:4px;
+  background:#20262e;color:var(--tenue);
+}
+.pa-chip.hay{background:#17313f;color:#79c0ff}
+.papers-visor{
+  border:1px solid var(--borde);border-radius:11px;background:var(--panel);
+  overflow:hidden;display:flex;flex-direction:column;
+}
+.visor-cab{
+  padding:12px 15px;border-bottom:1px solid var(--borde);
+  display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;
+}
+.visor-cab h4{margin:0;font-size:14px;line-height:1.4;flex:1;min-width:200px}
+.visor-cab .meta{font:11.5px var(--mono);color:var(--tenue);margin-top:4px}
+.visor-marco{flex:1;min-height:640px;background:#0a0d12}
+.visor-marco iframe{width:100%;height:100%;min-height:640px;border:0;display:block}
+.visor-vacio{
+  display:flex;align-items:center;justify-content:center;height:100%;
+  min-height:640px;color:var(--tenue);font-size:13px;text-align:center;padding:30px;
+}
+.papers-visor .nota{margin:0;padding:11px 15px;border-top:1px solid var(--borde)}
+
+/* ---------- lo que lleva dentro un ZIP de fuentes ---------- */
+.dentro{padding:9px;max-height:660px;overflow:auto}
+.dentro-f{
+  display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;
+  padding:7px 9px;border-radius:7px;font-size:12.5px;
+}
+.dentro-f:nth-child(odd){background:#12171e}
+.dentro-t{
+  font:600 9.5px var(--mono);letter-spacing:.06em;text-align:center;
+  padding:2px 0;border-radius:4px;background:#20262e;color:var(--tenue);
+}
+.dentro-n{font-family:var(--mono);font-size:11.8px;word-break:break-all}
+.dentro-k{font:11.5px var(--mono);color:var(--tenue);white-space:nowrap}
+/* ---------- el LaTeX ---------- */
+.codigo-tex{
+  margin:0;padding:12px 14px;max-height:660px;overflow:auto;
+  font:12px/1.55 var(--mono);background:#0a0d12;
+  white-space:pre;tab-size:2;
+}
+/* ---------- coloreado del codigo en la terminal ---------- */
+.term-linea .cm{color:#5f7a6b;font-style:italic}   /* comentarios */
+.term-linea .st{color:#a5d6a7}                     /* cadenas */
+.term-linea .kw{color:#c792ea}                     /* palabras reservadas */
+.term-linea .nu{color:#f0883e}                     /* numeros */
+.term-linea.destaca{
+  background:rgba(88,166,255,.18);
+  box-shadow:inset 3px 0 0 var(--acento);
+}
+#co-cuerpo .term-linea .ln{min-width:3.2em;color:#3c4653}
+/* la terminal se ajusta a su contenido en vez de estirarse hasta el alto de
+   la columna de la izquierda, que deja un hueco negro bajo el filtro */
+#codigo .papers-dos > .terminal{align-self:start}
+#codigo .papers-dos{align-items:start}
+.codigo-tex .ln{
+  display:inline-block;width:3.6em;margin-right:12px;text-align:right;
+  color:#39414c;user-select:none;
+}
 .metodo li{margin:0 0 9px;transition:opacity .3s,background .3s;border-radius:7px}
 .metodo li.paso-on{
   background:rgba(88,166,255,.1);box-shadow:-10px 0 0 rgba(88,166,255,.1);
@@ -913,6 +1004,42 @@ footer{padding:38px 0 54px;color:var(--tenue);font-size:12.5px;line-height:1.85}
   <p class="nota" id="nota-comparar"></p>
 </div></section>
 
+<section id="codigo" class="vista"><div class="caja">
+  <h2>Los scripts</h2>
+  <p class="sub">Los ocho archivos de /codigo, abiertos aqui con sus lineas numeradas. Los
+  cuatro que exige la consigna y los cuatro que los acompanan. De cada uno se ve su
+  encabezado, sus funciones con la linea en que empiezan, y el texto entero, que se puede
+  filtrar igual que el registro de ejecucion.</p>
+
+  <div class="rejilla" id="co-resumen"
+       style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))"></div>
+
+  <div class="papers-dos" style="grid-template-columns:300px 1fr">
+    <div>
+      <div class="papers-lista" id="co-lista" style="max-height:none"></div>
+      <div class="papers-lista" id="co-funciones"
+           style="margin-top:12px;max-height:300px"></div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-barra">
+        <span class="luz" style="background:#ff5f57"></span>
+        <span class="luz" style="background:#febc2e"></span>
+        <span class="luz" style="background:#28c840"></span>
+        <span class="term-nombre" id="co-nombre"></span>
+        <span class="sello" id="co-sello"></span>
+      </div>
+      <div class="term-cuerpo" id="co-cuerpo" style="max-height:660px"></div>
+      <div class="term-pie">
+        <input type="search" id="co-filtro" placeholder="filtrar el codigo">
+        <span id="co-cuenta" style="font-family:var(--mono);font-size:11.5px"></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="nota" id="co-nota"></p>
+</div></section>
+
 <section id="tablas" class="vista"><div class="caja">
   <h2>Las tablas del articulo</h2>
   <p class="sub">Las once tablas, como salieron del codigo. Haz clic en una cabecera para
@@ -1030,6 +1157,92 @@ footer{padding:38px 0 54px;color:var(--tenue);font-size:12.5px;line-height:1.85}
     <span class="pie" id="conteo-ref"></span>
   </div>
   <ol class="refs" id="refs"></ol>
+</div></section>
+
+<section id="entregables" class="vista"><div class="caja">
+  <h2>El articulo, el poster y el Beamer</h2>
+  <p class="sub">Las tres piezas que se entregan de este trabajo, abiertas aqui mismo. Son los
+  archivos de la Carpeta 1, los mismos que se descargan al final; aqui estan para poder
+  leerlos sin salir de la pagina.</p>
+
+  <div class="controles">
+    <div class="campo" style="min-width:auto">
+      <label>Que pieza abrir</label>
+      <div class="grupo-btn" id="en-piezas"></div>
+    </div>
+  </div>
+
+  <div class="papers-visor" style="margin-top:14px">
+    <div class="visor-cab" id="en-cab"></div>
+    <div class="visor-marco" id="en-marco"></div>
+    <p class="nota" id="en-nota"></p>
+  </div>
+</div></section>
+
+<section id="papers" class="vista"><div class="caja">
+  <h2>Los papers</h2>
+  <p class="sub">Los articulos en ingles de los que sale el estado del arte, su traduccion
+  al espanol y el poster de cada uno. Se abren aqui mismo, sin descargar nada: el visor
+  carga el PDF original. Las tres piezas del mismo numero se ven con los botones de arriba,
+  de modo que se puede comprobar de un clic que el poster corresponde a su articulo.</p>
+
+  <div class="controles">
+    <div class="campo">
+      <label for="pa-buscar">Buscar por titulo</label>
+      <input type="search" id="pa-buscar" placeholder="risk, beta, Borsa, liquidity, capital...">
+    </div>
+    <div class="campo" style="min-width:auto">
+      <label>Que pieza mostrar</label>
+      <div class="grupo-btn" id="pa-pieza">
+        <button class="btn on" data-pieza="ingles">En ingles</button>
+        <button class="btn" data-pieza="traducido">Traducido</button>
+        <button class="btn" data-pieza="poster">Poster</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="repro-papers"></div>
+
+  <div class="papers-dos">
+    <div class="papers-lista" id="pa-lista"></div>
+    <div class="papers-visor">
+      <div class="visor-cab" id="pa-cab"></div>
+      <div class="visor-marco" id="pa-marco"></div>
+      <p class="nota" id="pa-nota"></p>
+    </div>
+  </div>
+</div></section>
+
+<section id="desarrollo" class="vista"><div class="caja">
+  <h2>Las fuentes</h2>
+  <p class="sub">La Carpeta 2 guarda el codigo fuente de cada pieza comprimido, de modo que
+  desde fuera solo se ve un ZIP. Aqui estan abiertos: lo que lleva dentro cada uno y su
+  LaTeX entero, con el que se compila el PDF que ves en las otras secciones.</p>
+
+  <div class="controles">
+    <div class="campo" style="min-width:auto">
+      <label>Que fuente</label>
+      <div class="grupo-btn" id="de-familias"></div>
+    </div>
+    <div class="campo" style="min-width:auto">
+      <label>Que mostrar</label>
+      <div class="grupo-btn">
+        <button class="btn on" data-vista-de="arbol">Lo que lleva dentro</button>
+        <button class="btn" data-vista-de="tex">El LaTeX</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="repro-desarrollo"></div>
+
+  <div class="papers-dos">
+    <div class="papers-lista" id="de-lista"></div>
+    <div class="papers-visor">
+      <div class="visor-cab" id="de-cab"></div>
+      <div id="de-cuerpo"></div>
+      <p class="nota" id="de-nota"></p>
+    </div>
+  </div>
 </div></section>
 
 <section id="metodo" class="vista"><div class="caja">
@@ -1275,7 +1488,11 @@ function montarRepro(cfg) {
   const r = {ir, parar, reproducir, api, vista: cfg.vista || null,
              auto: cfg.auto !== false};
   REPROS.push(r);
-  ir(1);
+  /* En reposo, una figura que crece se deja terminada (t = 1), pero un pase
+     que recorre elementos se deja en el primero (t = 0): si se dejara en uno,
+     montar el mando abriria la seccion en el ultimo elemento, que es lo que
+     hacia abrir Tablas en la tabla diez. */
+  ir(cfg.reposo == null ? 1 : cfg.reposo);
   return r;
 }
 
@@ -2281,11 +2498,500 @@ SEC.forEach(s => {
 
   montarRepro({
     donde:"#repro-comparar", segundos:9, vista:"comparar", pasos:PAREJAS.length,
+    reposo:0,
     pinta: t => {
       const k = Math.min(PAREJAS.length - 1, Math.floor(t * PAREJAS.length));
       a.value = PAREJAS[k][0]; b.value = PAREJAS[k][1];
       pinta();
       return `pareja ${k + 1} de ${PAREJAS.length}`;
+    }
+  });
+})();
+
+/* ===================== el articulo, el poster y el Beamer =====================
+   Las tres piezas propias, en el mismo visor que los papers. Antes solo se
+   podian descargar desde la seccion de archivos, que esta al final de todo: un
+   trabajo que se presenta deberia poder leerse desde la primera pantalla. */
+(function entregables() {
+  const sec = $("#entregables");
+  if (!sec) return;
+  const P = (typeof PRODUCTOS === "undefined" ? [] : PRODUCTOS)
+              .filter(p => p[3]);                 // solo los que se hallaron
+  if (!P.length) { sec.remove(); return; }
+
+  let k = 0;
+  $("#en-piezas").innerHTML = P.map(([t], i) =>
+    `<button class="btn${i === k ? " on" : ""}" data-ent="${i}">${esc(t)}</button>`
+  ).join("");
+
+  function pinta() {
+    const [titulo, detalle, ruta, , mb] = P[k];
+    $("#en-piezas").querySelectorAll("[data-ent]").forEach(b =>
+      b.classList.toggle("on", +b.dataset.ent === k));
+    $("#en-cab").innerHTML = `
+      <div>
+        <h4>${esc(titulo)}</h4>
+        <div class="meta">${esc(detalle)} &middot; ${fmt(mb, 1)} MB</div>
+      </div>
+      <a class="btn" href="${ruta}" target="_blank" rel="noopener">Abrir en una pestana</a>
+      <a class="btn" href="${ruta}" download>Descargar</a>`;
+    $("#en-marco").innerHTML =
+      `<iframe src="${ruta}#view=FitH" title="${esc(titulo)}"></iframe>`;
+    $("#en-nota").innerHTML =
+      `Es el archivo tal cual se entrega, sin recomprimir. Si el PDF no se dibuja
+       en tu navegador, usa el boton de abrir en una pestana. El LaTeX con el que
+       se compila esta en <button class="enlace" data-ir="desarrollo">las
+       fuentes</button>.`;
+  }
+  $("#en-piezas").querySelectorAll("[data-ent]").forEach(b =>
+    b.onclick = () => { k = +b.dataset.ent; pinta(); });
+  pinta();
+})();
+
+/* ===================== los scripts =====================
+   Misma terminal que el registro de ejecucion, pero con el codigo dentro. El
+   texto se pide al servidor al abrir cada archivo, como el LaTeX: son 113 KB
+   entre los ocho y no hacen falta hasta que alguien abre uno.
+
+   El coloreado es un tokenizador corto, no una libreria: en Python basta con
+   distinguir comentarios, cadenas, palabras reservadas y numeros, y meter una
+   dependencia externa romperia lo que esta pagina promete, que es funcionar
+   sin pedirle nada a nadie. */
+(function codigo() {
+  const sec = $("#codigo");
+  if (!sec) return;
+  const C = (typeof CODIGO === "undefined" ? [] : CODIGO);
+  if (!C.length) { sec.remove(); return; }
+
+  let k = 0, filtro = "";
+  const cache = {};
+
+  const CLAVES = new Set(("def class return if elif else for while try except " +
+    "finally with as import from in not and or is None True False lambda raise " +
+    "yield global pass break continue assert del async await").split(" "));
+
+  /* Las cadenas de tres comillas cruzan lineas, de modo que el coloreado no
+     puede ir linea a linea sin recordar si quedo una abierta. */
+  let abierta = null;
+
+  function pintaLinea(l) {
+    let salida = "", i = 0;
+    if (abierta) {
+      const fin = l.indexOf(abierta);
+      if (fin < 0) return `<span class="st">${esc(l)}</span>`;
+      salida = `<span class="st">${esc(l.slice(0, fin + 3))}</span>`;
+      i = fin + 3;
+      abierta = null;
+    }
+    const re = /("""|''')|(#.*$)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b([A-Za-z_]\w*)\b|\b(\d[\d_.]*)\b/g;
+    re.lastIndex = i;
+    let m;
+    while ((m = re.exec(l))) {
+      salida += esc(l.slice(i, m.index));
+      if (m[1]) {                                   // abre triple comilla
+        const cierra = l.indexOf(m[1], m.index + 3);
+        if (cierra < 0) {
+          abierta = m[1];
+          salida += `<span class="st">${esc(l.slice(m.index))}</span>`;
+          return salida;
+        }
+        salida += `<span class="st">${esc(l.slice(m.index, cierra + 3))}</span>`;
+        i = cierra + 3; re.lastIndex = i; continue;
+      }
+      const cls = m[2] ? "cm" : m[3] ? "st"
+                : m[4] ? (CLAVES.has(m[4]) ? "kw" : null) : "nu";
+      salida += cls ? `<span class="${cls}">${esc(m[0])}</span>` : esc(m[0]);
+      i = m.index + m[0].length;
+    }
+    return salida + esc(l.slice(i));
+  }
+
+  function resumen() {
+    const tot = C.reduce((a, f) => a + f.lineas, 0);
+    const fn = C.reduce((a, f) => a + f.funciones.length, 0);
+    const com = C.reduce((a, f) => a + f.comentarios, 0);
+    const cab = C.filter(f => f.encabezado).length;
+    $("#co-resumen").innerHTML = [
+      ["Scripts", C.length, `${C.filter(f => f.obligatorio).length} son los que exige la consigna`],
+      ["Lineas", fmt(tot, 0), "entre los ocho archivos"],
+      ["Funciones", fn, "con su linea de inicio"],
+      ["Comentarios", fmt(com, 0), `${fmt(100*com/tot, 0)} por ciento de las lineas`],
+      ["Con encabezado", `${cab} de ${C.length}`, "las cuatro lineas obligatorias"],
+    ].map(([t, v, p]) =>
+      `<div class="tarjeta" style="--c:var(--acento)">
+         <h4>${t}</h4><div class="cifra" style="font-size:22px">${v}</div>
+         <div class="pie">${p}</div></div>`).join("");
+  }
+
+  function pintaLista() {
+    $("#co-lista").innerHTML = C.map((f, i) => `
+      <button class="pa-item${i === k ? " on" : ""}" data-co="${i}">
+        <span class="pa-n">${String(i).padStart(2, "0")}</span>
+        <span>
+          <span class="pa-t" style="font-family:var(--mono);font-size:12px">${esc(f.n)}</span>
+          <span class="pa-t" style="display:block;color:var(--tenue);font-size:11.5px;
+                margin-top:3px">${esc(f.que)}</span>
+          <span class="pa-chips">
+            <span class="pa-chip hay">${fmt(f.lineas, 0)} lineas</span>
+            <span class="pa-chip">${f.funciones.length} fn</span>
+            ${f.obligatorio ? `<span class="pa-chip hay">obligatorio</span>` : ""}
+          </span>
+        </span>
+      </button>`).join("");
+    $("#co-lista").querySelectorAll("[data-co]").forEach(b =>
+      b.onclick = () => { k = +b.dataset.co; filtro = ""; $("#co-filtro").value = "";
+                          pinta(); });
+  }
+
+  function pintaFunciones(f) {
+    $("#co-funciones").innerHTML = !f.funciones.length
+      ? `<p class="nota" style="padding:12px">Este archivo no define funciones.</p>`
+      : `<p class="nota" style="padding:9px 10px 4px;margin:0">Sus funciones, pulsa
+           para saltar</p>` + f.funciones.map(fn => `
+        <button class="pa-item" data-ln="${fn.l}" style="grid-template-columns:44px 1fr">
+          <span class="pa-n">${fn.l}</span>
+          <span class="pa-t" style="font-family:var(--mono);font-size:11.8px">
+            ${fn.tipo === "class" ? "class " : ""}${esc(fn.n)}</span>
+        </button>`).join("");
+    $("#co-funciones").querySelectorAll("[data-ln]").forEach(b =>
+      b.onclick = () => salta(+b.dataset.ln));
+  }
+
+  function salta(n) {
+    const nodo = $(`#co-cuerpo [data-l="${n}"]`);
+    if (!nodo) return;
+    nodo.scrollIntoView({block:"center", behavior:"smooth"});
+    nodo.classList.add("destaca");
+    setTimeout(() => nodo.classList.remove("destaca"), 1600);
+  }
+
+  function muestra(f, texto) {
+    const lineas = texto.split("\n");
+    const anchoN = String(lineas.length).length;
+    abierta = null;
+    const f2 = sinTildes(filtro);
+    let fuera = 0;
+    const html = lineas.map((l, i) => {
+      const pintada = pintaLinea(l);       // siempre, para no perder el estado
+      if (f2 && !sinTildes(l).includes(f2)) { fuera++; return ""; }
+      return `<div class="term-linea" data-l="${i + 1}">
+                <span class="ln">${String(i + 1).padStart(anchoN, " ")}</span>
+                <span class="txt">${pintada || "&nbsp;"}</span>
+              </div>`;
+    }).join("");
+    $("#co-cuerpo").innerHTML = html ||
+      `<p class="nota">Ninguna linea contiene eso.</p>`;
+    $("#co-cuenta").textContent = f2
+      ? `${fmt(lineas.length - fuera, 0)} de ${fmt(lineas.length, 0)} lineas`
+      : `${fmt(lineas.length, 0)} lineas`;
+  }
+
+  const sinTildes = s => String(s || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  function pinta() {
+    pintaLista();
+    const f = C[k];
+    pintaFunciones(f);
+    $("#co-nombre").textContent = f.n;
+    $("#co-sello").className = "sello" + (f.encabezado ? "" : " aviso");
+    $("#co-sello").textContent = f.encabezado
+      ? "Con el encabezado de cuatro lineas" : "Sin el encabezado obligatorio";
+
+    $("#co-nota").innerHTML = (f.encabezado
+      ? `Su encabezado dice: <b>${f.cab.map(esc).join("</b> &middot; <b>")}</b>. `
+      : "") + `Se sirve el archivo tal cual esta en /codigo, sin recortar.
+      <a href="${f.ruta}" download>Descargar ${esc(f.n)}</a>.`;
+
+    if (cache[f.ruta] != null) { muestra(f, cache[f.ruta]); return; }
+    $("#co-cuerpo").innerHTML = `<p class="nota">Cargando ${esc(f.n)}...</p>`;
+    fetch(f.ruta)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(t => { cache[f.ruta] = t; if (C[k] === f) muestra(f, t); })
+      .catch(() => {
+        if (C[k] !== f) return;
+        $("#co-cuerpo").innerHTML = `<p class="nota">No se pudo cargar el archivo.
+          Si abriste esta pagina desde el disco, el navegador bloquea la lectura de
+          archivos vecinos por seguridad; publicada funciona.
+          <a href="${f.ruta}" download>Descargar ${esc(f.n)}</a>.</p>`;
+        $("#co-cuenta").textContent = "";
+      });
+  }
+
+  let tecleo = null;
+  $("#co-filtro").addEventListener("input", e => {
+    clearTimeout(tecleo);
+    tecleo = setTimeout(() => {
+      filtro = e.target.value;
+      const f = C[k];
+      if (cache[f.ruta] != null) muestra(f, cache[f.ruta]);
+    }, 170);
+  });
+
+  resumen();
+  pinta();
+})();
+
+/* ===================== las fuentes de la Carpeta 2 =====================
+   El LaTeX no viaja dentro de la pagina: son 581 KB entre los treinta y cuatro
+   y la triplicarian. Se piden al servidor cuando se abren. Abierta desde el
+   disco con file://, esa peticion la bloquea el navegador por seguridad, asi
+   que en ese caso se explica y se ofrece el enlace, en lugar de dejar un
+   recuadro vacio sin motivo. */
+(function desarrollo() {
+  const sec = $("#desarrollo");
+  if (!sec) return;
+  const D = (typeof DESARROLLO === "undefined" ? [] : DESARROLLO);
+  if (!D.length) { sec.remove(); return; }
+
+  const FAM = [];
+  D.forEach(f => { if (!FAM.some(x => x[0] === f.slug))
+                     FAM.push([f.slug, f.familia]); });
+  let fam = FAM[0][0], elegido = 0, modo = "arbol";
+  const cache = {};
+
+  function dela() { return D.filter(f => f.slug === fam); }
+
+  $("#de-familias").innerHTML = FAM.map(([s, n]) => {
+    const c = D.filter(f => f.slug === s).length;
+    return `<button class="btn${s === fam ? " on" : ""}" data-fam="${s}">
+              ${esc(n)}${c > 1 ? ` <span style="opacity:.6">${c}</span>` : ""}
+            </button>`;
+  }).join("");
+
+  function pintaLista() {
+    const l = dela();
+    $("#de-lista").innerHTML = l.map((f, i) => `
+      <button class="pa-item${i === elegido ? " on" : ""}" data-de="${i}">
+        <span class="pa-n">${String(i + 1).padStart(2, "0")}</span>
+        <span>
+          <span class="pa-t">${esc(f.nombre)}</span>
+          <span class="pa-chips">
+            <span class="pa-chip hay">${f.dentro.length} archivos</span>
+            <span class="pa-chip">${fmt(f.mb, 2)} MB</span>
+            ${f.tex ? `<span class="pa-chip hay">${fmt(f.tex_lineas, 0)} lineas</span>`
+                    : `<span class="pa-chip">sin LaTeX</span>`}
+          </span>
+        </span>
+      </button>`).join("");
+    $("#de-lista").querySelectorAll("[data-de]").forEach(b =>
+      b.onclick = () => { elegido = +b.dataset.de; pinta(); });
+  }
+
+  function arbol(f) {
+    const ICO = {tex:"TEX", png:"IMG", jpg:"IMG", jpeg:"IMG", pdf:"PDF",
+                 bib:"BIB", cls:"CLS", sty:"STY", eps:"EPS", csv:"CSV"};
+    return `<div class="dentro">` + f.dentro.map(a => {
+      const ext = (a.n.split(".").pop() || "").toLowerCase();
+      return `<div class="dentro-f">
+                <span class="dentro-t">${ICO[ext] || ext.toUpperCase().slice(0,3)}</span>
+                <span class="dentro-n">${esc(a.ruta)}</span>
+                <span class="dentro-k">${fmt(a.kb, 1)} KB</span>
+              </div>`;
+    }).join("") + `</div>`;
+  }
+
+  function pintaTex(f) {
+    const caja = $("#de-cuerpo");
+    if (!f.tex) {
+      caja.innerHTML = `<div class="visor-vacio">Este ZIP no trae ningun .tex.</div>`;
+      return;
+    }
+    if (cache[f.tex] != null) { muestraTex(f, cache[f.tex]); return; }
+    caja.innerHTML = `<div class="visor-vacio">Cargando ${esc(f.tex_nombre)}...</div>`;
+    fetch(f.tex)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(t => { cache[f.tex] = t; if (vigente(f)) muestraTex(f, t); })
+      .catch(() => {
+        if (!vigente(f)) return;
+        caja.innerHTML = `<div class="visor-vacio">
+          No se pudo cargar el LaTeX.<br><br>
+          Si abriste esta pagina desde el disco, el navegador bloquea la lectura de
+          archivos vecinos por seguridad. Publicada funciona.<br><br>
+          <a class="btn" href="${f.tex}" download>Descargar ${esc(f.tex_nombre)}</a>
+        </div>`;
+      });
+  }
+
+  function vigente(f) { return dela()[elegido] === f && modo === "tex"; }
+
+  function muestraTex(f, texto) {
+    const lineas = texto.split("\n");
+    /* Se numeran las lineas para poder citar una en la exposicion. */
+    $("#de-cuerpo").innerHTML =
+      `<pre class="codigo-tex"><code>` + lineas.map((l, i) =>
+        `<span class="ln">${String(i + 1).padStart(4, " ")}</span>${esc(l)}`
+      ).join("\n") + `</code></pre>`;
+  }
+
+  function pinta() {
+    pintaLista();
+    const f = dela()[elegido];
+    if (!f) return;
+    $("#de-familias").querySelectorAll("[data-fam]").forEach(b =>
+      b.classList.toggle("on", b.dataset.fam === fam));
+    document.querySelectorAll("[data-vista-de]").forEach(b =>
+      b.classList.toggle("on", b.dataset.vistaDe === modo));
+
+    $("#de-cab").innerHTML = `
+      <div>
+        <h4>${esc(f.nombre)}</h4>
+        <div class="meta">${f.dentro.length} archivos &middot; ${fmt(f.mb, 2)} MB${
+          f.tex ? ` &middot; ${esc(f.tex_nombre)}, ${fmt(f.tex_lineas, 0)} lineas`
+                : ""}</div>
+      </div>
+      ${f.tex ? `<a class="btn" href="${f.tex}" download>Descargar el .tex</a>` : ""}`;
+
+    if (modo === "arbol") $("#de-cuerpo").innerHTML = arbol(f);
+    else pintaTex(f);
+
+    $("#de-nota").innerHTML = f.error
+      ? `Este ZIP no se pudo abrir: ${esc(f.error)}`
+      : `Las figuras que ves dentro son las mismas que produce
+         <button class="enlace" data-ir="figuras">04_analisis.py</button>, de modo que el
+         PDF no lleva ninguna imagen pegada a mano.`;
+  }
+
+  $("#de-familias").querySelectorAll("[data-fam]").forEach(b =>
+    b.onclick = () => { fam = b.dataset.fam; elegido = 0; pinta(); });
+  document.querySelectorAll("[data-vista-de]").forEach(b =>
+    b.onclick = () => { modo = b.dataset.vistaDe; pinta(); });
+  pinta();
+
+  montarRepro({
+    donde:"#repro-desarrollo", segundos:2.2 * D.length, vista:"desarrollo",
+    pasos:D.length, auto:false, reposo:0,
+    pinta: t => {
+      const k = Math.min(D.length - 1, Math.floor(t * D.length));
+      const f = D[k];
+      if (f.slug !== fam || dela()[elegido] !== f) {
+        fam = f.slug;
+        elegido = dela().indexOf(f);
+        pinta();
+        const n = $(`[data-de="${elegido}"]`);
+        if (n) n.scrollIntoView({block:"nearest"});
+      }
+      return `${k + 1} de ${D.length}`;
+    }
+  });
+})();
+
+/* ===================== los papers =====================
+   Lista a la izquierda y visor a la derecha. El PDF se muestra en un iframe
+   contra el archivo original, sin convertirlo a imagenes: asi el texto sigue
+   siendo seleccionable y buscable, y no hay que generar miniaturas de noventa
+   documentos. El navegador que no sepa dibujar un PDF embebido recibe el
+   enlace para abrirlo en una pestana, que es el caso de algunos moviles. */
+(function papers() {
+  const sec = $("#papers");
+  if (!sec) return;
+  const P = (typeof PAPERS === "undefined" ? [] : PAPERS);
+  if (!P.length) { sec.remove(); return; }
+
+  const NOMBRE = {ingles: "En ingles", traducido: "Traducido", poster: "Poster"};
+  let pieza = "ingles", elegido = P[0].n, filtro = "";
+
+  const sinTildes = s => String(s || "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+  function visibles() {
+    if (!filtro) return P;
+    const f = sinTildes(filtro);
+    return P.filter(p => sinTildes(p.titulo).includes(f) ||
+                         String(p.n).includes(f));
+  }
+
+  function pintaLista() {
+    const lista = visibles();
+    $("#pa-lista").innerHTML = lista.length === 0
+      ? `<p class="nota" style="padding:14px">Ningun titulo contiene eso.</p>`
+      : lista.map(p => `
+        <button class="pa-item${p.n === elegido ? " on" : ""}" data-paper="${p.n}">
+          <span class="pa-n">${String(p.n).padStart(2, "0")}</span>
+          <span>
+            <span class="pa-t">${esc(p.titulo || "Paper " + p.n)}</span>
+            <span class="pa-chips">
+              ${["ingles", "traducido", "poster"].map(c =>
+                `<span class="pa-chip${p[c] ? " hay" : ""}">${NOMBRE[c]}</span>`
+               ).join("")}
+            </span>
+          </span>
+        </button>`).join("");
+    $("#pa-lista").querySelectorAll("[data-paper]").forEach(b =>
+      b.onclick = () => { elegido = +b.dataset.paper; pinta(); });
+  }
+
+  function pinta() {
+    pintaLista();
+    const p = P.find(x => x.n === elegido);
+    if (!p) return;
+    /* Si la pieza elegida no existe para este numero se cae a la que si, en
+       lugar de mostrar un visor vacio sin explicacion. */
+    const hay = ["ingles", "traducido", "poster"].filter(c => p[c]);
+    const usa = p[pieza] ? pieza : (hay[0] || null);
+
+    $("#pa-pieza").querySelectorAll("[data-pieza]").forEach(b => {
+      b.classList.toggle("on", b.dataset.pieza === usa);
+      b.disabled = !p[b.dataset.pieza];
+      b.style.opacity = p[b.dataset.pieza] ? "" : ".4";
+    });
+
+    const pag = p[usa + "_pag"], mb = p[usa + "_mb"];
+    $("#pa-cab").innerHTML = `
+      <div>
+        <h4>${String(p.n).padStart(2, "0")}. ${esc(p.titulo || "Paper " + p.n)}</h4>
+        <div class="meta">${usa ? NOMBRE[usa] : "sin piezas"}${
+          pag ? " &middot; " + pag + (pag === 1 ? " pagina" : " paginas") : ""}${
+          mb ? " &middot; " + fmt(mb, 2) + " MB" : ""}</div>
+      </div>
+      ${usa ? `<a class="btn" href="${p[usa]}" target="_blank" rel="noopener">
+                 Abrir en una pestana</a>
+               <a class="btn" href="${p[usa]}" download>Descargar</a>` : ""}`;
+
+    $("#pa-marco").innerHTML = usa
+      ? `<iframe src="${p[usa]}#view=FitH" title="${esc(p.titulo || "Paper " + p.n)}"
+                 loading="lazy"></iframe>`
+      : `<div class="visor-vacio">De este numero no hay ningun archivo copiado.</div>`;
+
+    const faltan = ["ingles", "traducido", "poster"].filter(c => !p[c]);
+    $("#pa-nota").innerHTML = faltan.length
+      ? `De este paper falta ${faltan.map(c => NOMBRE[c].toLowerCase()).join(" y ")}.
+         El visor muestra lo que hay.`
+      : `Las tres piezas de este numero estan. Si el PDF no se dibuja en tu
+         navegador, usa el boton de abrir en una pestana.`;
+  }
+
+  $("#pa-pieza").querySelectorAll("[data-pieza]").forEach(b =>
+    b.onclick = () => { if (!b.disabled) { pieza = b.dataset.pieza; pinta(); } });
+
+  let tecleo = null;
+  $("#pa-buscar").addEventListener("input", e => {
+    clearTimeout(tecleo);
+    tecleo = setTimeout(() => {
+      filtro = e.target.value;
+      const lista = visibles();
+      if (lista.length && !lista.some(p => p.n === elegido)) elegido = lista[0].n;
+      pinta();
+    }, 160);
+  });
+
+  pinta();
+
+  /* El pase recorre los numeros en orden. No arranca solo: cada paso carga un
+     PDF de varios MB y hacerlo sin que nadie lo pida seria gastar la conexion
+     del que entra a leer uno concreto. */
+  montarRepro({
+    donde:"#repro-papers", segundos:2.6 * P.length, vista:"papers",
+    pasos:P.length, auto:false, reposo:0,
+    pinta: t => {
+      const k = Math.min(P.length - 1, Math.floor(t * P.length));
+      if (P[k].n !== elegido) {
+        elegido = P[k].n;
+        pinta();
+        const n = $(`[data-paper="${elegido}"]`);
+        if (n) n.scrollIntoView({block:"nearest"});
+      }
+      return `paper ${P[k].n} de ${P.length}`;
     }
   });
 })();
@@ -2301,7 +3007,7 @@ SEC.forEach(s => {
 
   montarRepro({
     donde:"#repro-metodo", segundos:2.6 * pasos.length, vista:"metodo",
-    pasos:pasos.length, auto:false,
+    pasos:pasos.length, auto:false, reposo:1,
     pinta: t => {
       const k = Math.min(pasos.length - 1, Math.floor(t * pasos.length));
       pasos.forEach((n, i) => {
@@ -2435,7 +3141,7 @@ SEC.forEach(s => {
      y cambiarsela de golpe seria un estorbo. */
   montarRepro({
     donde:"#repro-tablas", segundos:2.4 * llaves.length, vista:"tablas",
-    pasos:llaves.length, auto:false,
+    pasos:llaves.length, auto:false, reposo:0,
     pinta: t => {
       const k = Math.min(llaves.length - 1, Math.floor(t * llaves.length));
       if (llaves[k] !== activa) { activa = llaves[k]; orden = null; asc = true; pinta(); }
@@ -2717,12 +3423,19 @@ SEC.forEach(s => {
   (function busca(ns) { ns.forEach(n => {
     if (n.ajeno) ajenas.push([n.n, cuenta(n)]); else busca(n.d||[]);
   }); })(ARBOL || []);
+  /* Los articulos de terceros se pueden leer en la seccion de los papers, pero
+     no se reparten en los ZIP: son de sus editoriales. El aviso dice las dos
+     cosas, porque decir solo una de ellas seria enganoso. */
+  const hayVisor = typeof PAPERS !== "undefined" && PAPERS.length;
   $("#aviso-ajeno").innerHTML = ajenas.length
     ? `<b>Lo que esta pagina no reparte.</b> ` + ajenas.map(([n, c]) =>
         `${n} (${c} archivos)`).join(" y ") + `. Los articulos en ingles son de sus
-       editoriales y las traducciones al espanol son obras derivadas de ellos, de modo que el
-       arbol los lista para que se vea el trabajo hecho pero los ZIP no los incluyen. Cada uno
-       se consulta por su DOI en las referencias del articulo.`
+       editoriales y las traducciones al espanol son obras derivadas de ellos, de modo que
+       ${hayVisor
+         ? `se pueden leer uno a uno en <button class="enlace" data-ir="papers">la seccion
+            de los papers</button>, pero los ZIP de descarga no los incluyen`
+         : `el arbol los lista para que se vea el trabajo hecho pero los ZIP no los incluyen`}.
+       Cada uno se consulta tambien por su DOI en las referencias del articulo.`
     : `<b>Nota.</b> El arbol de arriba se armo sin las carpetas de articulos de terceros.`;
 
   const tot = (ARBOL||[]).reduce((a,c) => a + cuenta(c), 0);
@@ -3035,12 +3748,15 @@ SEC.forEach(s => {
   const fichas = Array.from(document.querySelectorAll("#galeria .figura"));
   montarRepro({
     donde:"#repro-figuras", segundos:2.2 * FIGURAS.length, vista:"figuras",
-    pasos:FIGURAS.length, auto:false,
+    pasos:FIGURAS.length, auto:false, reposo:0,
     pinta: t => {
       const k = Math.min(FIGURAS.length - 1, Math.floor(t * FIGURAS.length));
-      fichas.forEach((n, i) => n.classList.toggle("en-pase", i === k));
-      if (fichas[k]) fichas[k].scrollIntoView({block:"center", behavior:"smooth"});
-      return `figura ${FIGURAS[k].n} de ${FIGURAS.length}`;
+      /* En reposo (t = 0) no se resalta ninguna: la galeria se ve entera. */
+      fichas.forEach((n, i) => n.classList.toggle("en-pase", t > 0 && i === k));
+      if (t > 0 && fichas[k])
+        fichas[k].scrollIntoView({block:"center", behavior:"smooth"});
+      return t > 0 ? `figura ${FIGURAS[k].n} de ${FIGURAS.length}`
+                   : `${FIGURAS.length} figuras`;
     }
   });
 })();
@@ -3282,10 +3998,12 @@ function bajar(texto, nombre, tipo) {
 /* El orden y los grupos son los de las tres carpetas de la entrega, para que
    la web se recorra igual que el archivo que recibe el docente. */
 const GRUPOS = [
-  ["1. Productos",                ["resultados", "bibliografia"]],
-  ["2. Desarrollo",               ["proceso", "metodo"]],
-  ["3. Base de datos y código",   ["tablas", "figuras", "panel", "dispersion",
-                                   "capm", "cartera", "comparar", "archivos"]],
+  ["1. Productos",                ["entregables", "resultados", "papers",
+                                   "bibliografia"]],
+  ["2. Desarrollo",               ["proceso", "desarrollo", "metodo"]],
+  ["3. Base de datos y código",   ["codigo", "tablas", "figuras", "panel",
+                                   "dispersion", "capm", "cartera", "comparar",
+                                   "archivos"]],
 ];
 
 const RUTAS = (function rutas() {
@@ -3293,16 +4011,25 @@ const RUTAS = (function rutas() {
      articulo concluye, luego como se desarrollo y al final los datos. */
   const DEF = [
     /* 1. Productos */
+    ["entregables", "El articulo",     "El journal, su poster y el Beamer, para leerlos aqui.",
+     s => (typeof PRODUCTOS !== "undefined"
+             ? PRODUCTOS.filter(p => p[3]).length + " piezas" : "")],
     ["resultados",  "Resultados",      "Las betas de los cuatro sectores y su costo de capital.",
      s => `${SEC.length} sectores`],
+    ["papers",      "Los papers",      "Los articulos, su traduccion y su poster, para verlos aqui.",
+     s => (typeof PAPERS !== "undefined" ? PAPERS.length + " papers" : "")],
     ["bibliografia","Bibliografía",    "Las referencias del articulo, cada una con su enlace.",
      s => (typeof REFS !== "undefined" ? REFS.length + " referencias" : "")],
     /* 2. Desarrollo */
     ["proceso",     "El proceso",      "El registro de ejecucion y como se armaron las carteras.",
      s => (typeof LOG !== "undefined" ? LOG.total + " lineas" : "")],
+    ["desarrollo",  "Las fuentes",     "El LaTeX de cada pieza y lo que lleva dentro su ZIP.",
+     s => (typeof DESARROLLO !== "undefined" ? DESARROLLO.length + " fuentes" : "")],
     ["metodo",      "Método",          "Como se construyo cada cifra, paso por paso.",
      s => "5 pasos"],
     /* 3. Base de datos y codigo */
+    ["codigo",      "Los scripts",     "Los ocho archivos de /codigo, con sus lineas y funciones.",
+     s => (typeof CODIGO !== "undefined" ? CODIGO.length + " scripts" : "")],
     ["tablas",      "Tablas",          "Las once tablas, ordenables y con buscador.",
      s => `${Object.keys(TITULOS).length} tablas`],
     ["figuras",     "Figuras",         "Las diez figuras del articulo, para ver y descargar.",
@@ -3325,7 +4052,8 @@ const RUTAS = (function rutas() {
 
 const COLORES_RUTA = ["--mineria","--banca","--construccion","--consumo",
                       "--acento","--mineria","--banca","--construccion",
-                      "--consumo","--acento","--mineria","--banca"];
+                      "--consumo","--acento","--mineria","--banca",
+                      "--construccion","--consumo","--acento","--mineria"];
 
 function irA(id, empujar = true) {
   const destino = document.getElementById(id) ? id : "indice";

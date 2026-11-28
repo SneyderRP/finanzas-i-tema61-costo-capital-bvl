@@ -1,0 +1,195 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster de revisión de literatura (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{28}{37.0}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{33.0}{39.6}\selectfont}
+\newcommand{\smallsize}{\fontsize{23.0}{29.9}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=20mm, bottom=20mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{REVISIÓN DE LITERATURA \quad|\quad FINANZAS I \quad|\quad TEMA 61}\par}
+\vspace{10mm}
+{\color{white}\fontsize{66}{74.6}\selectfont\bfseries Geopolitical risk and the cost of capital in emerging economies\par}
+\vspace{8mm}
+{\color{mist}\fontsize{38}{46.4}\selectfont\itshape Riesgo geopolítico y costo de capital en economías emergentes\par}
+\vspace{10mm}
+{\color{white}\fontsize{29}{35}\selectfont\bfseries Richard W. Carney, Sadok El Ghoul, Omrane Guedhami y He (Helen) Wang\par}
+\vspace{9mm}
+\pill{white}{white}{\color{navy}Q1}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries \textit{Emerging Markets Review}, 61, 101149 (2024)}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=8mm, bottom=8mm, halign=center]
+{\color{navy}\fontsize{27}{36}\selectfont \textbf{Póster elaborado por:} Meglinho Sneyder Rojas Poma \enspace\textbar\enspace Código 2024200522B\par \fontsize{24}{32}\selectfont Escuela Profesional de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace Finanzas I (055D), 2026-II\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Mercado}}}\par\vspace{2mm}{\color{white}19 economías emergentes}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Muestra}}}\par\vspace{2mm}{\color{white}55 900 observaciones}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Periodo}}}\par\vspace{2mm}{\color{white}1987 a 2018}\end{minipage}\hfill\begin{minipage}[t]{174.8mm}\raggedright{\color{acento}\smallsize\bfseries\textls[110]{\MakeUppercase{Método}}}\par\vspace{2mm}{\color{white}Regresiones de panel con muestras divididas}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Contexto}El costo de capital es el retorno que exigen los inversionistas según el riesgo de una empresa, y define sus decisiones de inversión y su valor. Con mercados más integrados, ganan peso los riesgos globales como guerras, crisis y terrorismo.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Problema}Se sabía poco sobre si los eventos geopolíticos encarecen el capital de las empresas de economías emergentes cuando los inversionistas huyen hacia mercados más seguros.\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo}Medir el efecto del riesgo geopolítico sobre el costo del capital propio de las empresas de economías emergentes y qué factores lo amortiguan.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item El riesgo se mide con el índice global de riesgo geopolítico y sus componentes de amenazas y acciones.
+\item Se controlan otros riesgos país.
+\item Se divide la muestra según instituciones del país y según la exposición internacional de la empresa.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Los errores estándar se ajustan por autocorrelación y heterocedasticidad con el procedimiento de Newey-West.
+\item Se incluyen efectos fijos de país, industria y año.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Tabla clave del estudio}
+\begin{minipage}[c]{333.2mm}\centering
+\fcolorbox{line}{white}{\includegraphics[width=\dimexpr333.2mm-2\fboxsep-2\fboxrule\relax]{figura.png}}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-333.2mm-18mm\relax}\raggedright
+{\color{navy}\bfseries Tabla 3.}\enspace{\itshape Riesgo geopolítico y costo del capital propio (COE). Columnas 1 a 3: sin controles, con controles de empresa y con todos los controles; columna 4: riesgo geopolítico ponderado.}\par\vspace{8mm}
+{\color{teal}\smallsize\bfseries\textls[110]{CÓMO LEERLA}}\par\vspace{4mm}
+\begin{itemize}
+\item El coeficiente del riesgo geopolítico es positivo y significativo al 1 \% en todas las columnas (0.010 a 0.013).
+\item Con todos los controles, una desviación estándar más de riesgo geopolítico (22.884) eleva el costo de capital en unos 25 puntos básicos.
+\item La beta (0.094) y el apalancamiento (5.160) elevan el costo de capital; el tamaño ($-0.995$) y el momentum ($-2.150$) lo reducen.
+\end{itemize}
+\vspace{8mm}
+{\color{muted}\smallsize Tabla tomada de Carney et al. (2024).}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Resultados}
+\begin{tcolorbox}[enhanced, sharp corners, colback=tealSoft, boxrule=0pt, left=14mm, right=14mm, top=10mm, bottom=11mm,
+  borderline west={4mm}{0mm}{teal}, fontupper=\bodysize\color{ink}\raggedright]
+{\color{teal}\smallsize\bfseries\textls[110]{HALLAZGO CENTRAL}}\par\vspace{4mm}
+{\bfseries Un mayor riesgo geopolítico eleva, en promedio, el costo del capital propio de las empresas de economías emergentes.}
+\end{tcolorbox}
+\vspace{11mm}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item El efecto es menor en países con más límites al poder ejecutivo y mejores instituciones regulatorias.
+\item Las empresas con cotización cruzada en EE. UU. y con ventas al exterior están más protegidas.
+\item El resultado se mantiene con los componentes de amenazas y de acciones geopolíticas.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{itemize}
+\item Una medida ponderada que da más peso al riesgo geopolítico reciente confirma el resultado (0.010, significativo al 1 \%).
+\item El R$^2$ ajustado pasa de 0.215 sin controles a 0.466 con todos los controles.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}El riesgo geopolítico se suma al costo de capital en los países emergentes, pero las buenas instituciones y la apertura internacional de las empresas reducen ese efecto.\end{tcolorbox}
+\begin{tcolorbox}[card=gold, colback=goldSoft]\cardtitle{Aporte al tema 61}Recuerda que el costo de capital en un país emergente incluye el riesgo país. En la BVL, varias empresas de las carteras, como Credicorp, Southern Copper y Buenaventura, también cotizan en Nueva York.\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{245mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{FUENTE DE DATOS DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Índice global de riesgo geopolítico, indicadores de riesgo país ICRG y datos de empresas de 19 economías emergentes, de 1987 a 2018.}
+\end{minipage}\hfill
+\begin{minipage}[c]{385mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{REFERENCIA}}\par\vspace{5mm}
+{\color{white}\smallsize\hangindent=1.2em\hangafter=1 Carney, R. W., El Ghoul, S., Guedhami, O., y Wang, H. (2024). Geopolitical risk and the cost of capital in emerging economies. \textit{Emerging Markets Review}, \textit{61}, Artículo 101149. \url{https://doi.org/10.1016/j.ememar.2024.101149}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://doi.org/10.1016/j.ememar.2024.101149}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y LEE EL ARTÍCULO}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

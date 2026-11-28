@@ -1,0 +1,667 @@
+%=================================================================
+% Artículo científico, Unidad II, Finanzas I (055D), UNCP, 2026-II
+% Plantilla MDPI adaptada: sin números de línea, logos de la UNCP,
+% textos en español y citas y referencias en formato APA 7.
+% Compilar con pdfLaTeX (Overleaf).
+%=================================================================
+\documentclass[jrfm,article,submit,oneauthor]{Definitions/mdpi}
+
+\firstpage{1}
+\makeatletter
+\setcounter{page}{\@firstpage}
+\makeatother
+\pubvolume{1}
+\issuenum{1}
+\articlenumber{0}
+\pubyear{2026}
+\copyrightyear{2026}
+\datereceived{ }
+\daterevised{ }
+\dateaccepted{ }
+\datepublished{ }
+
+%=================================================================
+% Paquetes y ajustes propios
+\usepackage{hanging}
+\usepackage{xurl}
+\newcommand{\nota}[1]{\par\vspace{1.5mm}{\fontsize{8}{10}\selectfont\raggedright\textit{Nota.} #1\par}}
+\renewcommand{\appendixname}{Anexo}
+\AtBeginDocument{%
+  \renewcommand{\figurename}{Figura}%
+  \renewcommand{\tablename}{Tabla}%
+  \renewcommand{\appendixname}{Anexo}%
+}
+\captionsetup{singlelinecheck=false}
+\captionsetup[figure]{position=top,skip=4pt}
+\captionsetup[table]{position=top,skip=4pt}
+\setlength{\emergencystretch}{2.5em}
+\hyphenpenalty=5000
+% Interlineado de 1.5 en el cuerpo; tablas, figuras y referencias en sencillo
+\AtBeginDocument{\setstretch{1.5}}
+\AtBeginEnvironment{table}{\setstretch{1}}
+\AtBeginEnvironment{figure}{\setstretch{1}}
+
+% Pie de página, encabezado y columna izquierda de la primera página
+\renewcommand{\mdpipie}{Finanzas I (055D) \textbullet{} Escuela Profesional de Economía \textbullet{} Universidad Nacional del Centro del Perú \textbullet{} 2026-II}
+\renewcommand{\mdpicabecera}{Rojas Poma (2026). Betas sectoriales y costo de capital en la BVL}
+\renewcommand{\mdpicolumnaizq}{%
+\textbf{Citación:} Rojas Poma, M. S. (2026). Betas sectoriales y costo de capital en un mercado ilíquido: evidencia de la Bolsa de Valores de Lima, 2021-2026. Artículo de la Unidad II, Finanzas I (055D), Universidad Nacional del Centro del Perú.\par\medskip
+\textbf{Docente:} Dr. Ciro Iván Machacuay Meza\par\medskip
+\textbf{Fecha:} 25 de noviembre de 2026\par\medskip
+\textbf{Datos y código:} \url{https://github.com/SneyderRP/finanzas-i-tema61-costo-capital-bvl}}
+
+%=================================================================
+\Title{Betas sectoriales y costo de capital en un mercado ilíquido: evidencia de la Bolsa de Valores de Lima, 2021-2026}
+
+\Author{Meglinho Sneyder Rojas Poma}
+\AuthorNames{Meglinho Sneyder Rojas Poma}
+\address[1]{Escuela Profesional de Economía, Facultad de Economía, Universidad Nacional del Centro del Perú, Huancayo, Perú}
+
+\abstract{Estimar el costo de capital por sectores en la Bolsa de Valores de Lima (BVL) es complejo, debido por la baja liquidez y la ausencia de índices sectoriales de manera oficial. El estudio estima el costo de capital y la  $\beta$ cuatro sectores conformado por minería, banca, consumo y construcción. Donde se recopilo datos mediante un panel de 3672 observaciones (918 días por sector durante el periodo de 2021-2026. La data se obtuvo mediante el backend de la BVL (clasificación y moneda) y la API de Yahoo Finance (precios, tasa del Tesoro de EE.\,UU. y tipo de cambio). Luego de seleccionar seis acciones por baja liquidez, se calcularon las $\beta$ mediante MCO con errores de Newey-West y se determino el costo de capital con el CAPM. Los resultados indican que  el sector minero amplifica el riesgo ($\beta=1.616$), la banca sigue al mercado ($\beta=1.069$, sin diferencia de 1), la construcción lo acompaña moderadamente ($\beta=0.868$) y el consumo lo amortigua ($\beta=0.547$). Con la prima de mercado realizada, el costo de capital va de 12.3\,\% (consumo) a 28.7\,\% (minería); con una prima de referencia del 7.5\,\%, el rango es de 8.0\,\% a 16.0\,\%. Los resultados se mantienen consistentes incluso al retirar cada sector del mercado por separado; además la frontera eficiente de Markowitz ratifica que combinar los cuatro sectores y permite incrementar el ratio de Sharpe de 0.88, correspondiente al mejor sector individual, hasta 1.05 debido a la diversificación.}
+\keyword{beta sectorial, costo de capital, CAPM, frontera eficiente, iliquidez, Bolsa de Valores de Lima}
+\JEL{G11, G12, G15, G31}
+\abstracten{\textbf{Industry betas and the cost of capital in an illiquid market: evidence from the Lima Stock Exchange, 2021-2026.} Estimating the cost of capital by sector in the Lima Stock Exchange (BVL) is complex due to low liquidity and the lack of official sectoral indices. This study estimates the cost of capital and the $\beta$ of four sectors: mining, banking, consumption, and construction. Data were collected using a panel of 3\,672 observations (918 days per sector) over the 2021-2026 period. The data were obtained through the BVL backend (sector classification and currency) and the Yahoo Finance API (prices, U.S.\,Treasury rate, and exchange rate). After filtering out six stocks for low liquidity, $\beta$ were estimated using OLS with Newey-West errors, and the cost of capital was determined using the CAPM. The results indicate that the mining sector amplifies market risk ($\beta=1.616$), banking follows the market ($\beta=1.069$, not significantly different from 1), construction accompanies it moderately ($\beta=0.868$), and consumption dampens it ($\beta=0.547$). Using the realized market premium, the cost of capital ranges from 12.3\,\% (consumption) to 28.7\,\% (mining); with a reference premium of 7.5\,\%, the range is 8.0\,\% to 16.0\,\%. The results remain consistent even when each sector is excluded from the market separately. Furthermore, the Markowitz efficient frontier confirms that combining the four sectors increases the Sharpe ratio from 0.88, corresponding to the best individual sector, to 1.05 due to diversification.}
+\keyworden{industry beta, cost of capital, CAPM, efficient frontier, illiquidity, Lima Stock Exchange}
+
+%=================================================================
+\begin{document}
+
+\section{Introducción}
+El costo de capital patrimonial no puede obtenerse directamente del mercado, por ende se  observa en el mercado, también estimarse. Para ello el modelo CAPM se compone de tres factores que son la tasa libre de riesgo, la prima de mercado y la $\beta$,que representa la sensibilidad del rendimiento de una acción o sector ante los cambios del mercado. Entonces una $\beta$ mal estimada altera el costo de capital, la valoración de las empresas y sus decisiones de inversión.
+
+Esta dificultad se presencia con mayor frecuencia en los mercados emergentes. Hourani et al. (2023) enseñan que en bolsas pequeñas hay complicaciones para estimar con precisión el costo de capital por industria, debido a que los factores de riesgo varían en el tiempo y no se mantienen estáticos; Yildiz y Erzurumlu (2018) documentan que hay limitaciones en la capacidad explicativa de la $\beta$ tradicional donde pierde poder en estas bolsas; y Altay y Çalgıcı (2019) identifican que la iliquidez, representa un riesgo que el CAPM tradicional no los contempla, donde puede generar subestimación de la $\beta$ cuando los precios no se actualizan diariamente.
+
+La BVL refleja estas limitaciones, debido a un mercado pequeño y la baja frecuencia de negociación que tuvo efectos sobre la rentabilidad, el riesgo y el volumen negociado por la escasa integración regional (Lizarzaburu Bolaños et al., 2015). A ello se suma la falta de series históricas e índices sectoriales, donde varias acciones permanecen semanas sin tener cambios, a diferencia de las ligas mayores que cotizan diariamente en Nueva York.
+
+La dificultad que se tuvo en el estudio fue palnteada mediante esta pregunta ¿cuáles son las $\beta$ y los costo de capital de los 4 sectores en la BVL, estimados con datos diarios y controlando la iliquidez? Donde el objetivo es estimar estos indicadores para las cuatro carteras sectoriales durante noviembre de 2021 y octubre de 2026. Entonces para lograrlo, se tiene  elaborara una base de datos que se obtuvo con extracción automatizada captura del periodo, además calcular las $\beta$ incorporando la tasa del Tesoro de EE.,UU. y el tipo de cambio, y determinar el costo de capital mediante el CAPM. De paso analizar la estabilidad de los resultados frente a diferentes índices de mercado y las ventajas de diversificar las inversiones. 
+
+El aporte del estudio es doble; donde hay evidencia empírica, además ofrece estimaciones recientes del costo de capital por sector de la BVL con datos diarios; por otro, incorpora un procedimiento para la construcción de carteras sectoriales en mercados con baja liquidez, incluyendo fuentes oficiales y de precios, averiguando cotizaciones desactualizadas. 
+
+% =====================================================================
+%  ANTECEDENTES
+% =====================================================================
+\section{Antecedentes}
+\subsection{Costo de capital por sector y estimación de la beta}
+Diversos estudios recientes mencionan que el costo de capital debe analizarse por separado, a través de sus características de cada sector económico y no regirse a las condiciones de cada país. Hourani et al. (2023), a partir del análisis de 29 mercados frontera, mediante estimaciones presentan limitaciones, ya sea a que los factores de riesgo varían en el tiempo. Asimismo, Bazhutov et al. (2023) recalca que la estabilidad de la $\beta$ está sujeta por el periodo de análisis, la frecuencia de los datos y el índice utilizado como referencia. En cambio en los mercados emergentes, los resultados de la $\beta$ es mixta. Mientras Azimli (2020) respalda favorable en Borsa Istanbul, mientras Gökçen (2026) y Çam et al. (2024) identifican que las acciones de bajo riesgo pueden rendir más, e incluso la $\beta$  puede presentar signo negativo. Por otro lado, Chen y Zhang (2021) confirman que aspectos corporativos, como la responsabilidad social, pueden influir a reducir el costo del capital propio.
+
+\subsection{Liquidez, microestructura y formación de precios}
+En mercados ilíquidos, la $\beta$ se subestimas porque los precios no se actualizan de manera diaria. Altay y Çalgıcı (2019) demuestran que incorporar betas a la iliquidez mejora la explicación de los rendimientos en Borsa Istanbul. De manera similar, Su y Tokmakcioglu (2021) validan el uso de información diaria cuando se escasea de información intradía. Si se menciona, de la microestructura del mercado, tiende a tener impacto en el comportamiento de los precios. Gülay (2022) capta que la cantidad de movimientos genera una influencia sobre la volatilidad de corto plazo. Mientras que Bildik (2023) observa, en si que los precios incorporan información en un intervalo aproximado de quince minutos tras su suspensión. Asimismo, Cepoi et al. (2025) documenta que en época la pandemia los mercados locales perdieron durante un tiempo la atención protagónica en la formación de precios frente a mercados externos.
+
+\subsection{Riesgo sectorial, contagio y factores externos}
+La maleabilidad del riesgo no es homogénea para todos los sectores, ya que cada sector tiene sus características propias frente al mercado durante sus cambios económicos y financieros. Abdel-Hafez et al. (2026) y Özdemir y Taş (2025) evidencian que la incertidumbre económica y la duda de los inversionistas tienen repercusiones diversas en función a la actividad económica. A de entender que los mercados emergentes cada vez más adquieren importancia los factores externos. Carney et al. (2024) hallan que los riesgos geopolíticos impactan en el incremento del costo del capital propio; mientras que Ghallabi et al. (2025) documentan que la transmisión de los efectos que tiene los mercados de materias primas y las bolsas en tiempos de crisis. En Sudamérica, Brum-Civelli et al. (2024) señalan que los precios de los productos básicos ayudaron a reducir los efectos del endurecimiento financiero internacional de 2022. Por su parte, Bugan et al. (2022) advierten que los mercados emergentes presentan movimientos que se asemejan a escenarios de mucho movimiento, que reduce las posibilidades de diversificación. En el sector bancario, Arbaa y Varon (2019) y Ozsoz et al. (2014) resaltan el impacto del riesgo cambiario y del sistema financiero en los rendimientos.
+
+
+% =====================================================================
+%  MATERIALES Y MÉTODOS
+% =====================================================================
+\section{Materiales y métodos}
+\noindent\textbf{Pasos para la búsqueda de la data}
+
+\noindent\textbf{1. Hipótesis general}
+\begin{itemize}
+\item \textbf{H1} Los cuatro sectores minero, bancario, de construcción y de consumo de la BVL están sujetas por betas distintas, por ende los costos de capital  son distintos en el periodo 2021-2026.
+\item \textbf{H0} Los cuatro sectores minero, bancario, de construcción y de consumo de la BVL están sujetas tienen la misma beta, por ende, tienen el mismo costo de capital en el periodo 2021-2026.
+\end{itemize}
+
+\noindent\textbf{2. Hipótesis específicas}
+
+Para la minería, la hipótesis alterna (\textbf{H1}) plantea que su beta es mayor que 1 en el periodo 2021-2026, es decir, que se mueve más que el mercado, mientras que la hipótesis nula (\textbf{H0}) plantea que su beta es igual a 1. En el caso del consumo, la \textbf{H1} sostiene que su beta es menor que 1, y la \textbf{H0}, que es igual a 1. Asimismo, para la banca, la \textbf{H1} indica que su beta es distinta de 1, y la \textbf{H0}, que es igual a 1. Por último, para la construcción, la \textbf{H1} plantea que su beta es distinta de 1, mientras que la \textbf{H0} plantea que es igual a 1. Todas se contrastan con un nivel de significancia de 5\,\%.
+
+\subsection{Fuentes de datos y procedimiento de extracción}
+La data proviene de dos vías, donde ninguna exige una clave de acceso. La primera es el scraping al backend de la BVL. El portal de la BLV es una aplicación de página única, es decir, su HTML no trae tablas, por ello se tuvo que inspeccionar el tráfico del portal, donde se encontró que consume el dominio data on demand de la BLV, que responde en formato JSON. De ahí se obtuvo el catálogo de los nueve sectores oficiales y, para cada sector, sus instrumentos con su moneda de cotización. Como este backend solo da información del día en curso (ocho rutas de histórico respondieron con HTTP 404), este procedimiento se realizo para usó para saber qué acciones componen cada sector y en qué moneda cotiza cada una.
+
+La segunda vía es la API de Yahoo Finance, donde se descargaron los precios de cierre diarios de 20 acciones, el rendimiento del Tesoro de EE.\,UU. a 10 años (\texttt{\^{}TNX}) y el tipo de cambio de soles por dólar (\texttt{USDPEN=X}). Se fijaron como intervalo durante el periodo de la fecha de inicio (1 de noviembre de 2021) y la de corte (31 de octubre de 2026), de modo que cada ejecución consulta el mismo periodo. Las solicitudes se hicieron con una pausa de 1.5 segundos, quedaron registradas en log ejecucion y la extracción definitiva se realizó el 1 de noviembre de 2026.
+
+Por ende se hizo un cambio en el diseño, porque al inicio se trabajó con series del Banco Central de Reserva del Perú (BCRP), pero desde el 31 de octubre de 2026 su portal respondía con una página de verificación antibot en lugar de datos, y eso pasó en siete pruebas hechas desde dos máquinas. Entonces las series se cambiaron por sus equivalentes de Yahoo Finance: el Tesoro de EE.\,UU. es la misma tasa que reexporta el BCRP y el tipo de cambio cumple la misma función. Lo único que se perdió fue el índice de riesgo país, que no tiene equivalente, por ello se usa el CAPM clásico. Y para comprobar los precios, se cotejó el cierre del 30 de octubre de 2026 de diez acciones con el último precio del backend de la BVL, donde coincidieron los diez casos con una tolerancia de 0.5\,\%.
+
+\subsection{Construcción de las carteras sectoriales}
+La clasificación oficial de la BVL no tiene los sectores de consumo y construcción, y su categoría (Diversas) junta empresas sin relación económica entre sí, como un holding bancario, uno financiero, una cadena de retail y una cementera. Por ende, las carteras se armaron combinando la clasificación oficial con la actividad económica de cada emisor. Corporación Aceros Arequipa y SIDERPERU se pusieron en construcción porque producen acero de construcción y su demanda sigue al ciclo constructor, y se excluyeron las segundas clases de acción de un mismo emisor. En la Tabla~\ref{tab:carteras} se presenta cómo quedó cada cartera, con sus acciones, su moneda de cotización y el número de acciones.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Composición de las carteras sectoriales}\label{tab:carteras}
+\small
+\begin{tabularx}{\linewidth}{@{}l L c c@{}}
+\toprule
+Cartera & Acciones (moneda de cotización) & N & Moneda \\
+\midrule
+Minería & SCCO, BVN, CVERDEC1 (US\$); VOLCABC1, MINSURI1, NEXAPEC1 (S/) & 6 & Mixta \\
+Banca & BAP, IFS (US\$); BBVAC1 (S/) & 3 & Mixta \\
+Consumo & INRETC1 (US\$); ALICORC1, BACKUSI1 (S/) & 3 & Mixta \\
+Construcción & CPACASC1, UNACEMC1, CORAREI1, SIDERC1 (S/) & 4 & Soles \\
+\bottomrule
+\end{tabularx}
+\nota{Acciones de cada cartera y su moneda. Elaboración propia con datos de la BVL y Yahoo Finance (2026).}
+\end{adjustwidth}
+\end{table}
+
+Se aprecia que la minería es la cartera más grande, con seis acciones, mientras que la banca y el consumo tienen tres cada una y la construcción, cuatro. Tres de las cuatro carteras juntan acciones en soles y en dólares, por eso se tuvo que llevarlas a una sola moneda; solo la construcción está formada por acciones en soles.
+
+\subsection{Filtro de liquidez}
+Durante un segundo cotejo se encontró una diferencia de 11.3\,\% en el precio de BUENAVI1. Al revisarla se vio que Yahoo Finance repite el último precio conocido en los días sin negociación, y un precio repetido genera retornos iguales a cero que bajan la beta. Por ello se calculó, para cada acción, el porcentaje de días en que su precio cambió de verdad y la racha más larga sin moverse, lo cual se muestra en la Tabla~\ref{tab:liquidez}.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Porcentaje de días en que el precio de cada acción cambió}\label{tab:liquidez}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrr lrr@{}}
+\toprule
+Acción & Se mueve & Peor racha & Acción & Se mueve & Peor racha \\
+\midrule
+SCCO & 99.7\,\% & 2 & UNACEMC1 & 59.4\,\% & 9 \\
+BVN & 98.6\,\% & 2 & SIDERC1 & 57.4\,\% & 10 \\
+VOLCABC1 & 79.6\,\% & 6 & CORAREI1 & 57.1\,\% & 15 \\
+ALICORC1 & 74.4\,\% & 6 & NEXAPEC1 & 43.2\,\% & 27 \\
+FERREYC1 & 71.8\,\% & 11 & ENGIEC1 & 39.5\,\% & 26 \\
+CVERDEC1 & 71.3\,\% & 13 & LUSURC1 & 36.6\,\% & 34 \\
+MINSURI1 & 70.6\,\% & 8 & ATACOBC1 & 26.6\,\% & 65 \\
+INRETC1 & 69.5\,\% & 13 & SCOTIAC1 & 12.5\,\% & 50 \\
+CREDITC1 & 67.5\,\% & 10 & INTERBC1 & 11.9\,\% & 56 \\
+CPACASC1 & 66.5\,\% & 9 & GLORIAI1 & 10.1\,\% & 64 \\
+BBVAC1 & 61.8\,\% & 12 & CPACASI1 & 7.2\,\% & 121 \\
+BACKUSI1 & 60.9\,\% & 19 & BUENAVI1 & 4.1\,\% & 341 \\
+\bottomrule
+\end{tabular*}
+\nota{Porcentaje de días en que el precio cambió; la peor racha son los días seguidos con el mismo precio. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+En la Tabla~\ref{tab:liquidez} se distinguen dos grupos, que son SCCO y BVN, donde varían el precio casi todos los días (99.7\,\% y 98.6\,\%) y las acciones locales más grandes, como VOLCABC1 y ALICORC1, entre el 70\,\% y el 80\,\% de los días. En el otro extremo, seis acciones cambian de precio menos del 30\,\% de los días, el caso más notorio es BUENAVI1, que pasó 341 días hábiles seguidos con el mismo precio. En estas acciones, la mayoría de los retornos diarios sería cero solo por falta de negociación.
+
+La regla que se adoptó es igual para los cuatro sectores, donde se conserva un instrumento por grupo económico, el más líquido, y se excluye todo instrumento cuyo precio cambie menos del 30\,\% de los días. Así salieron BUENAVI1, INTERBC1, SCOTIAC1, GLORIAI1, ATACOBC1 y CPACASI1, y entraron BVN, IFS y BAP. Decimos que este hallazgo es relevante, porque Buenaventura cambia de precio el 4.1\,\% de los días como acción local y el 98.3\,\% como recibo de depósito en Nueva York, siendo la misma empresa, y lo mismo pasa con Credicorp e Intercorp Financial.
+
+\subsection{Tratamiento de la data}
+Se realizó la limpieza de la data para tener una base final. Las seis acciones que cotizan en dólares (BAP, BVN, CVERDEC1, IFS, INRETC1 y SCCO) se pasaron a soles con el tipo de cambio de cada día, porque un retorno en dólares y uno en soles no se pueden comparar si el tipo de cambio se movió. Se descartaron 870 filas de acciones en dólares en días sin tipo de cambio publicado y ninguna se rellenó, para que cada valor sea real y verificable. Luego se calculó el retorno logarítmico diario de cada acción como $r_{i,t} = 100 \times \ln(P_{i,t}/P_{i,t-1})$, y el retorno de cada cartera como el promedio simple de sus acciones, ya que el backend de la BVL no publica la capitalización bursátil.
+
+El índice de mercado se armó con las 20 acciones, también con ponderación igual, porque el índice oficial S\&P/BVL Perú General no estaba disponible en Yahoo Finance (HTTP 404). Como las carteras forman parte de ese índice y eso tiende a subir las betas, se construyó además, para cada sector, un índice que excluye sus propias acciones. Por último, de los 1\,255 días posibles se conservaron 918, que son los días en que las acciones de Lima, el Tesoro y el tipo de cambio tienen dato, porque cada fuente tiene su propio calendario de feriados. Así, la base final es un panel balanceado de cuatro sectores por 918 días, con 3\,672 observaciones, y la definición de cada variable está en el Anexo A. El estudio es cuantitativo, no experimental y de alcance explicativo, y el análisis se hizo en cuatro fases.
+
+\begin{itemize}
+\item \textbf{Análisis Descriptivo:} medidas de tendencia central, mínimo y máximo de los retornos, y su evolución acumulada.
+\item \textbf{Análisis Inferencial:} prueba de Dickey-Fuller aumentada y correlaciones de Pearson entre sectores.
+\item \textbf{Análisis Econométrico:} regresión por mínimos cuadrados ordinarios con errores de Newey y West, costo de capital con el CAPM, robustez y revisión de residuos con Durbin-Watson y Jarque-Bera.
+\item \textbf{Análisis Financiero:} frontera eficiente de Markowitz y medidas de desempeño de Sharpe, Treynor y Jensen.
+\end{itemize}
+
+\subsection{Modelo matemático}
+El modelo está expresado por la siguiente función:
+\[
+Y_{s,t} = f(\, X_{1,t},\ X_{2,t},\ X_{3,t} \,)
+\]
+\noindent Donde $Y_{s,t}$ representa el retorno diario de la cartera del sector $s$ en el día $t$, considerado como la variable endógena del modelo; $X_{1,t}$ denota el retorno diario del mercado; $X_{2,t}$ corresponde a la variación diaria del rendimiento del Tesoro de EE.\,UU. a 10 años; y $X_{3,t}$ indica la variación diaria del tipo de cambio de soles por dólar.
+
+\subsection{Modelo econométrico}
+\begin{equation}
+Y_{s,t} = \alpha_s + \beta_s X_{1,t} + c_{1,s} X_{2,t} + c_{2,s} X_{3,t} + \varepsilon_{s,t}
+\label{eq:beta}
+\end{equation}
+\noindent Donde $\alpha_s$ es la constante; $\beta_s$ es la beta del sector $s$, que mide cuánto se mueve la cartera cuando el mercado se mueve 1\,\%; $c_{1,s}$ y $c_{2,s}$ son los coeficientes de las variables de control; y $\varepsilon_{s,t}$ es el término de error. Se usaron errores estándar de Newey y West con 5 rezagos, que equivalen a una semana de negociación, para corregir la heterocedasticidad y autocorrelación de las series. Con la beta estimada se calculó el costo del capital propio de cada sector mediante el CAPM:
+\begin{equation}
+K_{e,s} = R_f + \beta_s \,(R_m - R_f)
+\label{eq:capm}
+\end{equation}
+\noindent Donde $R_f$ es la tasa libre de riesgo, medida como el rendimiento promedio del Tesoro de EE.\,UU. a 10 años en la ventana (3.886\,\%), y $R_m$ el retorno anualizado del mercado peruano, que se obtiene al multiplicar su retorno diario promedio por 252 días de negociación (19.266\,\%). Entonces la prima de mercado realizada es de 15.380\,\%. Como esta prima refleja un periodo favorable para la BVL, también se calculó el costo de capital con una prima de referencia de 7.5\,\% como contraste. Para la robustez, la Ecuación~\ref{eq:beta} se estimó de nuevo cambiando $X_{1,t}$ por $X_{1b,s,t}$, el mercado sin el propio sector, y las hipótesis específicas se contrastaron con el estadístico $z = (\hat{\beta}_s - 1)/\mathrm{EE}(\hat{\beta}_s)$.
+
+\subsection{Modelo financiero}
+Como complemento del CAPM se aplicó la teoría de carteras de Markowitz (1952) a las cuatro carteras sectoriales. Para un vector de pesos $w$, con $w_s \geq 0$ y $\sum_s w_s = 1$, el retorno y la volatilidad anuales de la cartera combinada son:
+\begin{equation}
+R_p = \sum_{s} w_s\, \mu_s, \qquad \sigma_p = \sqrt{w^{\top} \Sigma\, w}
+\label{eq:markowitz}
+\end{equation}
+\noindent Donde $\mu_s$ es el retorno anual de cada sector y $\Sigma$ la matriz de covarianzas anualizada, ambos obtenidos al multiplicar los valores diarios por 252. Se simularon 200\,000 combinaciones de pesos no negativos, con semilla 522 para que el resultado se pueda reproducir, y se identificaron dos carteras: la de máximo ratio de Sharpe, o cartera tangente, y la de mínima varianza global.
+
+El desempeño de cada sector se midió con el ratio de Sharpe (Sharpe, 1966), que divide el retorno en exceso de la tasa libre de riesgo entre la volatilidad total, $S_s = (R_s - R_f)/\sigma_s$; el ratio de Treynor (Treynor, 1965), que lo divide entre la beta, $T_s = (R_s - R_f)/\beta_s$; y el alfa de Jensen (Jensen, 1968), que mide el retorno que no explica el riesgo sistemático y se obtuvo como la constante de la Ecuación~\ref{eq:beta} multiplicada por 252.
+
+% =====================================================================
+%  RESULTADOS
+% =====================================================================
+\section{Resultados}
+\subsection{Análisis descriptivo}
+En la Tabla~\ref{tab:descriptiva} se puede apreciar las medidas de los retornos diarios de las cuatro carteras y del índice de mercado, donde están la media, la desviación estándar, el mínimo, la mediana y el máximo, además de la volatilidad y el retorno llevados a términos anuales.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Estadística descriptiva de los retornos diarios por cartera}\label{tab:descriptiva}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrr@{}}
+\toprule
+Cartera & $M$ & $DE$ & Mín. & $Mdn$ & Máx. & Vol. anual & Ret. anual \\
+\midrule
+Minería & 0.107 & 1.779 & $-$10.008 & 0.062 & 9.965 & 28.25 & 27.07 \\
+Banca & 0.106 & 1.631 & $-$10.857 & 0.124 & 9.926 & 25.90 & 26.72 \\
+Construcción & 0.065 & 1.224 & $-$9.010 & 0.000 & 11.954 & 19.43 & 16.46 \\
+Consumo & 0.044 & 1.034 & $-$4.006 & 0.023 & 8.046 & 16.42 & 11.21 \\
+Mercado & 0.077 & 0.956 & $-$7.068 & 0.053 & 6.093 & 15.17 & 19.27 \\
+\bottomrule
+\end{tabular*}
+\nota{Retornos diarios en porcentaje; el retorno y la volatilidad anual se calcularon con 252 días. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Se muestra que la minería y la banca tuvieron los retornos promedio más altos, con 0.107\,\% y 0.106\,\% diarios, que equivalen a cerca de 27\,\% anual, pero también la mayor volatilidad, con 28.2\,\% y 25.9\,\% anual. En el otro extremo, el consumo tuvo el retorno más bajo (11.2\,\% anual) y la menor volatilidad (16.4\,\%). Otro aspecto que se observa es que la construcción tiene una mediana de cero, esto debido a que, aun después del filtro, varias de sus acciones no cambian de precio en muchos días. También hay días aislados con movimientos fuertes, donde la minería y la banca cayeron más de 10\,\% en un solo día y la construcción subió casi 12\,\%. Estos saltos generan colas pesadas, lo que se confirma en el diagnóstico de los residuos y justifica el uso de errores robustos.
+
+\subsection{Evolución de las carteras}
+En la Figura~\ref{fig:evolucion} se puede detallar cómo fue el retorno logarítmico acumulado de las cuatro carteras desde el inicio de la ventana. Cada línea parte de cero, de modo que su altura en una fecha indica cuánto había ganado o perdido la cartera hasta ese día.
+
+\begin{figure}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Evolución acumulada de las cuatro carteras sectoriales, 2021-2026}\label{fig:evolucion}
+\centering
+\includegraphics[width=\linewidth]{figuras/figura1_evolucion_sectorial.png}
+\nota{Suma de los retornos logarítmicos diarios, en porcentaje, desde el 2 de noviembre de 2021. $N = 918$ días por cartera. Elaboración propia.}
+\end{adjustwidth}
+\end{figure}
+
+En la Figura~\ref{fig:evolucion} se distinguen tres etapas. Entre 2022 y 2023 las carteras se movieron en un rango estrecho y terminaron 2023 con acumulados entre $-$13\,\% y 30\,\%, donde la banca y la construcción tocaron su punto más bajo a fines de ese año. Entre 2024 y 2025 la minería y la banca se separaron del resto y cerraron 2025 cerca de 70\,\%, mientras que el consumo apenas llegaba a 6\,\%. En 2026 todas las carteras subieron con fuerza: al 30 de octubre la minería acumulaba 99\,\%, la banca 97\,\%, la construcción 60\,\% y el consumo 41\,\%. Este ciclo favorable explica por qué la prima de mercado realizada resulta alta.
+
+\subsection{Análisis inferencial: raíz unitaria y correlaciones}
+La prueba de Dickey-Fuller aumentada rechazó la raíz unitaria en las cuatro variables del modelo, es decir, en el retorno de la cartera, el retorno del mercado y las variaciones del Tesoro y del tipo de cambio, con valores $p < .001$ en todos los casos (salidas de la tabla 2). Entonces todas las series son estacionarias, de orden I(0), y se pueden usar en la regresión sin diferenciarlas, lo cual es esperable porque ya están expresadas como retornos o variaciones diarias.
+
+La Tabla~\ref{tab:corr} relaciona los retornos diarios de los cuatro sectores mediante la correlación de Pearson, lo que permite ver qué tanto se mueven juntos y, por ende, cuánto riesgo se puede reducir al combinarlos en una misma cartera.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Correlaciones entre los retornos diarios de los sectores}\label{tab:corr}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccc@{}}
+\toprule
+Sector & Banca & Construcción & Consumo & Minería \\
+\midrule
+Banca & 1 & & & \\
+Construcción & .205 & 1 & & \\
+Consumo & .455 & .245 & 1 & \\
+Minería & .534 & .297 & .385 & 1 \\
+\bottomrule
+\end{tabular*}
+\nota{Coeficientes de correlación de Pearson entre los retornos diarios de cada sector (N = 918 observaciones). Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Se aprecia que todas las correlaciones son positivas pero moderadas. La relación más fuerte es la de minería con banca (.534), seguida de banca con consumo (.455). En cambio, la construcción es el sector menos relacionado con los demás, con correlaciones entre .205 y .297. Por ende, combinar la construcción con otros sectores da el mayor beneficio de diversificación dentro de la BVL.
+
+\subsection{Análisis econométrico: betas sectoriales}
+La Tabla~\ref{tab:betas} muestra las betas estimadas con la Ecuación~\ref{eq:beta} para cada sector, lo cual es el resultado principal del estudio, con su error estándar de Newey-West, el estadístico $z$, el valor $p$, el intervalo de confianza al 95\,\% y el $R^2$.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Betas sectoriales estimadas con errores de Newey-West}\label{tab:betas}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccccc@{}}
+\toprule
+Sector & Beta & EE & $z$ & $p$ & IC 95\,\% & $R^2$ \\
+\midrule
+Minería & 1.616 & 0.091 & 17.82 & $< .001$ & [1.438, 1.793] & .766 \\
+Banca & 1.069 & 0.093 & 11.56 & $< .001$ & [0.888, 1.250] & .588 \\
+Construcción & 0.868 & 0.065 & 13.29 & $< .001$ & [0.740, 0.996] & .399 \\
+Consumo & 0.547 & 0.055 & 9.97 & $< .001$ & [0.440, 0.655] & .419 \\
+\bottomrule
+\end{tabular*}
+\nota{$N = 918$ por sector. Cada regresión incluye una constante y las variaciones del Tesoro de EE.\,UU. y del tipo de cambio. Errores estándar robustos a heterocedasticidad y autocorrelación con cinco rezagos. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Se identifica que las cuatro betas son positivas y significativas al 1\,\%, con valores $z$ entre 9.97 y 17.82. Donde el sector de la mineria tiene la beta más alta (1.616), por lo que, si el mercado sube o baja 1\,\% en un día, la cartera minera tiende a moverse 1.6\,\% en la misma dirección. La banca tiene una beta de 1.069, muy cerca de la del mercado; la construcción, de 0.868; y el consumo, de 0.547, la más baja. Además, el mercado explica el 76.6\,\% de la variación diaria de la minería, el 58.8\,\% de la banca y cerca del 40\,\% del consumo y la construcción.
+
+En cuanto a las variables de control de esas mismas regresiones, la variación del Tesoro de EE.\,UU. no fue significativa en ningún sector ($p$ entre .122 y .761). En cambio, el tipo de cambio fue significativo en tres sectores con signos distintos: positivo en la banca (0.343, $z = 7.72$) y en el consumo (0.209, $z = 8.76$), y negativo en la construcción ($-$0.290, $z = -10.36$), mientras que en la minería no fue significativo (0.019, $p = .615$). La constante no fue significativa en ningún caso.
+
+Para saber si cada sector se mueve igual que el mercado se contrastó la hipótesis $\beta_s = 1$ con el estadístico $z = (\hat{\beta}_s - 1)/\mathrm{EE}(\hat{\beta}_s)$, usando los errores de la Tabla~\ref{tab:betas}. La Tabla~\ref{tab:hipotesis} resume las decisiones sobre las hipótesis específicas planteadas.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Contraste de las hipótesis específicas}\label{tab:hipotesis}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llccl@{}}
+\toprule
+Hipótesis & Sector y H1 & $z$ & $p$ & Decisión sobre H0 \\
+\midrule
+Específica 1 & Minería: $\beta > 1$ & 6.79 & $< .001$ & Se rechaza \\
+Específica 2 & Consumo: $\beta < 1$ & $-$8.24 & $< .001$ & Se rechaza \\
+Específica 3 & Banca: $\beta \neq 1$ & 0.74 & .456 & No se rechaza \\
+Específica 4 & Construcción: $\beta \neq 1$ & $-$2.02 & .043 & Se rechaza \\
+\bottomrule
+\end{tabular*}
+\nota{Nivel de significancia del 5 \% ($H_0: \beta_s = 1$). Estadístico $z = (\hat{\beta}_s - 1) / \text{EE}(\hat{\beta}_s)$ calculado con errores de Newey-West (Tabla 5); valores $p$ bilaterales. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Los resultados muestran que en la minería se rechaza la hipótesis nula a favor de una beta mayor que 1, y en el consumo y la construcción a favor de una beta menor que 1, aunque en la construcción el rechazo es solo al 5\,\%. A diferencia, en la banca no se rechaza, de modo que su riesgo sistemático es estadísticamente igual al del mercado. Por ende, se respalda la hipótesis general; los cuatro sectores no tienen la misma beta, y los intervalos de confianza de la minería y el consumo ni siquiera se cruzan ([1.438, 1.793] y [0.440, 0.655]).
+
+La Figura~\ref{fig:betas} enseña las mismas betas en barras ordenadas de menor a mayor, con una línea punteada en la beta del mercado, igual a 1, que sirve para separar a los sectores agresivos de los defensivos.
+
+\begin{figure}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Beta por sector}\label{fig:betas}
+\centering
+\includegraphics[width=\linewidth]{figuras/figura7_betas.png}
+\nota{Betas de la Tabla~\ref{tab:betas}, donde la línea punteada marca la beta del mercado, igual a 1. Elaboración propia.}
+\end{adjustwidth}
+\end{figure}
+
+En la Figura~\ref{fig:betas} se ve que la barra de la minería pasa con amplitud la línea del mercado, la de la banca queda apenas a la derecha, y las de construcción y consumo quedan a la izquierda. Entonces solo la minería amplifica con claridad los movimientos del mercado, mientras que el consumo es el sector más defensivo.
+
+\subsection{Costo de capital por sector}
+La Tabla~\ref{tab:ke} muestra el costo de capital de cada sector calculado con la Ecuación~\ref{eq:capm}, a partir de la beta de la Tabla~\ref{tab:betas} y de la tasa libre de riesgo, con dos primas de mercado: la realizada en la ventana y una de referencia de 7.5\,\%.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Costo de capital por sector según el CAPM}\label{tab:ke}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lccccc@{}}
+\toprule
+Sector & Beta & $R_f$ (\%) & Prima realizada (\%) & $K_e$ realizado (\%) & $K_e$ con prima de 7.5\,\% (\%) \\
+\midrule
+Minería & 1.616 & 3.886 & 15.380 & 28.73 & 16.00 \\
+Banca & 1.069 & 3.886 & 15.380 & 20.33 & 11.90 \\
+Construcción & 0.868 & 3.886 & 15.380 & 17.23 & 10.40 \\
+Consumo & 0.547 & 3.886 & 15.380 & 12.31 & 7.99 \\
+\bottomrule
+\end{tabular*}
+\nota{$R_f$ es el rendimiento promedio del Tesoro de EE.\,UU. a 10 años en la ventana; la prima realizada es el retorno anualizado del mercado (19.266\,\%) menos $R_f$ y la última columna usa una prima de referencia de 7.5\,\% como contraste. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Se aprecia que, con la prima realizada (15.380\,\%), el costo de capital va de 12.3\,\% en el consumo a 28.7\,\% en la minería, con la banca en 20.3\,\% y la construcción en 17.2\,\%. Con la prima de referencia de 7.5\,\%, los valores bajan a un rango de 8.0\,\% a 16.0\,\%, pero el orden es el mismo. Entonces un inversionista le exigiría a la minería cerca del doble de retorno que al consumo, cualquiera sea la prima que se use.
+
+La Figura~\ref{fig:ke} enseña el costo de capital de cada sector con la prima realizada, en barras horizontales, y marca con una línea punteada la tasa libre de riesgo (3.886\,\%).
+
+\begin{figure}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Costo de capital por sector}\label{fig:ke}
+\centering
+\includegraphics[width=\linewidth]{figuras/figura8_costo_capital.png}
+\nota{$K_e = R_f + \beta_s\,(R_m - R_f)$ con la prima realizada de 15.38\,\%, donde la línea punteada marca la tasa libre de riesgo. Elaboración propia.}
+\end{adjustwidth}
+\end{figure}
+
+En la Figura~\ref{fig:ke}, la línea punteada es el piso común de todos los sectores, y la distancia entre cada barra y esa línea es la compensación por riesgo, que es igual a la beta multiplicada por la prima. Por ello, la barra de la minería es más del doble de larga que la del consumo, y la banca y la construcción quedan en el medio.
+
+\subsection{Robustez y análisis de residuos}
+Como las carteras forman parte del índice de mercado, sus betas podrían estar infladas por correlación mecánica. Por ello, la Tabla~\ref{tab:robustez} muestra las betas estimadas otra vez con la Ecuación~\ref{eq:beta}, pero contra un mercado que excluye al propio sector, con los mismos estadísticos de la Tabla~\ref{tab:betas}.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Betas estimadas contra el mercado que excluye a cada sector}\label{tab:robustez}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccccc@{}}
+\toprule
+Sector & Beta & EE & $z$ & $p$ & IC 95\,\% & $R^2$ \\
+\midrule
+Minería & 1.093 & 0.099 & 11.07 & $< .001$ & [0.900, 1.287] & .332 \\
+Banca & 0.793 & 0.104 & 7.62 & $< .001$ & [0.589, 0.997] & .441 \\
+Construcción & 0.534 & 0.062 & 8.58 & $< .001$ & [0.412, 0.656] & .175 \\
+Consumo & 0.379 & 0.053 & 7.15 & $< .001$ & [0.275, 0.482] & .324 \\
+\bottomrule
+\end{tabular*}
+\nota{De las 918 observaciones por sector, la misma especificación de la Tabla~\ref{tab:betas}, reemplazando el retorno del mercado por el retorno del mercado sin las acciones del propio sector. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Se observa que todas las betas bajan, entre 0.17 y 0.52 puntos, y el $R^2$ también disminuye, pero las cuatro siguen siendo significativas al 1\,\% y el orden se mantiene: minería (1.093), banca (0.793), construcción (0.534) y consumo (0.379). Entonces el resultado principal no depende de cómo se construya el índice de mercado.
+
+Por último, el diagnóstico de los residuos de la Ecuación~\ref{eq:beta} (la salida de la tabla 7 de diagnostico) da un estadístico de Durbin-Watson entre 1.88 y 2.11 en los cuatro sectores, cerca de 2, por lo que no hay autocorrelación relevante. Pero la prueba de Jarque-Bera rechaza la normalidad en todos los casos ($p < .001$), con una curtosis entre 5.9 y 17.1, que se debe a los días con movimientos extremos. Con 918 observaciones por sector y errores de Newey-West, la inferencia sobre las betas sigue siendo confiable.
+
+\subsection{Análisis financiero: diversificación y desempeño}
+La Figura~\ref{fig:frontera} enseña las 200\,000 carteras simuladas en el plano de volatilidad y retorno anual, coloreadas según su ratio de Sharpe. La estrella marca la cartera de máximo Sharpe, el rombo la de mínima varianza y los círculos los cuatro sectores por separado.
+
+\begin{figure}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Frontera eficiente de las cuatro carteras sectoriales de la BVL}\label{fig:frontera}
+\centering
+\includegraphics[width=\linewidth]{figuras/figura9_frontera_eficiente.png}
+\nota{Cada punto es una de las 200\,000 combinaciones de pesos no negativos simuladas; el color indica su ratio de Sharpe, la estrella marca la cartera de máximo Sharpe y el rombo la de mínima varianza. Elaboración propia.}
+\end{adjustwidth}
+\end{figure}
+
+En la Figura~\ref{fig:frontera}, el borde superior izquierdo de la nube es la frontera eficiente, es decir, las carteras que para cada nivel de riesgo dan el mayor retorno. Los cuatro sectores aislados quedan por debajo o a la derecha de esa frontera, lo que significa que ninguno es eficiente por sí solo, y la construcción y el consumo son los más alejados. La estrella está en la zona más clara de la nube, donde el Sharpe es mayor, y el rombo en el extremo izquierdo, donde la volatilidad es mínima.
+
+La Tabla~\ref{tab:frontera} detalla los pesos, el retorno, la volatilidad y el ratio de Sharpe de las dos carteras de la Figura~\ref{fig:frontera}, y los compara con la cartera de ponderación igual.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Carteras notables de la frontera eficiente}\label{tab:frontera}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lccccccc@{}}
+\toprule
+Cartera & Minería & Banca & Construcción & Consumo & Retorno & Volatilidad & Sharpe \\
+\midrule
+Máximo Sharpe (tangente) & 23.5 & 40.0 & 36.4 & 0.0 & 23.06 & 18.26 & 1.050 \\
+Mínima varianza global & 0.9 & 6.7 & 37.4 & 55.0 & 14.35 & 13.87 & 0.755 \\
+Ponderación igual & 25.0 & 25.0 & 25.0 & 25.0 & 20.36 & 16.45 & 1.002 \\
+\bottomrule
+\end{tabular*}
+\nota{Pesos, retorno anual y volatilidad anual en porcentaje., que el ratio de Sharpe usa $R_f = 3.886\,\%$. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Se aprecia que la cartera tangente invierte 40.0\,\% en banca, 36.4\,\% en construcción y 23.5\,\% en minería, sin consumo, y obtiene un retorno anual de 23.06\,\% con una volatilidad de 18.26\,\% y un Sharpe de 1.05. La de mínima varianza se concentra en consumo (55.0\,\%) y construcción (37.4\,\%), los dos sectores de beta baja, y baja la volatilidad a 13.87\,\%, por debajo de la de cualquier sector aislado. La ponderación igual queda muy cerca de la tangente, con un Sharpe de 1.00. Frente al mejor sector aislado, la banca (Sharpe de 0.88), la cartera tangente mejora el Sharpe en 19.1\,\%, y frente al sector menos volátil, el consumo (16.42\,\%), la de mínima varianza reduce la volatilidad en 15.5\,\% (salidas de tabla 10 ganancia diversificacion). Esta ganancia se explica por las correlaciones moderadas de la Tabla~\ref{tab:corr}, sobre todo las de la construcción.
+
+La Tabla~\ref{tab:desempeno} resume el desempeño ajustado por riesgo de cada sector con el ratio de Sharpe, el ratio de Treynor y el alfa de Jensen con su valor $p$, además de la diferencia entre el retorno realizado y el costo de capital de la Tabla~\ref{tab:ke}.
+
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Desempeño ajustado por riesgo de las carteras sectoriales}\label{tab:desempeno}
+\small
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccccccc@{}}
+\toprule
+Sector & Beta & Retorno & $K_e$ & Sharpe & Treynor & Alfa & $p$ del alfa & Retorno $-$ $K_e$ \\
+\midrule
+Minería & 1.616 & 27.07 & 28.73 & 0.821 & 14.35 & $-$4.23 & .557 & $-$1.66 \\
+Banca & 1.069 & 26.72 & 20.33 & 0.882 & 21.36 & 5.57 & .517 & 6.39 \\
+Construcción & 0.868 & 16.46 & 17.23 & 0.647 & 14.48 & 0.30 & .967 & $-$0.78 \\
+Consumo & 0.547 & 11.21 & 12.31 & 0.446 & 13.37 & 0.40 & .953 & $-$1.10 \\
+\bottomrule
+\end{tabular*}
+\nota{Retorno, $K_e$, Treynor, alfa y la última columna, en porcentaje anual. El alfa de Jensen es la constante de la Ecuación~\ref{eq:beta} multiplicada por 252. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+Se identifica que, según el ratio de Sharpe, la banca (0.88) y la minería (0.82) compensaron mejor su volatilidad total, mientras que el consumo tuvo el menor (0.45). Con el ratio de Treynor, que solo toma en cuenta el riesgo sistemático, la banca destaca con amplitud (21.36\,\%) y los otros tres sectores quedan entre 13.4\,\% y 14.5\,\%. Sin embargo, ningún alfa de Jensen es significativo, con valores $p$ entre .517 y .967. Por consiguiente, el retorno de ningún sector se aleja del que predice su beta más de lo que permite el azar.
+
+La Figura~\ref{fig:lmv} ubica a cada sector frente a la línea del mercado de valores, $K_e = 3.89 + \beta \times 15.38$, que indica el retorno que exige el CAPM para cada nivel de beta. Cada círculo es el retorno anual realizado de un sector frente a su beta, y el cuadrado es el mercado.
+
+\begin{figure}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Línea del mercado de valores y posición de los cuatro sectores}\label{fig:lmv}
+\centering
+\includegraphics[width=\linewidth]{figuras/figura10_linea_mercado_valores.png}
+\nota{La línea es $K_e = R_f + \beta\,(R_m - R_f)$ con $R_f = 3.886\,\%$ y una prima realizada de 15.38\,\%, que los puntos son el retorno anual realizado de cada sector frente a su beta. Elaboración propia.}
+\end{adjustwidth}
+\end{figure}
+
+En la Figura~\ref{fig:lmv}, un sector sobre la línea obtuvo más de lo que exigía su riesgo sistemático, y uno por debajo, menos. La banca queda claramente por encima, con 6.4 puntos sobre su costo de capital, mientras que la minería, la construcción y el consumo quedan un poco por debajo, a menos de 2 puntos. Así, el CAPM describe bien el orden de los sectores, con la banca como única desviación notable, aunque no significativa.
+
+\section{Discusión}
+Al hacer comparaciones con los resultados obtenidos, se colige que el riesgo sistemático de la BVL es muy distinto entre sectores, y ese orden tiene sentido con lo que hace cada actividad. La minería depende del precio de los metales, y Ghallabi et al. (2025) muestran que la transmisión de riesgos entre materias primas y bolsas emergentes se intensifica en las crisis; en cambio, el consumo se apoya en una demanda más estable. Entonces el resultado coincide con Hourani et al. (2023) y con Abdel-Hafez et al. (2026), quienes encontraron que en mercados emergentes y frontera los sectores responden con intensidades muy diferentes a los mismos choques.
+
+En este sentido, la beta de la banca, que estadísticamente es igual a 1, se entiende en un mercado donde los bancos financian a casi todos los demás sectores. La banca fue además el sector más expuesto al tipo de cambio entre los de efecto positivo, lo que coincide con Arbaa y Varon (2019), quienes mostraron que las crisis cambiarias se trasladan a la banca. El efecto negativo en la construcción se puede vincular con que sus empresas venden en soles mientras parte de sus insumos se cotiza en dólares, aunque ese mecanismo no se prueba en este estudio. Por ende, el tipo de cambio es un factor que pesa, como encontraron Yildiz y Erzurumlu (2018) en Borsa Istanbul.
+
+Si hablamos del costo de capital, la prima realizada de 15.4\,\% es alta porque la BVL tuvo un ciclo favorable, sobre todo en 2026. Por ello, el 28.7\,\% de la minería se debe leer como el retorno que compensó su riesgo en el periodo, y para valorar proyectos es más prudente la prima de 7.5\,\%. En ambos casos, usar una sola tasa para toda la bolsa llevaría a sobrevalorar los proyectos mineros y a subvalorar los de consumo.
+
+La prueba de robustez muestra que la correlación mecánica con el índice sube las betas, un problema parecido al que describe Tomtosov (2024) cuando varias carteras comparten las mismas acciones, pero el orden se mantiene, en línea con Bazhutov et al. (2023), quienes advierten que la elección del índice puede cambiar el nivel de la beta.
+
+En el campo de la liquidez, Altay y Çalgıcı (2019) y Su y Tokmakcioglu (2021) muestran que la iliquidez afecta la medición del riesgo, y en la BVL ese problema es extremo, por eso el filtro fue necesario. Asimismo, que Buenaventura, Credicorp e Intercorp Financial se negocien casi a diario en Nueva York y mucho menos en Lima coincide con Cepoi et al. (2025) y Carney et al. (2024), ya que en las empresas con doble cotización la formación del precio y la percepción de riesgo dependen también del mercado extranjero.
+
+Por su parte, la construcción tiene un Sharpe bajo por sí sola, pero pesa en la cartera tangente y en la de mínima varianza por ser el sector menos correlacionado, lo que coincide con Yaman y Tuncel (2025), quienes muestran en Borsa Istanbul que diversificar entre sectores mejora la relación entre riesgo y retorno. Además, que ningún alfa de Jensen sea significativo respalda el uso del CAPM en la BVL, aunque la frontera y los alfas se calculan con retornos de un periodo favorable.
+
+Para cerrar, el $R^2$ cercano a .40 de la construcción y del consumo indica que el mercado explica menos de la mitad de sus movimientos diarios. Esto es coherente con Çam et al. (2024), quienes encuentran que en los mercados emergentes el riesgo propio de cada empresa es importante, y con Chen y Zhang (2021), que muestran que las características de la empresa influyen en su costo de capital. Por ello, el costo de capital del CAPM se debe complementar con el análisis de cada empresa.
+
+\subsection{Limitaciones}
+Se tiene presente que el estudio tiene limitaciones. Primero, como no se pudo obtener el índice de riesgo país se usó el CAPM clásico, por lo que el costo de capital puede estar subestimado para un inversionista extranjero. Segundo, las carteras usan ponderación igual porque la BVL no publica la capitalización bursátil, y Yaman y Tuncel (2025) muestran que la forma de ponderar cambia los resultados. Tercero, el índice de mercado es construido y no el oficial. Cuarto, al cruzar tres calendarios de feriados la ventana bajó de 1\,255 a 918 días. Quinto, la serie del tipo de cambio de Yahoo Finance tiene variaciones diarias de hasta 3.8\,\%, por eso conviene contrastarla con la del BCRP cuando su portal vuelva a atender solicitudes automatizadas. Por último, la beta se estimó constante en toda la ventana, aunque Hourani et al. (2023) muestran que puede cambiar en el tiempo.
+
+% =====================================================================
+%  CONCLUSIÓN
+% =====================================================================
+\section{Conclusión}
+Los resultados del análisis muestran que, con datos diarios entre noviembre de 2021 y octubre de 2026, los cuatro sectores de la BVL tienen betas distintas y, por lo tanto, costos de capital distintos, por ello se rechaza la hipótesis nula general. La minería tiene la beta más alta (1.616) y es el único sector que amplifica con claridad los movimientos del mercado; la banca se mueve con él (1.069, estadísticamente igual a 1), y la construcción (0.868) y el consumo (0.547) los amortiguan.
+
+Con la prima de mercado realizada, el costo de capital va de 12.3\,\% en el consumo a 28.7\,\% en la minería, y con una prima de referencia de 7.5\,\% va de 8.0\,\% a 16.0\,\%. Entonces la minería exige cerca del doble de retorno que el consumo, y ese orden se mantiene al medir cada sector contra un mercado que lo excluye.
+
+Además, el tipo de cambio influye en tres de los cuatro sectores, con efecto positivo en la banca y el consumo y negativo en la construcción, mientras que la variación del Tesoro de EE.\,UU. no tiene un efecto diario significativo. En lo metodológico, en la BVL es indispensable controlar la iliquidez.
+
+Haciendo una síntesis, combinar los cuatro sectores mejora el ratio de Sharpe de 0.88 a 1.05 y baja la volatilidad mínima de 16.4\,\% a 13.9\,\%, y ningún sector muestra un alfa de Jensen significativo, lo que respalda el uso del CAPM en la BVL. Para futuras investigaciones se propone incorporar la prima por riesgo país, ponderar por capitalización bursátil y estimar betas móviles.
+
+%=================================================================
+% ANEXOS
+%=================================================================
+\appendixtitles{yes}
+\appendixstart
+\appendix
+\section{Datos y código}\label{anexoA}
+
+\subsection{Repositorio}
+El código, los datos, las salidas y la documentación están en \url{https://github.com/SneyderRP/finanzas-i-tema61-costo-capital-bvl}.
+
+\subsection{Endpoints por vía de extracción}
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Endpoints consultados}\label{tab:endpoints}
+\small
+\begin{tabularx}{\linewidth}{@{}l l L@{}}
+\toprule
+Vía & Endpoint & Aporte \\
+\midrule
+Scraping (BVL) & \texttt{GET /v1/sector} & Catálogo de los nueve sectores oficiales \\
+Scraping (BVL) & \texttt{POST /v1/stock-quote/market} & Instrumentos de cada sector con su moneda de cotización \\
+API (Yahoo) & \texttt{/v8/finance/chart/\{símbolo\}.LM} & Precio de cierre diario de las acciones de Lima \\
+API (Yahoo) & \texttt{/v8/finance/chart/\{símbolo\}} & Precio diario de BAP, BVN, IFS y SCCO en Nueva York \\
+API (Yahoo) & \texttt{/v8/finance/chart/\%5ETNX} & Rendimiento del Tesoro de EE.\,UU. a 10 años \\
+API (Yahoo) & \texttt{/v8/finance/chart/USDPEN\%3DX} & Tipo de cambio de soles por dólar \\
+\bottomrule
+\end{tabularx}
+\nota{Dominio de la BVL: \url{https://dataondemand.bvl.com.pe}. Dominio de Yahoo Finance: \url{https://query1.finance.yahoo.com}. Ninguna fuente exige clave de acceso. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+\subsection{Ventana de consulta e integridad del archivo}
+La ventana se congeló del 2021-11-01 al 2026-10-31 (\texttt{period1} = 1635724800); la primera y la última observación son del 2021-11-02 y del 2026-10-30, y la extracción se hizo el 2026-11-01. El archivo \texttt{datos\_procesados\_2024200522B.csv} tiene 3\,672 filas por 9 columnas, sin datos faltantes, y se generó con Python 3.13 y las librerías de \texttt{requirements.txt}. Su hash SHA-256 es \texttt{d5e5ea080f282ccf3c743665ffefe45f\allowbreak b8bec10ea6777ef499ffdffd429a7ba7}.
+
+\subsection{Programas en orden de ejecución}
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Programas de la Carpeta 3}\label{tab:programas}
+\small
+\begin{tabularx}{\linewidth}{@{}l L@{}}
+\toprule
+Programa & Función \\
+\midrule
+\texttt{00\_config.py} & Parámetros compartidos: ventana congelada, carteras y rutas relativas \\
+\texttt{02\_scraping\_web.py} & Vía de scraping: descarga los sectores y las monedas desde el backend de la BVL \\
+\texttt{01\_extraccion\_api.py} & Vía API: descarga los precios, el Tesoro y el tipo de cambio desde Yahoo Finance \\
+\texttt{03\_limpieza\_datos.py} & Une las fuentes, convierte a soles, calcula retornos y carteras, y genera el hash \\
+\texttt{04\_analisis.py} & Genera las tablas y figuras: descriptivos, ADF, correlaciones, betas, costo de capital, robustez y diagnóstico \\
+\texttt{05\_markowitz.py} & Modelo financiero: frontera eficiente, carteras notables y desempeño ajustado por riesgo (tablas 8 a 10 y figuras 9 y 10) \\
+\bottomrule
+\end{tabularx}
+\nota{Los programas guardan cada descarga por separado y no repiten lo que ya está en disco. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+\subsection{Diccionario de variables}
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Diccionario del archivo procesado}\label{tab:diccionario}
+\small
+\begin{tabularx}{\linewidth}{@{}l L l@{}}
+\toprule
+Columna & Definición & Unidad \\
+\midrule
+\texttt{id} & Número correlativo de fila, de 1 a 3\,672 & Entero \\
+\texttt{fecha} & Día de negociación, llave común de las dos vías & AAAA-MM-DD \\
+\texttt{sector} & Cartera: minería, banca, consumo o construcción, según la BVL & Texto \\
+\texttt{Y\_retorno\_sector} & Retorno diario de la cartera sectorial & Porcentaje \\
+\texttt{X1\_retorno\_mercado} & Retorno diario del índice de mercado de 20 acciones & Porcentaje \\
+\texttt{X1b\_mercado\_ex\_sector} & Retorno del mercado sin las acciones del propio sector & Porcentaje \\
+\texttt{X2\_treasury\_10a} & Variación diaria del rendimiento del Tesoro de EE.\,UU. a 10 años & Puntos porcentuales \\
+\texttt{X3\_tipo\_cambio} & Variación diaria del tipo de cambio de soles por dólar & Porcentaje \\
+\texttt{n\_acciones} & Número de acciones con precio en la cartera ese día & Entero \\
+\bottomrule
+\end{tabularx}
+\nota{Archivo \texttt{datos\_procesados/datos\_procesados\_2024200522B.csv}. Frecuencia diaria. Elaboración propia.}
+\end{adjustwidth}
+\end{table}
+
+\section{Declaración sobre el uso de inteligencia artificial}
+Se usó inteligencia artificial para depurar el código de extracción y apoyar la redacción, dentro de lo que permite la consigna. El autor cotejó diez precios con el backend de la BVL, detectó el problema de liquidez y comprobó cada cifra del artículo con las salidas del código.
+
+%=================================================================
+% REFERENCIAS (APA 7)
+%=================================================================
+\begin{adjustwidth}{-\extralength}{0cm}
+\section*{Referencias}
+{\setstretch{1}\fontsize{9}{11}\selectfont\setlength{\parskip}{2pt}
+\begin{hangparas}{0.5cm}{1}
+Abdel-Hafez, E., Taspinar, N., y Eren, B. M. (2026). How uncertainty transmits across Turkish equity sectors. \textit{Borsa Istanbul Review}, \textit{26}(3), Artículo 100806. \url{https://doi.org/10.1016/j.bir.2026.100806}
+
+Altay, E., y Çalgıcı, S. (2019). Liquidity adjusted capital asset pricing model in an emerging market: Liquidity risk in Borsa Istanbul. \textit{Borsa Istanbul Review}, \textit{19}(4), 297-309. \url{https://doi.org/10.1016/j.bir.2019.06.002}
+
+Arbaa, O., y Varon, E. (2019). Turkish currency crisis: Spillover effects on European banks. \textit{Borsa Istanbul Review}, \textit{19}(4), 372-378. \url{https://doi.org/10.1016/j.bir.2019.07.003}
+
+Azimli, A. (2020). Pricing the common stocks in an emerging capital market: Comparison of the factor models. \textit{Borsa Istanbul Review}, \textit{20}(4), 334-346. \url{https://doi.org/10.1016/j.bir.2020.05.002}
+
+Bazhutov, D., Betzer, A., y Stehle, R. (2023). Beta estimation in the European network regulation context: What matters, what doesn't, and what is indispensable. \textit{Financial Markets and Portfolio Management}, \textit{37}(3), 239-275. \url{https://doi.org/10.1007/s11408-023-00428-z}
+
+Bildik, R. (2023). Trading halts and the advantage of institutional investors: Historical evidence from Borsa Istanbul. \textit{Borsa Istanbul Review}, \textit{23}(S), S6-S18. \url{https://doi.org/10.1016/j.bir.2023.12.006}
+
+Bolsa de Valores de Lima. (2026). \textit{Cotizaciones y clasificación sectorial de emisores} [Conjunto de datos]. Recuperado el 1 de noviembre de 2026, de \url{https://dataondemand.bvl.com.pe}
+
+Brum-Civelli, C., Fried-Gindel, A., y Garcia-Hiernaux, A. (2024). IFCI-SA: International financial conditions index for South American economies. \textit{Research in International Business and Finance}, \textit{72}(Parte A), Artículo 102507. \url{https://doi.org/10.1016/j.ribaf.2024.102507}
+
+Bugan, M. F., Cevik, E. I., y Dibooglu, S. (2022). Emerging market portfolios and Islamic financial markets: Diversification benefits and safe havens. \textit{Borsa Istanbul Review}, \textit{22}(1), 77-91. \url{https://doi.org/10.1016/j.bir.2021.01.007}
+
+Cakici, N., y Zaremba, A. (2024). What drives stock returns across countries? Insights from machine learning models. \textit{International Review of Financial Analysis}, \textit{96}(Parte A), Artículo 103569. \url{https://doi.org/10.1016/j.irfa.2024.103569}
+
+Çam, S., Uzkaralar, Ö., y Borak, M. (2024). Idiosyncratic risk and market volatility: Threat or opportunity for returns? A study of Borsa Istanbul stocks. \textit{Borsa Istanbul Review}, \textit{24}(4), 698-709. \url{https://doi.org/10.1016/j.bir.2024.04.001}
+
+Carney, R. W., El Ghoul, S., Guedhami, O., y Wang, H. (2024). Geopolitical risk and the cost of capital in emerging economies. \textit{Emerging Markets Review}, \textit{61}, Artículo 101149. \url{https://doi.org/10.1016/j.ememar.2024.101149}
+
+Cepoi, C.-O., Dumitrescu, B.-A., y Pop, I. D. (2025). Price discovery and government intervention during the COVID-19 pandemic: Evidence from European cross-listed firms. \textit{Borsa Istanbul Review}, \textit{25}(6), 1572-1584. \url{https://doi.org/10.1016/j.bir.2025.10.012}
+
+Chen, B., y Zhang, A. (2021). How does corporate social responsibility affect the cost of equity capital through operating risk? \textit{Borsa Istanbul Review}, \textit{21}(S1), S38-S45. \url{https://doi.org/10.1016/j.bir.2021.01.005}
+
+Ersan, O., y Ekinci, C. (2016). Algorithmic and high-frequency trading in Borsa Istanbul. \textit{Borsa Istanbul Review}, \textit{16}(4), 233-248. \url{https://doi.org/10.1016/j.bir.2016.09.005}
+
+Ghallabi, F., Ghorbel, A., y Karim, S. (2025). Decoding systemic risks across commodities and emerging market stock markets. \textit{Financial Innovation}, \textit{11}, Artículo 47. \url{https://doi.org/10.1186/s40854-024-00732-1}
+
+Gökçen, U. (2026). Factor investing in the Turkish equity market. \textit{Borsa Istanbul Review}, Artículo 100884. \url{https://doi.org/10.1016/j.bir.2026.100884}
+
+Gülay, G. (2022). Volatility, trading activity and maximum lot amounts: Evidence from Borsa Istanbul. \textit{Borsa Istanbul Review}, \textit{22}(3), 409-425. \url{https://doi.org/10.1016/j.bir.2022.03.002}
+
+Gülay, G., y Ersan, Y. (2023). Tick size, liquid stocks and market quality: Evidence from a natural experiment in a unique setting. \textit{Borsa Istanbul Review}, \textit{23}(5), 1037-1057. \url{https://doi.org/10.1016/j.bir.2023.07.003}
+
+Hourani, A., Wang, Y., Demiralay, S., y McGroarty, F. (2023). Industry costs of equity: Evidence from frontier markets. \textit{International Review of Financial Analysis}, \textit{87}, Artículo 102573. \url{https://doi.org/10.1016/j.irfa.2023.102573}
+
+Jensen, M. C. (1968). The performance of mutual funds in the period 1945-1964. \textit{The Journal of Finance}, \textit{23}(2), 389-416. \url{https://www.jstor.org/stable/2325404}
+
+Karaca, C., Mensi, W., y Gemici, E. (2025). Inverted U-shaped dynamics of capital structure and firm value: Evidence from an emerging market. \textit{Borsa Istanbul Review}, \textit{25}(5), 939-952. \url{https://doi.org/10.1016/j.bir.2025.05.010}
+
+Lizarzaburu Bolaños, E. R., Burneo, K., Galindo, H., y Berggrun, L. (2015). Emerging markets integration in Latin America (MILA) stock market indicators: Chile, Colombia, and Peru. \textit{Journal of Economics, Finance and Administrative Science}, \textit{20}(39), 74-83. \url{https://doi.org/10.1016/j.jefas.2015.08.002}
+
+Markowitz, H. (1952). Portfolio selection. \textit{The Journal of Finance}, \textit{7}(1), 77-91. \url{https://www.jstor.org/stable/2975974}
+
+Özdemir, M., y Taş, O. (2025). Investor attention and its impact on portfolio volatility and sectoral risk spillovers in Borsa Istanbul. \textit{Borsa Istanbul Review}, \textit{25}(1), 107-126. \url{https://doi.org/10.1016/j.bir.2024.12.014}
+
+Ozsoz, E., Rengifo, E. W., y Akinkunmi, M. A. (2014). What determines return risks for bank equities in Turkey? \textit{Borsa Istanbul Review}, \textit{14}(1), 23-31. \url{https://doi.org/10.1016/j.bir.2013.12.002}
+
+Şahin, B. C., y Kuz, F. (2021). The effects of short selling on price discovery: A study for Borsa Istanbul. \textit{Borsa Istanbul Review}, \textit{21}(2), 133-138. \url{https://doi.org/10.1016/j.bir.2020.09.004}
+
+Sharpe, W. F. (1966). Mutual fund performance. \textit{The Journal of Business}, \textit{39}(1), 119-138. \url{https://doi.org/10.1086/294846}
+
+Su, E., y Tokmakcioglu, K. (2021). A comparison of bid-ask spread proxies and determinants of bond bid-ask spread. \textit{Borsa Istanbul Review}, \textit{21}(3), 227-238. \url{https://doi.org/10.1016/j.bir.2020.10.005}
+
+Tomtosov, A. (2024). Overlapping portfolio holdings and unique sources of emerging market risk. \textit{Borsa Istanbul Review}, \textit{24}(1), 201-217. \url{https://doi.org/10.1016/j.bir.2023.12.003}
+
+Treynor, J. L. (1965). How to rate management of investment funds. \textit{Harvard Business Review}, \textit{43}(1), 63-75.
+
+Usman, M. (2023). Bank contribution to financial sector systemic risk and expected returns: Evidence from large U.S. banks. \textit{Borsa Istanbul Review}, \textit{23}(1), 203-216. \url{https://doi.org/10.1016/j.bir.2022.10.002}
+
+Yahoo Finance. (2026). \textit{Historical market data} [Conjunto de datos]. Recuperado el 1 de noviembre de 2026, de \url{https://query1.finance.yahoo.com}
+
+Yaman, S., y Tuncel, M. B. (2025). The benefits of sectoral diversification for investors with different risk perceptions. \textit{Borsa Istanbul Review}, \textit{25}(3), 597-616. \url{https://doi.org/10.1016/j.bir.2025.02.008}
+
+Yildiz, M. E., y Erzurumlu, Y. O. (2018). Testing postmodern portfolio theory based on global and local single factor market model: Borsa Istanbul case. \textit{Borsa Istanbul Review}, \textit{18}(4), 259-268. \url{https://doi.org/10.1016/j.bir.2018.03.001}
+
+Yıldırım, D., y Çelik, A. K. (2021). Testing the pecking order theory of capital structure: Evidence from Turkey using panel quantile regression approach. \textit{Borsa Istanbul Review}, \textit{21}(4), 317-331. \url{https://doi.org/10.1016/j.bir.2020.11.002}
+\end{hangparas}
+}
+\end{adjustwidth}
+
+\end{document}

@@ -52,7 +52,7 @@ import re
 import shutil
 import sys
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 
@@ -498,6 +498,396 @@ def copiar_productos(arb):
     return salida
 
 
+# Lo que un editor cuela delante del titulo en la primera pagina.
+ROTULO = re.compile(
+    r"^\s*(full length article|research article|original (research )?article|"
+    r"review article|short communication|research paper|article)\s*",
+    re.I)
+# Cabecera de revista: "Borsa Istanbul Review 24 (2024) 698-709"
+CABECERA = re.compile(r"\(\s*(19|20)\d{2}\s*\)\s*[\d:;,\s–-]*$|"
+                      r"\d+\s*[:(]\s*\d+[-–]\d+")
+# Nombre de archivo disfrazado de titulo en los metadatos
+NOMBRE_ARCHIVO = re.compile(r"^microsoft word|\.(docx?|pdf|tex|rtf|indd)\b|"
+                            r"^untitled|^manuscript|^\s*$", re.I)
+
+
+def titulo_de_pdf(pdf, limite=190):
+    """Titulo del articulo, de sus metadatos o de su primera pagina, o None.
+
+    Se intenta primero el campo /Title, que en estos treinta PDF acierta en
+    veintiocho. Se descarta cuando trae el nombre del archivo del editor
+    ("Microsoft Word - IRFA_Full_manuscript.docx"), que es el caso tipico de
+    un PDF exportado desde Word.
+
+    Como respaldo se lee la primera pagina y se descartan las lineas que son
+    cabecera de revista, DOI, fecha o lista de autores. Si nada convence se
+    devuelve None y la pagina muestra "Paper N" en lugar de un titulo
+    inventado, que es lo que haria falso el listado.
+    """
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        return None
+    try:
+        lector = PdfReader(str(pdf))
+    except Exception:
+        return None
+
+    def sirve(t):
+        if not t:
+            return None
+        t = re.sub(r"\s{2,}", " ", str(t)).strip().strip(" .,;:-")
+        t = ROTULO.sub("", t).strip()
+        if len(t) < 25 or " " not in t or NOMBRE_ARCHIVO.search(t):
+            return None
+        if t.isupper():
+            t = t.capitalize()
+        return t[:limite]
+
+    try:
+        meta = lector.metadata or {}
+        bueno = sirve(meta.get("/Title"))
+        if bueno:
+            return bueno
+    except Exception:
+        pass
+
+    try:
+        texto = lector.pages[0].extract_text() or ""
+    except Exception:
+        return None
+
+    DESCARTA = re.compile(
+        r"doi|https?://|www\.|@|issn|isbn|vol\.|volume|\bpp\b|"
+        r"elsevier|springer|wiley|emerald|taylor|mdpi|sciencedirect|"
+        r"received|accepted|published|available online|abstract|keywords|"
+        r"all rights reserved|creative commons|licen[sc]e|^\s*\d+\s*$",
+        re.I)
+    def palabras(s):
+        return {w for w in re.findall(r"[A-Za-zÁ-Úá-ú]{3,}", s.lower())}
+
+    # La cabecera de la revista ("Journal of X 20 (2015) 74-83") suele venir en
+    # la primera linea, y debajo se repite como membrete partido en varias
+    # lineas cortas. Se guardan sus palabras para descartar ese membrete: una
+    # linea cuyas palabras ya esten todas en la cabecera no es el titulo.
+    membrete = set()
+    for cruda in texto.split("\n")[:4]:
+        if CABECERA.search(cruda) or re.match(r"\s*(the )?(international )?"
+                                              r"(journal|review|revista)\b",
+                                              cruda, re.I):
+            membrete |= palabras(cruda)
+
+    lineas = []
+    for cruda in texto.split("\n")[:28]:
+        l = ROTULO.sub("", re.sub(r"\s{2,}", " ", cruda).strip()).strip()
+        autores = (l.count(";") >= 1 and l.count(",") >= 1) or \
+                  l.count(",") >= 3 or \
+                  re.search(r"\b[A-Z]\.\s*[A-Z]|\s[a-z]\s*,\s*\*", l)
+        pal = palabras(l)
+        eco = bool(membrete) and bool(pal) and pal <= membrete
+        if len(l) < 14 or DESCARTA.search(l) or CABECERA.search(l) \
+           or autores or eco:
+            if lineas:
+                break          # ya habia titulo y esta linea lo cierra
+            continue
+        lineas.append(l)
+        if sum(len(x) for x in lineas) > limite:
+            break
+    if not lineas:
+        return None
+    # El titulo puede acabar pegado al primer autor: "...sectors Eyad Abdel a,*"
+    t = re.split(r"\s+[A-ZÁÉÍÓÚ][a-zá-ú]+\s+[A-ZÁÉÍÓÚ][\w'-]+\s+[a-z]\s*,",
+                 " ".join(lineas))[0]
+    t = t.strip(" .,;:-")
+    if t.isupper():
+        t = t.capitalize()
+    return t[:limite] if len(t) > 24 else None
+
+
+def copiar_papers(arb):
+    """Copia los articulos, sus traducciones y sus posteres, y los empareja.
+
+    Las tres carpetas estan en AJENO porque no entran en el ZIP de productos:
+    son material de terceros y pesan cerca de cien MB. Para la pagina si se
+    copian, porque poder abrirlos ahi es lo que permite comprobar de un clic
+    que cada poster corresponde a su articulo.
+
+    El emparejamiento va por el numero del nombre ("paper 7", "Poster_07"), no
+    por el orden de la carpeta, porque un listado alfabetico pone el 10 antes
+    del 2 y emparejaria mal. Se devuelve una lista ordenada por ese numero con
+    lo que exista de cada uno; si a un numero le falta una pieza, la pagina lo
+    muestra apagado en lugar de ofrecer un enlace roto.
+    """
+    origen = None
+    for c in arb:
+        if c["slug"] == "producto":
+            origen = UNIDAD / c["ruta"]
+    if not origen or not origen.exists():
+        return []
+
+    CLASES = (("ingles",    ("articulos ingles", "articulo ingles", "ingles")),
+              ("traducido", ("traducidos", "traducido")),
+              ("poster",    ("posters",)))
+
+    hallado = defaultdict(dict)
+    pesos = defaultdict(dict)
+    for d, _subs, archivos in os.walk(origen):
+        ruta = limpiar(d).lower()
+        clase = None
+        for nombre, marcas in CLASES:
+            if any(m in ruta for m in marcas):
+                clase = nombre
+                break
+        if not clase:
+            continue
+        for a in archivos:
+            if not a.lower().endswith(".pdf"):
+                continue
+            m = re.search(r"(\d{1,2})", limpiar(a))
+            if not m:
+                continue
+            hallado[int(m.group(1))][clase] = Path(d) / a
+
+    if not hallado:
+        return []
+
+    base = DOCS / "productos" / "papers"
+    for clase, _ in CLASES:
+        (base / clase).mkdir(parents=True, exist_ok=True)
+
+    salida = []
+    for n in sorted(hallado):
+        piezas = hallado[n]
+        fila = {"n": n, "titulo": None}
+        for clase, _ in CLASES:
+            p = piezas.get(clase)
+            if not p:
+                fila[clase] = None
+                continue
+            # Nombre corto y sin acentos ni espacios: es una URL publica.
+            destino = base / clase / f"{n:02d}.pdf"
+            shutil.copy2(p, destino)
+            fila[clase] = f"productos/papers/{clase}/{n:02d}.pdf"
+            fila[clase + "_mb"] = round(destino.stat().st_size / 1048576, 2)
+            fila[clase + "_pag"] = contar_paginas(destino)
+        if piezas.get("ingles"):
+            fila["titulo"] = titulo_de_pdf(piezas["ingles"])
+        salida.append(fila)
+
+    completos = sum(1 for f in salida
+                    if f.get("ingles") and f.get("traducido") and f.get("poster"))
+    mb = sum(f.get(c + "_mb", 0) for f in salida for c, _ in CLASES)
+    print(f"  papers    : {len(salida)} numerados, {completos} con las tres "
+          f"piezas, {mb:.0f} MB")
+    for f in salida:
+        faltan = [c for c, _ in CLASES if not f.get(c)]
+        if faltan:
+            print(f"      paper {f['n']}: falta {', '.join(faltan)}")
+    sin_titulo = [f["n"] for f in salida if not f["titulo"]]
+    if sin_titulo:
+        print(f"      sin titulo legible: {sin_titulo}")
+    return salida
+
+
+def copiar_desarrollo(arb):
+    """Lee los ZIP de la Carpeta 2 y saca de cada uno su fuente LaTeX.
+
+    La Carpeta 2 guarda el codigo fuente de cada pieza comprimido, de modo que
+    desde fuera solo se ve un ZIP y no se puede juzgar el trabajo. Aqui se abre
+    cada uno, se lista lo que lleva dentro y se extrae su .tex a /desarrollo
+    como archivo suelto.
+
+    El texto no se mete en la pagina: son 653 KB de LaTeX entre los treinta y
+    cuatro, y triplicarian el peso del index para algo que casi nadie va a
+    abrir. Se sirven como archivos aparte y la pagina los pide cuando hacen
+    falta. Lo que si viaja en la pagina es el arbol de cada ZIP, que es poco y
+    es lo que se mira primero.
+    """
+    origen = None
+    for c in arb:
+        if c["slug"] == "desarrollo":
+            origen = UNIDAD / c["ruta"]
+    if not origen or not origen.exists():
+        return []
+
+    destino = DOCS / "desarrollo"
+    destino.mkdir(parents=True, exist_ok=True)
+
+    def familia(ruta):
+        t = limpiar(ruta).lower()
+        if "poster" in t and "journal" in t:
+            return ("poster_journal", "El poster del articulo")
+        if re.search(r"poster[_\s]*\d", t):
+            return ("posters", "Los posteres de las apreciaciones")
+        if "beamer" in t:
+            return ("beamer", "El Beamer")
+        if "journal" in t:
+            return ("journal", "El articulo")
+        if "poster" in t:
+            return ("posters", "Los posteres de las apreciaciones")
+        return ("otros", "Otros")
+
+    salida = []
+    for d, _subs, archivos in os.walk(origen):
+        for a in sorted(archivos):
+            if not a.lower().endswith(".zip"):
+                continue
+            z = Path(d) / a
+            rel = str(z.relative_to(origen))
+            slug, etiqueta = familia(rel)
+            fila = {"slug": slug, "familia": etiqueta,
+                    "nombre": limpiar(a)[:-4].strip(),
+                    "mb": round(z.stat().st_size / 1048576, 2),
+                    "dentro": [], "tex": None, "tex_lineas": 0}
+            try:
+                with zipfile.ZipFile(z) as f:
+                    entradas = [i for i in f.infolist() if not i.is_dir()]
+                    for i in sorted(entradas, key=lambda i: i.filename):
+                        fila["dentro"].append(
+                            {"n": i.filename.split("/")[-1],
+                             "ruta": i.filename,
+                             "kb": round(i.file_size / 1024, 1)})
+                    # El .tex principal es el que abre el documento, no el mas
+                    # grande: la plantilla MDPI del journal trae un
+                    # journalnames.tex de 144 KB con la lista de revistas de la
+                    # editorial, que por tamanio ganaria al articulo entero.
+                    texs = [i for i in entradas
+                            if i.filename.lower().endswith(".tex")]
+                    if texs:
+                        def abre_documento(i):
+                            try:
+                                t = f.read(i).decode("utf-8", errors="replace")
+                            except Exception:
+                                return False
+                            return ("\\begin{document}" in t
+                                    and "\\documentclass" in t)
+                        principales = [i for i in texs if abre_documento(i)]
+                        prin = max(principales or texs,
+                                   key=lambda i: i.file_size)
+                        cuerpo = f.read(prin).decode("utf-8", errors="replace")
+                        nombre = re.sub(r"[^A-Za-z0-9]+", "_",
+                                        limpiar(a)[:-4]).strip("_").lower()
+                        (destino / f"{nombre}.tex").write_text(
+                            cuerpo, encoding="utf-8")
+                        fila["tex"] = f"desarrollo/{nombre}.tex"
+                        fila["tex_nombre"] = prin.filename.split("/")[-1]
+                        fila["tex_lineas"] = cuerpo.count("\n") + 1
+                        fila["tex_kb"] = round(len(cuerpo.encode()) / 1024, 1)
+            except Exception as e:
+                fila["error"] = f"{type(e).__name__}: {e}"
+            salida.append(fila)
+
+    # Cuando conviven dos versiones de la misma pieza y una se declara oficial
+    # en su nombre, se publica solo esa. Es la misma regla que copiar_productos
+    # aplica al PDF, de modo que la pagina no acabe mostrando el PDF oficial
+    # junto al LaTeX del borrador, que es peor que mostrar los dos o ninguno.
+    por_pieza = defaultdict(list)
+    for f in salida:
+        base = re.sub(r"\(?\s*oficial\s*\)?", "",
+                      f["nombre"], flags=re.I).strip().lower()
+        por_pieza[(f["slug"], base)].append(f)
+    descartados = []
+    for grupo in por_pieza.values():
+        if len(grupo) < 2:
+            continue
+        oficiales = [f for f in grupo if "oficial" in f["nombre"].lower()]
+        if not oficiales:
+            continue
+        for f in grupo:
+            if f not in oficiales:
+                descartados.append(f["nombre"])
+                salida.remove(f)
+    if descartados:
+        print(f"      no se publican, hay version oficial: {descartados}")
+
+    salida.sort(key=lambda f: (["journal", "poster_journal", "beamer",
+                                "posters", "otros"].index(f["slug"]),
+                               f["nombre"]))
+    porfam = Counter(f["slug"] for f in salida)
+    con_tex = sum(1 for f in salida if f["tex"])
+    kb = sum(f.get("tex_kb", 0) for f in salida)
+    print(f"  desarrollo: {len(salida)} fuentes, {con_tex} con LaTeX extraido, "
+          f"{kb:.0f} KB  ({dict(porfam)})")
+    rotos = [f["nombre"] for f in salida if f.get("error")]
+    if rotos:
+        print(f"      no se pudieron abrir: {rotos}")
+    return salida
+
+
+def copiar_codigo():
+    """Copia los scripts a /codigo y saca de cada uno su ficha.
+
+    El texto no se mete en la pagina, igual que con el LaTeX: se sirve aparte y
+    se pide al abrirlo. De cada script se anota lo que la consigna manda mirar
+    (el encabezado obligatorio de cuatro lineas) y lo que hace falta para
+    moverse por el: sus funciones con el numero de linea en que empiezan, de
+    modo que desde la pagina se pueda saltar a una y explicarla.
+    """
+    origen = AQUI
+    if not origen.exists():
+        return []
+    destino = DOCS / "codigo"
+    destino.mkdir(parents=True, exist_ok=True)
+
+    QUE = {
+        "00_config.py":        "Los parametros congelados: ventana, semilla, tickers y rutas.",
+        "utilidades.py":       "Lo que comparten los demas: log, carpetas y descarga con reintento.",
+        "01_extraccion_api.py":"Via API. Baja precios, Tesoro y tipo de cambio de Yahoo Finance.",
+        "02_scraping_web.py":  "Via scraping. Saca de la BVL el sector y la moneda de cada accion.",
+        "03_limpieza_datos.py":"Une las dos vias, convierte a soles y arma el panel por sector.",
+        "04_analisis.py":      "Las regresiones, las betas con Newey-West y el costo de capital.",
+        "05_markowitz.py":     "Las veinte mil carteras, la frontera y las carteras notables.",
+        "06_generar_web.py":   "Arma esta pagina con las salidas de los anteriores.",
+    }
+    ORDEN = list(QUE)
+
+    salida = []
+    for p in sorted(origen.glob("*.py")):
+        try:
+            texto = p.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            continue
+        shutil.copy2(p, destino / p.name)
+        lineas = texto.split("\n")
+
+        # El encabezado obligatorio: cuatro lineas de comentario al principio
+        cab = [l for l in lineas[:4]]
+        # bool() porque un and encadenado devuelve el ultimo operando, y el
+        # ultimo aqui es el Match de la expresion regular, que no es JSON.
+        tiene_cab = bool(len(cab) >= 4 and cab[0].startswith("#")
+                         and "2024200522B" in cab[1]
+                         and re.search(r"[Tt]ema\s*61", cab[2])
+                         and re.search(r"\d{4}-\d{2}-\d{2}", cab[3]))
+
+        funciones = [{"n": m.group(2), "l": i + 1, "tipo": m.group(1)}
+                     for i, l in enumerate(lineas)
+                     if (m := re.match(r"\s*(def|class)\s+(\w+)", l))]
+
+        salida.append({
+            "n": p.name,
+            "ruta": f"codigo/{p.name}",
+            "que": QUE.get(p.name, ""),
+            "lineas": len(lineas),
+            "kb": round(len(texto.encode()) / 1024, 1),
+            "comentarios": sum(1 for l in lineas if l.lstrip().startswith("#")),
+            "encabezado": tiene_cab,
+            "cab": [l.lstrip("# ").strip() for l in cab] if tiene_cab else [],
+            "funciones": funciones,
+            "obligatorio": p.name in ("01_extraccion_api.py", "02_scraping_web.py",
+                                      "03_limpieza_datos.py", "04_analisis.py"),
+        })
+
+    salida.sort(key=lambda f: (ORDEN.index(f["n"]) if f["n"] in ORDEN else 99,
+                               f["n"]))
+    sin_cab = [f["n"] for f in salida if not f["encabezado"]]
+    print(f"  codigo    : {len(salida)} scripts, "
+          f"{sum(f['lineas'] for f in salida)} lineas, "
+          f"{sum(len(f['funciones']) for f in salida)} funciones")
+    if sin_cab:
+        print(f"      SIN el encabezado de cuatro lineas: {sin_cab}")
+    return salida
+
+
 def leer_log(maximo=420):
     """Lleva el registro de ejecucion a la pagina, para mostrarlo tal cual.
 
@@ -648,7 +1038,16 @@ def leer_referencias(pdf):
     # mismo patron y cortaba la referencia en dos. Se exige ademas un anio de
     # cuatro cifras entre parentesis cerca del inicio, que toda entrada trae y
     # ninguna continuacion tiene.
-    arranca = re.compile(r"^[A-ZÁÉÍÓÚÑÇÖŞĞİ][\w’'áéíóúñçöşğıİ-]+(?:,| y )")
+    # Dos formas de empezar una entrada. La primera es un apellido seguido de
+    # coma o de " y ", que es como vienen los autores personales. La segunda es
+    # un autor institucional, que no lleva coma y acaba en punto antes del
+    # anio: "Bolsa de Valores de Lima. (2026)." o "Yahoo Finance. (2026).".
+    # Sin la segunda se perdian justo las dos fuentes de datos del trabajo, que
+    # son las referencias que mas importa que aparezcan.
+    arranca = re.compile(
+        r"^[A-ZÁÉÍÓÚÑÇÖŞĞİ][\w’'áéíóúñçöşğıİ-]+(?:,| y )"
+        r"|^[A-ZÁÉÍÓÚÑÇÖŞĞİ][\w’'áéíóúñçöşğıİ-]*"
+        r"(?:\s+[A-Za-zÁ-Úá-ú][\w’'áéíóúñ-]*){0,5}\.\s*\((?:19|20)\d{2}")
     anio = re.compile(r"\((?:19|20)\d{2}[a-z]?\)")
     entradas, act = [], ""
     for linea in texto.split("\n"):
@@ -850,6 +1249,10 @@ def main():
     for et, _, ruta, hay, mb in productos:
         print(f"    {et:20}", f"{ruta}  {mb} MB" if hay else "NO SE HALLO")
 
+    papers = copiar_papers(arb)
+    desarrollo = copiar_desarrollo(arb)
+    codigo = copiar_codigo()
+
     figuras = copiar_figuras()
     con_mini = sum(1 for f in figuras if "_mini" in f["img"])
     print(f"  figuras   : {len(figuras)}, {con_mini} con miniatura")
@@ -898,6 +1301,9 @@ def main():
         "const ARBOL = " + json.dumps(arb, ensure_ascii=False) + ";\n"
         "const ZIPS = " + json.dumps(zips, ensure_ascii=False) + ";\n"
         "const PRODUCTOS = " + json.dumps(productos, ensure_ascii=False) + ";\n"
+        "const PAPERS = " + json.dumps(papers, ensure_ascii=False) + ";\n"
+        "const DESARROLLO = " + json.dumps(desarrollo, ensure_ascii=False) + ";\n"
+        "const CODIGO = " + json.dumps(codigo, ensure_ascii=False) + ";\n"
         "const REFS = " + json.dumps(refs, ensure_ascii=False) + ";\n"
         "const FIGURAS = " + json.dumps(figuras, ensure_ascii=False) + ";\n"
         "const LOG = " + json.dumps(log, ensure_ascii=False) + ";\n"

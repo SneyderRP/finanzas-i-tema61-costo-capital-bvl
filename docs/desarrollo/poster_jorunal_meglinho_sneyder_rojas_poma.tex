@@ -1,0 +1,226 @@
+\documentclass{article}
+% ---------------------------------------------------------------
+% Póster del artículo de investigación (A0 vertical)
+% Finanzas I (055D), UNCP, 2026-II. Compilar con pdfLaTeX.
+% ---------------------------------------------------------------
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}}{}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[letterspace=120]{microtype}
+\usepackage{anyfontsize}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{qrcode}
+\urlstyle{same}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% ---------------- Paleta ----------------
+\definecolor{navy}{HTML}{8E0C11}
+\definecolor{navyLight}{HTML}{B8121A}
+\definecolor{gold}{HTML}{00A3E0}
+\definecolor{acento}{HTML}{A6E1F7}
+\definecolor{goldSoft}{HTML}{E8F6FC}
+\definecolor{teal}{HTML}{353435}
+\definecolor{tealSoft}{HTML}{F1EEEE}
+\definecolor{ink}{HTML}{231F20}
+\definecolor{muted}{HTML}{5E5757}
+\definecolor{line}{HTML}{E5D7D7}
+\definecolor{page}{HTML}{F6F1F1}
+\definecolor{mist}{HTML}{F7D3D5}
+\pagecolor{page}
+
+% ---------------- Tamaños (ajustados por póster) ----------------
+\newcommand{\bodysize}{\fontsize{21}{27.7}\selectfont}
+\newcommand{\cardtitlesize}{\fontsize{24.8}{29.8}\selectfont}
+\newcommand{\smallsize}{\fontsize{17.2}{22.4}\selectfont}
+
+% ---------------- Estilos de tarjeta ----------------
+\tcbset{
+  card/.style={enhanced, sharp corners, colback=white, colframe=line, boxrule=0.9mm,
+    left=14mm, right=14mm, top=12mm, bottom=12mm, fontupper=\bodysize\color{ink}\raggedright,
+    overlay={\fill[#1] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}},
+  card/.default=navy,
+}
+\newcommand{\cardtitle}[2][navy]{{\color{#1}\cardtitlesize\bfseries\textls[110]{\MakeUppercase{#2}}}\par\vspace{7mm}}
+\newcommand{\bul}{\raisebox{0.18em}{\color{gold}\rule{0.5em}{0.5em}}}
+\setlist[itemize]{label=\bul, leftmargin=1.25em, labelsep=0.6em, itemsep=0.55em, topsep=0pt, parsep=0pt}
+\newcommand{\pill}[3]{\tcbox[on line, enhanced, arc=7mm, boxrule=0.8mm, colback=#1, colframe=#2,
+  left=7mm, right=7mm, top=3mm, bottom=3mm, fontupper=\fontsize{26}{30}\selectfont\bfseries]{#3}}
+
+\begin{document}
+
+% ======================= ENCABEZADO =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=16mm, bottom=16mm,
+  overlay={\fill[gold] (frame.south west) rectangle ([yshift=5mm]frame.south east);
+           \fill[navyLight] ([xshift=-160mm]frame.north east) -- (frame.north east) -- ([yshift=-160mm]frame.north east) -- cycle;}]
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Escudo_UNCP.png}\end{minipage}\hfill
+\begin{minipage}[c]{555mm}\centering
+{\color{acento}\fontsize{25}{30}\selectfont\bfseries\textls[160]{ARTÍCULO DE INVESTIGACIÓN \quad|\quad FINANZAS I \quad|\quad UNIDAD II \quad|\quad TEMA 61}\par}
+\vspace{9mm}
+{\color{white}\fontsize{56}{64}\selectfont\bfseries Betas sectoriales y costo de capital en un mercado ilíquido: evidencia de la Bolsa de Valores de Lima, 2021-2026\par}
+\vspace{7mm}
+{\color{mist}\fontsize{34}{41}\selectfont\itshape Industry betas and the cost of capital in an illiquid market: evidence from the Lima Stock Exchange, 2021-2026\par}
+\vspace{9mm}
+{\color{white}\fontsize{32}{38}\selectfont\bfseries Meglinho Sneyder Rojas Poma\par}
+\vspace{8mm}
+\pill{white}{white}{\color{navy}Código 2024200522B}\hspace{6mm}\pill{navy}{white}{\color{white}\mdseries Finanzas I (055D), 2026-II}
+\end{minipage}\hfill
+\begin{minipage}[c]{92mm}\centering\includegraphics[width=\linewidth]{Logo_FE.png}\end{minipage}
+\end{tcolorbox}
+\vspace{-1mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=goldSoft, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=7mm, bottom=7mm, halign=center]
+{\color{navy}\fontsize{26}{34}\selectfont Escuela Profesional de Economía, Facultad de Economía, Universidad Nacional del Centro del Perú \enspace\textbar\enspace \textbf{Docente:} Dr. Ciro Iván Machacuay Meza \enspace\textbar\enspace Huancayo, 2026\par}
+\end{tcolorbox}
+
+\vfill
+% ======================= CUERPO =======================
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, left=16mm, right=16mm, top=12mm, bottom=11mm,
+  fontupper=\bodysize\raggedright, overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[t]{170mm}{\color{acento}\smallsize\bfseries\textls[110]{MERCADO}}\par\vspace{2mm}{\color{white}Bolsa de Valores de Lima}\end{minipage}\hfill
+\begin{minipage}[t]{185mm}{\color{acento}\smallsize\bfseries\textls[110]{MUESTRA}}\par\vspace{2mm}{\color{white}4 carteras sectoriales y un mercado de 20 acciones}\end{minipage}\hfill
+\begin{minipage}[t]{170mm}{\color{acento}\smallsize\bfseries\textls[110]{PERIODO}}\par\vspace{2mm}{\color{white}Nov. 2021 a oct. 2026, 918 días hábiles}\end{minipage}\hfill
+\begin{minipage}[t]{170mm}{\color{acento}\smallsize\bfseries\textls[110]{MÉTODO}}\par\vspace{2mm}{\color{white}MCO con Newey-West y CAPM}\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Problema}
+El costo de capital se estima con el CAPM y depende de la beta. En la BVL estimarlo por sector es difícil: no hay índices sectoriales ni series históricas, y varias acciones pasan semanas sin cambiar de precio, lo que subestima la beta.
+\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Objetivo e hipótesis}
+Estimar la beta y el costo de capital de la minería, la banca, la construcción y el consumo entre 2021 y 2026.\par\vspace{5mm}
+{\color{navy}\bfseries Hipótesis:} los sectores tienen betas distintas; la minería, mayor que 1, y el consumo, menor que 1.
+\end{tcolorbox}
+\begin{tcolorbox}[card]\cardtitle{Datos}
+\begin{itemize}
+\item Scraping del backend de la BVL: sectores oficiales y moneda de cada acción.
+\item API de Yahoo Finance: precios diarios, Tesoro de EE.\,UU. a 10 años y tipo de cambio.
+\item Panel balanceado de 3\,672 observaciones.
+\end{itemize}
+\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Metodología}
+\begin{minipage}[t]{0.47\linewidth}
+{\color{navy}\bfseries Filtro de liquidez.} Un precio repetido no es una cotización. Se dejó una acción por grupo económico y se excluyeron seis acciones que cambiaron de precio menos del 30\,\% de los días; por ejemplo, BUENAVI1 pasó 341 días seguidos con el mismo precio.\par\vspace{6mm}
+{\color{navy}\bfseries Carteras.} Ponderación igual: minería (6 acciones), banca (3), consumo (3) y construcción (4). Las acciones en dólares se convirtieron a soles con el tipo de cambio diario.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\linewidth}
+{\color{navy}\bfseries Etapa 1: beta de cada sector.}
+\[ Y_{s,t} = \alpha_s + \beta_s X_{1,t} + c_{1,s} X_{2,t} + c_{2,s} X_{3,t} + \varepsilon_{s,t} \]
+{\smallsize $X_1$: mercado; $X_2$: variación del Tesoro a 10 años; $X_3$: variación del tipo de cambio. Errores de Newey-West con 5 rezagos.}\par\vspace{6mm}
+{\color{navy}\bfseries Etapa 2: costo de capital.}
+\[ K_{e,s} = R_f + \beta_s\,(R_m - R_f) \]
+{\smallsize $R_f = 3.886\,\%$; prima realizada de 15.38\,\% y prima de referencia de 7.5\,\%.}\par\vspace{6mm}
+{\color{navy}\bfseries Etapa 3: modelo financiero.} Frontera eficiente de Markowitz con 200\,000 combinaciones de pesos no negativos (semilla 522), y desempeño con los ratios de Sharpe y Treynor y el alfa de Jensen.
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcolorbox}[card]\cardtitle{Modelo financiero: frontera eficiente de Markowitz}
+\begin{minipage}[c]{300mm}\centering
+\includegraphics[width=\linewidth]{figuras/figura9_frontera_eficiente.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{\dimexpr\linewidth-318mm\relax}\raggedright
+{\itshape 200\,000 combinaciones de pesos de los cuatro sectores; el color indica el ratio de Sharpe.}\par\vspace{5mm}
+\begin{itemize}
+\item \textbf{Máximo Sharpe:} banca 40.0\,\%, construcción 36.4\,\% y minería 23.5\,\%; retorno de 23.06\,\% con volatilidad de 18.26\,\% (Sharpe 1.05).
+\item \textbf{Mínima varianza:} consumo 55.0\,\% y construcción 37.4\,\%; volatilidad de 13.87\,\%.
+\item Combinar sectores eleva el mejor Sharpe aislado (banca, 0.88) en 19.1\,\% y reduce la volatilidad mínima en 15.5\,\%.
+\item Ningún alfa de Jensen es significativo ($p$ de .517 a .967).
+\end{itemize}
+\vspace{3mm}{\color{muted}\smallsize Fuente: \textit{salidas/figura9\_frontera\_eficiente.png}, \textit{tabla8} a \textit{tabla10}}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=2, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Betas sectoriales}
+\centering\includegraphics[width=\linewidth,height=125mm,keepaspectratio]{figuras/figura7_betas.png}\par\raggedright\par\vspace{4mm}
+{\smallsize\renewcommand{\arraystretch}{1.25}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccc@{}}
+\textbf{Sector} & \textbf{Beta} & \textbf{IC 95\,\%} & $\boldsymbol{R^2}$ & $\boldsymbol{\beta_s=1}$ \\ \hline
+Minería & \textbf{1.616} & [1.438, 1.793] & .766 & Mayor \\
+Banca & \textbf{1.069} & [0.888, 1.250] & .588 & Igual \\
+Construcción & \textbf{0.868} & [0.740, 0.996] & .399 & Menor \\
+Consumo & \textbf{0.547} & [0.440, 0.655] & .419 & Menor \\
+\end{tabular*}\par}
+\vspace{3mm}{\color{muted}\smallsize Fuente: \textit{salidas/figura7\_betas.png} y \textit{tabla4\_betas}}
+\end{tcolorbox}
+\begin{tcolorbox}[card=teal]\cardtitle[teal]{Costo de capital}
+\centering\includegraphics[width=\linewidth,height=125mm,keepaspectratio]{figuras/figura8_costo_capital.png}\par\raggedright\par\vspace{4mm}
+{\smallsize\renewcommand{\arraystretch}{1.25}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcc@{}}
+\textbf{Sector} & \textbf{Prima realizada} & \textbf{Prima de 7.5\,\%} \\ \hline
+Minería & \textbf{28.73\,\%} & 16.00\,\% \\
+Banca & \textbf{20.33\,\%} & 11.90\,\% \\
+Construcción & \textbf{17.23\,\%} & 10.40\,\% \\
+Consumo & \textbf{12.31\,\%} & 7.99\,\% \\
+\end{tabular*}\par}
+\vspace{3mm}{\color{muted}\smallsize Fuente: \textit{salidas/figura8\_costo\_capital.png} y \textit{tabla5\_costo\_capital}}
+\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+\hspace*{34mm}\begin{minipage}{773mm}
+\begin{tcbraster}[raster columns=3, raster equal height, raster column skip=16mm]
+\begin{tcolorbox}[card]\cardtitle{Robustez y diagnóstico}
+\begin{itemize}
+\item Contra un mercado sin el propio sector, las betas bajan a 1.093, 0.793, 0.534 y 0.379, pero el ordenamiento no cambia.
+\item Durbin-Watson entre 1.88 y 2.11: sin autocorrelación relevante.
+\item El tipo de cambio influye en banca, consumo y construcción; el Tesoro no es significativo.
+\end{itemize}
+\end{tcolorbox}
+\begin{tcolorbox}[card, raster multicolumn=2]\cardtitle{Conclusiones}
+\begin{itemize}
+\item Los sectores de la BVL tienen betas distintas: la minería amplifica el mercado, la banca se mueve con él y la construcción y el consumo lo amortiguan.
+\item La minería exige cerca del doble de retorno que el consumo; una sola tasa para toda la bolsa valoraría mal los proyectos.
+\item Combinar los cuatro sectores mejora la relación entre riesgo y retorno, y la construcción es clave para diversificar.
+\item En la BVL es indispensable controlar la iliquidez antes de estimar la beta.
+\end{itemize}
+\end{tcolorbox}
+\end{tcbraster}
+\end{minipage}
+
+\vfill
+% ======================= PIE =======================
+\begin{tcolorbox}[enhanced, sharp corners, colback=navy, boxrule=0pt, width=\paperwidth,
+  left=34mm, right=34mm, top=14mm, bottom=11mm,
+  overlay={\fill[gold] (frame.north west) rectangle ([yshift=-5mm]frame.north east);}]
+\begin{minipage}[c]{300mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{LIMITACIONES}}\par\vspace{5mm}
+{\color{white}\smallsize Sin prima por riesgo país, ponderación igual, índice de mercado propio y una sola beta para toda la ventana.}
+\end{minipage}\hfill
+\begin{minipage}[c]{330mm}\raggedright
+{\color{acento}\smallsize\bfseries\textls[110]{DATOS Y CÓDIGO DEL ESTUDIO}}\par\vspace{5mm}
+{\color{white}\smallsize Base de datos, programas \textit{00\_config.py} a \textit{04\_analisis.py}, salidas y bitácora:\par \url{https://github.com/SneyderRP/finanzas-i-tema61-costo-capital-bvl}\par}
+\end{minipage}\hfill
+\begin{minipage}[c]{100mm}\centering
+\tcbox[enhanced, sharp corners, colback=white, boxrule=0pt, left=3mm, right=3mm, top=3mm, bottom=3mm]{\qrcode[hyperlink, height=46mm]{https://github.com/SneyderRP/finanzas-i-tema61-costo-capital-bvl}}\par\vspace{4mm}
+{\color{acento}\fontsize{17}{21}\selectfont\bfseries\textls[100]{ESCANEA Y VE LOS DATOS}}
+\end{minipage}
+\end{tcolorbox}
+\end{document}

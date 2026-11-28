@@ -1,0 +1,291 @@
+# Meglinho Sneyder Rojas Poma
+# Codigo de matricula: 2024200522B
+# Tema 61 del temario: Costo de capital por sector en la BVL: mineria, banca, consumo y construccion
+# Fecha de extraccion: 2026-11-01
+
+"""
+DIVERSIFICACION Y DESEMPENO AJUSTADO POR RIESGO.
+
+Amplia el analisis con dos modelos financieros del silabo que el CAPM
+por si solo no cubre.
+
+MODELO 1. Frontera eficiente de Markowitz (semana 12 del silabo,
+Markowitz 1952). Combina las cuatro carteras sectoriales en una sola y
+busca, entre todas las combinaciones posibles de pesos no negativos que
+suman uno, dos carteras notables:
+
+    - la de maximo ratio de Sharpe, llamada cartera tangente
+    - la de minima varianza global
+
+El punto del modelo es que un sector mediocre por si solo puede valer
+mucho dentro de una cartera si se mueve distinto a los demas. Lo que
+decide su peso no es su retorno, sino su correlacion con el resto.
+
+MODELO 2. Medidas de desempeno ajustado por riesgo (semana 11 del
+silabo, Sharpe 1964):
+
+    Sharpe  = (R - Rf) / sigma      retorno por unidad de riesgo total
+    Treynor = (R - Rf) / beta       retorno por unidad de riesgo sistematico
+    Alfa de Jensen = R - [Rf + beta (Rm - Rf)]
+
+El alfa de Jensen tambien se toma del intercepto de la regresion de
+04_analisis.py, con su p-valor, para no afirmar como significativo lo
+que no lo es.
+
+ENTRADA
+    datos_procesados/datos_procesados_2024200522B.csv
+    salidas/tabla4_betas.csv
+    salidas/tabla5_costo_capital.csv
+
+SALIDA
+    salidas/tabla8_frontera_carteras.csv y .tex
+    salidas/tabla9_desempeno_ajustado.csv y .tex
+    salidas/tabla10_ganancia_diversificacion.csv y .tex
+    salidas/figura9_frontera_eficiente.png
+    salidas/figura10_linea_mercado_valores.png
+
+Se ejecuta despues de 04_analisis.py. No toca los datos crudos ni el
+panel: solo lee y escribe en salidas/.
+"""
+
+import sys
+from pathlib import Path
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+def _carpeta_del_codigo():
+    """Ubica la carpeta codigo/ tanto si esto corre como archivo como si se
+    pega en una celda, donde __file__ no existe."""
+    try:
+        return Path(__file__).resolve().parent
+    except NameError:
+        pass
+    candidatas = []
+    if "C3" in globals():                      # variable del cuaderno
+        candidatas.append(Path(str(globals()["C3"])) / "codigo")
+    candidatas += [Path.cwd(), Path.cwd() / "codigo", Path.cwd().parent / "codigo"]
+    for c in candidatas:
+        if (c / "utilidades.py").exists():
+            return c.resolve()
+    raise SystemExit(
+        "No encuentro utilidades.py. Ejecuta esto desde la carpeta codigo/, "
+        "o define C3 con la ruta de la Carpeta 3 antes de pegar la celda.")
+
+
+sys.path.insert(0, str(_carpeta_del_codigo()))
+from utilidades import cfg, registrar, abortar
+
+DIAS_ANIO = 252
+N_CARTERAS = 200_000
+ORDEN = ["mineria", "banca", "construccion", "consumo"]
+# Etiquetas con tilde para las figuras y las tablas del articulo. cfg.ETIQUETAS
+# las guarda sin tilde porque alimenta nombres de archivo.
+ETQ = {"mineria": "Minería", "banca": "Banca",
+       "construccion": "Construcción", "consumo": "Consumo"}
+COLOR = {"mineria": "#1f77b4", "banca": "#ff7f0e",
+         "construccion": "#d62728", "consumo": "#2ca02c"}
+
+# Intercepto diario y su p-valor, leidos de la salida de 04_analisis.py.
+# Se declaran aqui porque la tabla4 guarda solo la beta.
+ALFA_DIARIO = {"mineria": -0.0168, "banca": 0.0221,
+               "consumo": 0.0016, "construccion": 0.0012}
+ALFA_PVALOR = {"mineria": 0.557, "banca": 0.517,
+               "consumo": 0.953, "construccion": 0.967}
+
+
+def guardar_tabla(t, nombre, titulo):
+    """Misma funcion que en 04_analisis.py: csv para revisar, tex para el articulo."""
+    t.to_csv(cfg.DIR_SALIDAS / f"{nombre}.csv", encoding="utf-8")
+    (cfg.DIR_SALIDAS / f"{nombre}.tex").write_text(
+        t.to_latex(caption=titulo, label=f"tab:{nombre}", float_format="%.4f"),
+        encoding="utf-8")
+    registrar(f"Guardado {nombre}", filas=len(t))
+
+
+def guardar_figura(nombre):
+    plt.tight_layout()
+    plt.savefig(cfg.DIR_SALIDAS / f"{nombre}.png", dpi=300)
+    plt.close()
+    registrar(f"Guardada {nombre}.png")
+
+
+def main():
+    registrar("=" * 60)
+    registrar("05_markowitz.py: diversificacion y desempeno ajustado")
+
+    # ------------------------------------------------------------- 1
+    # Insumos
+    if not cfg.ARCHIVO_PROCESADO.exists():
+        abortar("Falta el panel procesado. Ejecuta antes 03_limpieza_datos.py.")
+    for n in ("tabla4_betas", "tabla5_costo_capital"):
+        if not (cfg.DIR_SALIDAS / f"{n}.csv").exists():
+            abortar(f"Falta salidas/{n}.csv. Ejecuta antes 04_analisis.py.")
+
+    panel = pd.read_csv(cfg.ARCHIVO_PROCESADO, parse_dates=["fecha"])
+    betas = pd.read_csv(cfg.DIR_SALIDAS / "tabla4_betas.csv")
+    costo = pd.read_csv(cfg.DIR_SALIDAS / "tabla5_costo_capital.csv")
+
+    Rf = float(costo["Rf (%)"].iloc[0])
+    prima = float(costo["Prima de mercado (%)"].iloc[0])
+    Rm = Rf + prima
+    registrar(f"Rf {Rf} % | prima {prima} % | Rm {Rm:.3f} %")
+
+    # Beta por sector, con la clave en minusculas del panel
+    beta = {s.lower(): float(betas.loc[betas.Sector == s, "Beta"].iloc[0])
+            for s in betas.Sector}
+
+    ancho = panel.pivot(index="fecha", columns="sector",
+                        values="Y_retorno_sector")[ORDEN]
+    registrar(f"Panel en formato ancho: {ancho.shape[0]} dias x {ancho.shape[1]} sectores")
+
+    mu = ancho.mean().values * DIAS_ANIO          # retorno anual, en porcentaje
+    S = ancho.cov().values * DIAS_ANIO            # covarianza anual
+    sigma = np.sqrt(np.diag(S))
+
+    # ------------------------------------------------------------- 2
+    # Frontera: carteras aleatorias con pesos no negativos que suman uno
+    rng = np.random.default_rng(cfg.SEMILLA)
+    W = rng.dirichlet(np.ones(len(ORDEN)), N_CARTERAS)
+    ret = W @ mu
+    vol = np.sqrt(np.einsum("ij,jk,ik->i", W, S, W))
+    sharpe = (ret - Rf) / vol
+
+    i_tan, i_min = int(sharpe.argmax()), int(vol.argmin())
+    w_ig = np.repeat(1 / len(ORDEN), len(ORDEN))
+    r_ig, v_ig = w_ig @ mu, float(np.sqrt(w_ig @ S @ w_ig))
+
+    def fila(nombre, w, r, v):
+        d = {"Cartera": nombre}
+        d.update({f"{ETQ[s]} %": round(w[k] * 100, 1) for k, s in enumerate(ORDEN)})
+        d.update({"Retorno anual %": round(float(r), 2),
+                  "Volatilidad anual %": round(float(v), 2),
+                  "Sharpe": round(float((r - Rf) / v), 4)})
+        return d
+
+    t8 = pd.DataFrame([
+        fila("Maximo Sharpe (tangente)", W[i_tan], ret[i_tan], vol[i_tan]),
+        fila("Minima varianza global", W[i_min], ret[i_min], vol[i_min]),
+        fila("Ponderacion igual", w_ig, r_ig, v_ig),
+    ]).set_index("Cartera")
+
+    guardar_tabla(t8, "tabla8_frontera_carteras",
+                  "Carteras notables de la frontera eficiente de Markowitz")
+
+    # ------------------------------------------------------------- 3
+    # Desempeno ajustado por riesgo, sector por sector
+    filas = []
+    for k, s in enumerate(ORDEN):
+        b = beta[s]
+        ke = Rf + b * prima
+        filas.append({
+            "Sector": ETQ[s],
+            "Beta": round(b, 4),
+            "Retorno anual %": round(float(mu[k]), 2),
+            "Volatilidad anual %": round(float(sigma[k]), 2),
+            "Ke del CAPM %": round(ke, 2),
+            "Sharpe": round(float((mu[k] - Rf) / sigma[k]), 4),
+            "Treynor %": round(float((mu[k] - Rf) / b), 2),
+            "Alfa de Jensen anual %": round(ALFA_DIARIO[s] * DIAS_ANIO, 2),
+            "p del alfa": ALFA_PVALOR[s],
+            "Retorno menos Ke %": round(float(mu[k]) - ke, 2),
+        })
+    t9 = pd.DataFrame(filas).set_index("Sector")
+    guardar_tabla(t9, "tabla9_desempeno_ajustado",
+                  "Desempeno ajustado por riesgo de las carteras sectoriales")
+
+    # ------------------------------------------------------------- 4
+    # Cuanto aporta diversificar
+    mejor_solo = float(max((mu[k] - Rf) / sigma[k] for k in range(len(ORDEN))))
+    t10 = pd.DataFrame([
+        {"Indicador": "Mejor Sharpe de un sector por separado",
+         "Valor": round(mejor_solo, 4)},
+        {"Indicador": "Sharpe de la cartera tangente",
+         "Valor": round(float(sharpe[i_tan]), 4)},
+        {"Indicador": "Mejora porcentual del Sharpe",
+         "Valor": round(float(sharpe[i_tan] / mejor_solo - 1) * 100, 1)},
+        {"Indicador": "Volatilidad del sector menos volatil (%)",
+         "Valor": round(float(sigma.min()), 2)},
+        {"Indicador": "Volatilidad de la cartera de minima varianza (%)",
+         "Valor": round(float(vol[i_min]), 2)},
+        {"Indicador": "Reduccion porcentual de la volatilidad",
+         "Valor": round((1 - float(vol[i_min]) / float(sigma.min())) * 100, 1)},
+    ]).set_index("Indicador")
+    guardar_tabla(t10, "tabla10_ganancia_diversificacion",
+                  "Ganancia de combinar los cuatro sectores en una cartera")
+
+    # ------------------------------------------------------------- 5
+    # Figura 9: la frontera
+    plt.figure(figsize=(9, 6))
+    paso = max(1, N_CARTERAS // 8000)
+    plt.scatter(vol[::paso], ret[::paso], c=sharpe[::paso], s=4,
+                cmap="viridis", alpha=.45)
+    plt.colorbar(label="Ratio de Sharpe")
+    for k, s in enumerate(ORDEN):
+        plt.scatter(sigma[k], mu[k], marker="o", s=140, color=COLOR[s],
+                    edgecolor="black", zorder=5, label=ETQ[s])
+    plt.scatter(vol[i_tan], ret[i_tan], marker="*", s=420, color="crimson",
+                edgecolor="black", zorder=6, label="Máximo Sharpe")
+    plt.scatter(vol[i_min], ret[i_min], marker="D", s=130, color="gold",
+                edgecolor="black", zorder=6, label="Mínima varianza")
+    plt.xlabel("Volatilidad anual (%)")
+    plt.ylabel("Retorno anual (%)")
+    plt.title("Frontera eficiente de las cuatro carteras sectoriales de la BVL")
+    plt.legend(loc="lower right", framealpha=.95)
+    plt.grid(alpha=.3)
+    guardar_figura("figura9_frontera_eficiente")
+
+    # ------------------------------------------------------------- 6
+    # Figura 10: linea del mercado de valores
+    plt.figure(figsize=(9, 6))
+    bx = np.linspace(0, max(beta.values()) * 1.15, 100)
+    plt.plot(bx, Rf + bx * prima, color="black", lw=1.6,
+             label=f"Línea del mercado de valores: Ke = {Rf:.2f} + β × {prima:.2f}")
+    for k, s in enumerate(ORDEN):
+        plt.scatter(beta[s], mu[k], s=160, color=COLOR[s],
+                    edgecolor="black", zorder=5)
+        plt.annotate(f"{ETQ[s]}\n{mu[k]:.1f} %", (beta[s], mu[k]),
+                     textcoords="offset points", xytext=(10, -4), fontsize=9)
+    plt.scatter(1.0, Rm, marker="s", s=120, color="gray", edgecolor="black",
+                zorder=5)
+    plt.annotate("Mercado", (1.0, Rm), textcoords="offset points",
+                 xytext=(10, -12), fontsize=9)
+    plt.axhline(Rf, color="gray", ls=":", lw=1)
+    plt.annotate(f"Rf = {Rf:.2f} %", (bx[-1], Rf), textcoords="offset points",
+                 xytext=(-10, 8), fontsize=9, color="gray", ha="right")
+    plt.xlabel("Beta")
+    plt.ylabel("Retorno anual realizado (%)")
+    plt.title("Línea del mercado de valores y posición de los cuatro sectores")
+    plt.legend(loc="upper left", framealpha=.95)
+    plt.grid(alpha=.3)
+    guardar_figura("figura10_linea_mercado_valores")
+
+    # ------------------------------------------------------------- 7
+    # Resumen en pantalla
+    print("\n" + "=" * 70)
+    print("TABLA 8. Carteras notables")
+    print("=" * 70)
+    print(t8.to_string())
+    print("\n" + "=" * 70)
+    print("TABLA 9. Desempeno ajustado por riesgo")
+    print("=" * 70)
+    print(t9.to_string())
+    print("\n" + "=" * 70)
+    print("TABLA 10. Ganancia de la diversificacion")
+    print("=" * 70)
+    print(t10.to_string())
+
+    sig_alfa = [ETQ[s] for s in ORDEN if ALFA_PVALOR[s] < 0.05]
+    print("\nAlfas de Jensen significativos al 5 %:",
+          ", ".join(sig_alfa) if sig_alfa else "ninguno")
+    print("Mejor Treynor:", t9["Treynor %"].idxmax())
+    print("Mejor Sharpe por sector:", t9["Sharpe"].idxmax())
+    print(f"\nSemilla: {cfg.SEMILLA}   Carteras simuladas: {N_CARTERAS:,}")
+    registrar("05_markowitz.py termino sin errores")
+
+
+if __name__ == "__main__":
+    main()
